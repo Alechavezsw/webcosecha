@@ -1,0 +1,62 @@
+# v0 sandbox internal files
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+.snowflake/
+.v0-trash/
+.vercel/
+next.user-config.*
+
+# Environment variables
+.env*.local
+
+# CRM leads (generados en runtime)
+data/crm/leads.json
+data/crm/social-clients.json
+data/crm/notifications.json
+
+# Common ignores
+node_modules
+.next/
+.DS_Store
+.next-claude/
+.next-preview/
+tsconfig.tsbuildinfo
+*.zip
+
+# Plantillas / exports locales (no van al deploy)
+3-d-gallery-photography-template/
+agentic-build-and-orchestrate-ai-agents-while-you-sleep/
+LbEErCxufs7/
+rHpzKyDqjby/
+sprint-a-linear-clone/
+tYY9uYmwOBP/
+ystrvTt00UW/
+scratch/
+Diseño web/
+
+# Fuentes locales (lo servido va en public/)
+/fotografia/
+/games/
+/Min/
+/mokamilia/
+/Equipo/
+
+*.exe
+
+# Carpetas de trabajo / duplicados en public/
+public/dise*/
+public/diseño/
+public/eventos/
+public/deportes/
+public/Nueva carpeta/
+public/Fodeao/
+public/LO9Dx1UhR8y/
+components/0rCmv8isVWf/
+components/ei7skHIgl1w/
+Min/node_modules/
+Min/dist/
+
+# Videos >100MB (GitHub los rechaza; subir manualmente a public/ en Hostinger)
+public/0503.mp4
+public/videos/0503.mp4

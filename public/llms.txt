@@ -1,0 +1,48 @@
+# Cosecha Creativa
+> Agencia de Marketing Digital, Diseño Web e Inteligencia Artificial en San Juan, Argentina.
+
+Cosecha Creativa es una agencia digital integral que fusiona diseño visual de alta gama, tecnologías de vanguardia (Next.js, Tailwind v4, WebGL) y automatización con Inteligencia Artificial (n8n, asistentes virtuales a medida). Lideramos proyectos en San Juan y a nivel nacional para empresas, gobiernos y organizaciones.
+
+## Páginas Principales e Institucionales
+
+- **[Home](https://cosechacreativa.com.ar/)** - Portada principal con nuestra propuesta de valor de marketing y tecnología interactiva. Presenta nuestras métricas de negocio, tecnologías, seguridad e integraciones.
+- **[Nosotros](https://cosechacreativa.com.ar/nosotros)** - Nuestra historia de más de dos décadas en el ecosistema digital, pilares institucionales, presentación del equipo liderado por Ale Chávez y un motor interactivo 3D (Usina Creativa).
+- **[Servicios](https://cosechacreativa.com.ar/servicios)** - Portafolio completo de soluciones digitales.
+- **[Blog](https://cosechacreativa.com.ar/blog)** - Artículos, ideas y guías sobre tendencias en desarrollo, inteligencia artificial, pauta y comunicación.
+- **[Compol](https://cosechacreativa.com.ar/compol)** - Estrategia y comunicación política moderna, segmentación avanzada de datos (micro-targeting) y campañas.
+- **[Minería](https://cosechacreativa.com.ar/mineria)** - Desarrollo de sistemas y automatización de procesos para el sector minero e industrial.
+- **[Nube](https://cosechacreativa.com.ar/nube)** - Infraestructura y almacenamiento cloud seguro y escalable.
+- **[Contacto](https://cosechacreativa.com.ar/contacto)** - Formulario interactivo para agendar una reunión o solicitar cotizaciones.
+
+## Áreas de Especialización y Servicios Clave
+
+- **Inteligencia Artificial**: Creación de asistentes inteligentes (chatbots) 24/7 en WhatsApp y web con base de datos propia, y automatizaciones integrales con n8n para reducir costos de backoffice.
+- **Desarrollo Web & Apps**: Creación de aplicaciones interactivas a medida, portales de noticias, landing pages de alta conversión, ecommerce optimizados, y sistemas corporativos ágiles.
+- **Gestión de Redes & Pauta**: Contenido dinámico vertical (Reels, TikTok) para conectar de forma humana y auténtica en San Juan, y campañas de publicidad paga (Meta Ads, Google Ads) altamente segmentadas.
+- **Diseño Gráfico & Branding**: Identidad visual corporativa, logotipos y postproducción audiovisual de cine y video institucional.
+
+---
+
+## Artículos del Blog (14 Lecturas Disponibles)
+
+### Inteligencia Artificial (IA)
+- **[automatizaciones-n8n-ia-empresas](https://cosechacreativa.com.ar/blog/automatizaciones-n8n-ia-empresas)** - Análisis de cómo conectar LLMs con flujos de trabajo autónomos en n8n para optimizar operaciones y leads.
+- **[chats-de-ia-para-sitios-web-en-san-juan](https://cosechacreativa.com.ar/blog/chats-de-ia-para-sitios-web-en-san-juan)** - La revolución de los chatbots inteligentes basados en contexto y documentos locales para mejorar la conversión web corporativa.
+
+### Desarrollo y Diseño Web (Web)
+- **[diseno-web-premium-conversion](https://cosechacreativa.com.ar/blog/diseno-web-premium-conversion)** - Por qué la usabilidad estética, la tipografía jerárquica, las transiciones fluidas y el glassmorphism aumentan la credibilidad de una marca.
+- **[desarrollamos-el-sistema-a-medida-para-tu-negocio-o-empresa-en-san-juan](https://cosechacreativa.com.ar/blog/desarrollamos-el-sistema-a-medida-para-tu-negocio-o-empresa-en-san-juan)** - El valor estratégico del software y las aplicaciones web a medida en San Juan versus soluciones enlatadas rígidas.
+- **[diseno-web-en-san-juan](https://cosechacreativa.com.ar/blog/diseno-web-en-san-juan)** - Claves para tener un sitio web veloz, responsivo y adaptado al consumidor sanjuanino moderno.
+- **[diseno-ux](https://cosechacreativa.com.ar/blog/diseno-ux)** - El diseño centrado en el usuario (UX/UI) y su impacto directo en la retención y conversión dentro de plataformas digitales.
+
+### Redes Sociales y Publicidad (Redes)
+- **[estrategias-redes-sociales-san-juan](https://cosechacreativa.com.ar/blog/estrategias-redes-sociales-san-juan)** - Cómo esquivar contenido aburrido, humanizar marcas sanjuaninas y ganar visibilidad con videos cortos.
+- **[publicidad-paga-en-redes-sociales](https://cosechacreativa.com.ar/blog/publicidad-paga-en-redes-sociales)** - Cómo optimizar presupuestos y pautar eficazmente en Meta Ads y Google Ads mediante segmentaciones demográficas precisas.
+- **[consultoria-estrategica-en-marketing-digital](https://cosechacreativa.com.ar/blog/consultoria-estrategica-en-marketing-digital)** - Planificación integral 360° para alinear los canales de marketing con los objetivos financieros y de ventas de las empresas.
+- **[fotografia-profesional-en-san-juan](https://cosechacreativa.com.ar/blog/fotografia-profesional-en-san-juan)** - Por qué las fotos reales e institucionales son fundamentales para ganar credibilidad en canales de comunicación frente a las imágenes de stock.
+- **[gestion-de-redes-sociales-en-san-juan-impulsa-tu-negocio-con-cosecha-creativa](https://cosechacreativa.com.ar/blog/gestion-de-redes-sociales-en-san-juan-impulsa-tu-negocio-con-cosecha-creativa)** - Un recorrido de cómo planificar calendarios editoriales, analizar métricas de interacción y entablar diálogos valiosos en redes.
+- **[despierta-tu-marca-con-cosecha-creativa-diseno-grafico-que-impacta-y-vende](https://cosechacreativa.com.ar/blog/despierta-tu-marca-con-cosecha-creativa-diseno-grafico-que-impacta-y-vende)** - La importancia de mantener la consistencia cromática, tipográfica y visual para construir autoridad de marca y recordación.
+
+### Comunicación Política (Compol)
+- **[comunicacion-politica-datos-emocion](https://cosechacreativa.com.ar/blog/comunicacion-politica-datos-emocion)** - Estrategias modernas de Compol basadas en el análisis inteligente de opinión, micro-targeting y narrativas digitales en formatos nativos.
+- **[estrategia-y-asesoramiento-politico](https://cosechacreativa.com.ar/blog/estrategia-y-asesoramiento-politico)** - Cómo conectar auténticamente con la ciudadanía moderna a través del storytelling emocional y la escucha social activa (Social Listening).
