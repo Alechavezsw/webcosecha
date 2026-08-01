@@ -35,11 +35,13 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-light-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-dark-32x32.png", sizes: "32x32", type: "image/png", media: "(prefers-color-scheme: dark)" },
     ],
-    apple: '/apple-icon.png',
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/favicon.svg",
   },
 }
 
@@ -49,7 +51,7 @@ const organizationJsonLd = {
   "@id": "https://cosechacreativa.com.ar/#organization",
   name: "Cosecha Creativa",
   url: "https://cosechacreativa.com.ar",
-  logo: "https://cosechacreativa.com.ar/icon-light-32x32.png",
+  logo: "https://cosechacreativa.com.ar/apple-icon.png",
   description:
     "Agencia de marketing digital en San Juan, Argentina. Gestión de redes sociales, diseño web, inteligencia artificial, automatizaciones y comunicación política.",
   address: {
