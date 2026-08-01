@@ -1075,7 +1075,8 @@ export function CardScanner({ embedded = false, className }: CardScannerProps) {
 
         .card-scanner-container {
           position: relative;
-          width: 100vw;
+          width: 100%;
+          max-width: 100%;
           height: 100vh;
           display: flex;
           align-items: center;
@@ -1088,14 +1089,21 @@ export function CardScanner({ embedded = false, className }: CardScannerProps) {
           width: 100%;
           max-width: 100%;
           height: auto;
-          min-height: 420px;
-          padding: 1.5rem 0;
+          min-height: 320px;
+          padding: 1rem 0;
           overflow: hidden;
+        }
+
+        @media (min-width: 640px) {
+          .card-scanner-container--embedded {
+            min-height: 420px;
+            padding: 1.5rem 0;
+          }
         }
 
         .card-stream {
           position: absolute;
-          width: 100vw;
+          width: 100%;
           height: 180px;
           display: flex;
           align-items: center;
@@ -1122,8 +1130,8 @@ export function CardScanner({ embedded = false, className }: CardScannerProps) {
 
         .card-wrapper {
           position: relative;
-          width: 400px;
-          height: 250px;
+          width: min(400px, 78vw);
+          height: min(250px, 48vw);
           flex-shrink: 0;
         }
 
@@ -1131,8 +1139,8 @@ export function CardScanner({ embedded = false, className }: CardScannerProps) {
           position: absolute;
           top: 0;
           left: 0;
-          width: 400px;
-          height: 250px;
+          width: 100%;
+          height: 100%;
           border-radius: 15px;
           overflow: hidden;
         }
@@ -1201,8 +1209,8 @@ export function CardScanner({ embedded = false, className }: CardScannerProps) {
           position: absolute;
           top: 0;
           left: 0;
-          width: 400px;
-          height: 250px;
+          width: 100%;
+          height: 100%;
           border-radius: 15px;
           overflow: hidden;
           clip-path: inset(0 calc(100% - var(--clip-left, 0%)) 0 0);
@@ -1315,7 +1323,7 @@ export function CardScanner({ embedded = false, className }: CardScannerProps) {
           top: 50%;
           left: 0;
           transform: translateY(-50%);
-          width: 100vw;
+          width: 100%;
           height: 250px;
           z-index: 0;
           pointer-events: none;
@@ -1326,7 +1334,7 @@ export function CardScanner({ embedded = false, className }: CardScannerProps) {
           top: 50%;
           left: -3px;
           transform: translateY(-50%);
-          width: 100vw;
+          width: 100%;
           height: 300px;
           z-index: 15;
           pointer-events: none;

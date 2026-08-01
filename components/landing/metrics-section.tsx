@@ -443,7 +443,7 @@ export function MetricsSection({ variant = "ai" }: { variant?: MetricsSectionVar
     <section ref={sectionRef} className="cc-aura cc-aura-gold relative py-32 lg:py-40 overflow-hidden">
       <GridBackground />
 
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
+      <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
         <div className="grid lg:grid-cols-12 gap-8 mb-20 lg:mb-32">
           <div className="lg:col-span-8 lg:col-start-1">
             <div
@@ -532,7 +532,7 @@ export function MetricsSection({ variant = "ai" }: { variant?: MetricsSectionVar
             }`}
             style={{ transitionDelay: isVisible ? "320ms" : "0ms" }}
           >
-            <div className="text-4xl md:text-5xl lg:text-6xl font-display tracking-tight mb-4 whitespace-nowrap overflow-hidden">
+            <div className="mb-4 text-3xl font-display tracking-tight sm:text-4xl md:text-5xl lg:text-6xl overflow-hidden">
               <AnimatedNumber end={metrics[0].value} suffix={metrics[0].suffix} prefix={metrics[0].prefix} />
             </div>
             <div className="mb-6">

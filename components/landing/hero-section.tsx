@@ -131,7 +131,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative flex min-h-screen flex-col overflow-hidden bg-black">
+    <section ref={sectionRef} className="relative flex min-h-[100svh] flex-col overflow-hidden bg-black">
       {/* Background video */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <div
@@ -159,33 +159,33 @@ export function HeroSection() {
       <Hero3DLayer />
 
       <div
-        className={`relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-6 py-20 will-change-transform sm:py-24 lg:px-12 lg:py-28 ${
+        className={`relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-4 pb-16 pt-28 will-change-transform sm:px-6 sm:py-24 lg:px-12 lg:py-28 ${
           isVisible ? "opacity-100" : "opacity-0"
         } transition-opacity duration-700`}
         style={{ transform: `translate3d(0, ${parallaxY * -0.22}px, 0)` }}
       >
-        <div className="w-full lg:max-w-[55%]">
+        <div className="w-full max-w-full lg:max-w-[55%]">
         {/* Eyebrow */}
         <div 
-          className={`mb-6 transition-all duration-700 ${
+          className={`mb-5 sm:mb-6 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
-          <span className="inline-flex items-center gap-3 text-sm font-mono text-white/60">
-            <span className="w-8 h-px bg-white/30" />
+          <span className="inline-flex max-w-full flex-wrap items-center gap-2 text-xs font-mono text-white/60 sm:gap-3 sm:text-sm">
+            <span className="hidden h-px w-8 bg-white/30 sm:inline-block" />
             Agencia de marketing digital en San Juan
           </span>
         </div>
         
         {/* Main headline */}
-        <div className="mb-6">
+        <div className="mb-5 sm:mb-6">
           <h1 
-            className={`text-left text-[clamp(2.5rem,6vw,6.5rem)] font-display leading-[1.0] tracking-tight text-white transition-all duration-1000 ${
+            className={`text-left font-display text-[clamp(2.15rem,9.5vw,6.5rem)] leading-[1.02] tracking-tight text-white transition-all duration-1000 sm:text-[clamp(2.5rem,6vw,6.5rem)] sm:leading-[1.0] ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <span className="block whitespace-nowrap">Hacemos que tu</span>
-            <span className="block whitespace-nowrap">
+            <span className="block sm:whitespace-nowrap">Hacemos que tu</span>
+            <span className="block sm:whitespace-nowrap">
               marca{" "}
               <span className="relative inline-block">
                 <BlurWord word={words[wordIndex]} trigger={wordIndex} />
@@ -196,21 +196,21 @@ export function HeroSection() {
 
         {/* Subtitle & Description */}
         <div 
-          className={`mb-10 max-w-xl transition-all duration-1000 delay-300 ${
+          className={`mb-8 max-w-xl transition-all duration-1000 delay-300 sm:mb-10 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <h2 className="text-lg md:text-xl text-white/85 font-normal mb-3">
+          <h2 className="mb-3 text-base font-normal text-white/85 sm:text-lg md:text-xl">
             Estrategia, creatividad y tecnología para potenciar tu presencia digital.
           </h2>
-          <p className="text-white/55 text-base md:text-lg leading-relaxed">
+          <p className="text-sm leading-relaxed text-white/55 sm:text-base md:text-lg">
             Somos Cosecha Creativa. Transformamos ideas en resultados comerciales reales. Desde gestión de redes y diseño web, hasta automatizaciones con inteligencia artificial para que tu negocio no pare de crecer.
           </p>
         </div>
 
         {/* Buttons */}
         <div 
-          className={`flex flex-wrap items-center gap-3 sm:gap-4 transition-all duration-1000 delay-500 ${
+          className={`flex w-full flex-col items-stretch gap-3 transition-all duration-1000 delay-500 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
@@ -262,12 +262,12 @@ export function HeroSection() {
       
       {/* Stats — ancladas al bloque inferior del hero */}
       <div
-        className={`relative z-10 shrink-0 px-6 pb-8 pt-2 transition-all duration-700 delay-500 will-change-transform lg:px-12 lg:pb-10 ${
+        className={`relative z-10 shrink-0 px-4 pb-6 pt-2 transition-all duration-700 delay-500 will-change-transform sm:px-6 sm:pb-8 lg:px-12 lg:pb-10 ${
           isVisible ? "opacity-100" : "opacity-0"
         }`}
         style={{ transform: `translate3d(0, ${parallaxY * -0.45}px, 0)` }}
       >
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-stretch gap-4 sm:gap-8 lg:gap-12">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:gap-8 lg:gap-12">
           {[
             {
               value: "Estrategia",
@@ -291,9 +291,9 @@ export function HeroSection() {
             <Link
               key={stat.label}
               href={stat.href}
-              className={`cc-hero-stat group relative flex min-w-[9rem] flex-1 flex-col gap-1 overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:hover:transform-none sm:min-w-[10rem] sm:px-5 sm:py-3.5 ${
+              className={`cc-hero-stat group relative flex min-w-0 flex-1 flex-col gap-1 overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:hover:transform-none sm:min-w-[10rem] sm:px-5 sm:py-3.5 ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-              } hover:-translate-y-2 hover:border-[#eca8d6]/35 hover:bg-white/[0.07] hover:shadow-[0_0_0_1px_rgba(236,168,214,0.25),0_20px_50px_-18px_rgba(236,168,214,0.55),0_8px_32px_-12px_rgba(161,0,242,0.35)] md:hover:-translate-y-2.5`}
+              } hover:-translate-y-1 hover:border-[#eca8d6]/35 hover:bg-white/[0.07] hover:shadow-[0_0_0_1px_rgba(236,168,214,0.25),0_20px_50px_-18px_rgba(236,168,214,0.55),0_8px_32px_-12px_rgba(161,0,242,0.35)] sm:hover:-translate-y-2 md:hover:-translate-y-2.5`}
               style={{ transitionDelay: `${520 + i * 110}ms` }}
             >
               {/* Glow de fondo */}

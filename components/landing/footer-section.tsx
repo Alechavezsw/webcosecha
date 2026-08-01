@@ -134,22 +134,22 @@ export function FooterSection() {
       </div>
 
       {/* Footer content — white text overlaid on top of the bioluminescent background */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
+      <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
         {/* Main Footer */}
-        <div className="py-16 lg:py-20">
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-6 md:gap-12 lg:gap-8">
+        <div className="py-12 sm:py-16 lg:py-20">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-6 md:gap-12 lg:gap-8">
             {/* Brand Column */}
             <div className="col-span-2">
               <a href="/" className="mb-6 inline-flex items-baseline gap-2">
-                <span className="font-display text-xl font-bold text-white sm:text-2xl tracking-wide">Cosecha Creativa</span>
+                <span className="font-display text-xl font-bold tracking-wide text-white sm:text-2xl">Cosecha Creativa</span>
               </a>
 
-              <p className="mb-8 max-w-xs text-sm leading-relaxed text-white/80 font-medium">
+              <p className="mb-6 max-w-xs text-sm font-medium leading-relaxed text-white/80 sm:mb-8">
                 Agencia de marketing digital en San Juan. Estrategia, creatividad y tecnología para que tu marca crezca.
               </p>
 
               {/* Social Links */}
-              <div className="flex gap-6">
+              <div className="flex flex-wrap gap-x-5 gap-y-3">
                 {socialLinks.map((link) => (
                   <a
                     key={link.name}
@@ -157,10 +157,10 @@ export function FooterSection() {
                     {...(link.href.startsWith("http")
                       ? { target: "_blank", rel: "noopener noreferrer" }
                       : {})}
-                    className="text-sm text-white/70 font-semibold hover:text-white transition-colors flex items-center gap-1 group"
+                    className="group flex items-center gap-1 text-sm font-semibold text-white/70 transition-colors hover:text-white"
                   >
                     {link.name}
-                    <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    <ArrowUpRight className="h-3 w-3 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
                   </a>
                 ))}
               </div>
@@ -168,9 +168,9 @@ export function FooterSection() {
 
             {/* Link Columns */}
             {Object.entries(footerLinks).map(([title, links]) => (
-              <div key={title}>
-                <h3 className="text-sm font-bold text-white mb-6 tracking-wider uppercase opacity-90">{title}</h3>
-                <ul className="space-y-4">
+              <div key={title} className="min-w-0">
+                <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-white opacity-90 sm:mb-6 sm:text-sm">{title}</h3>
+                <ul className="space-y-3 sm:space-y-4">
                   {links.map((link) => (
                     <li key={link.name}>
                       <a

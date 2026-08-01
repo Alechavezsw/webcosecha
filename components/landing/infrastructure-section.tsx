@@ -94,7 +94,7 @@ export function ServicesSection() {
       </div>
 
       <div
-        className="relative z-10 mx-auto max-w-[1200px] px-6 lg:px-10 will-change-transform"
+        className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-10 will-change-transform"
         style={{ transform: `translate3d(0, ${parallaxY * -0.3}px, 0)` }}
       >
         {/* Header */}

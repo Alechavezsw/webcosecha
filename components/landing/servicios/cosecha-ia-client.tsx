@@ -896,7 +896,7 @@ export function CosechaIaClient() {
           aria-hidden
         />
         <div className="pointer-events-none absolute left-0 right-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-[#a78bfa]/35 to-transparent" />
-        <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
+        <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
           <div className="grid gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-16">
             <div>
               <span className="liquid-glass mb-6 inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
@@ -1041,7 +1041,7 @@ export function CosechaIaClient() {
 
         <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-[#a78bfa]/40 to-transparent" aria-hidden />
 
-        <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
+        <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
           <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <span className="liquid-glass mb-5 inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
@@ -1128,7 +1128,7 @@ export function CosechaIaClient() {
         className={cn("relative scroll-mt-28 overflow-hidden bg-black/55", SECTION_PAD)}
         {...sectionReveal}
       >
-        <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
           <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <span className="liquid-glass mb-4 inline-flex rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
@@ -1174,7 +1174,7 @@ export function CosechaIaClient() {
           style={reduceMotion ? undefined : { y: metaGridParallaxY }}
         />
         <SectionParticlesLayer uid="metodologia" reduceMotion={reduceMotion} color="#c4b5fd" density={32} />
-        <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
+        <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
           <div
             aria-hidden
             className="pointer-events-none absolute bottom-10 left-3 top-10 z-[1] flex gap-[5px] lg:left-6"
@@ -1245,7 +1245,7 @@ export function CosechaIaClient() {
           style={reduceMotion ? undefined : { y: casosRadialGlowY }}
         />
         <SectionParticlesLayer uid="casos" reduceMotion={reduceMotion} color="#67e8f9" density={34} />
-        <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
+        <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
           <div
             aria-hidden
             className="pointer-events-none absolute bottom-10 left-3 top-10 z-[1] flex gap-[5px] lg:left-6"
@@ -1303,7 +1303,7 @@ export function CosechaIaClient() {
           density={28}
           opacityClass="opacity-[0.35] md:opacity-[0.45]"
         />
-        <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
+        <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
           <span className="liquid-glass mb-5 inline-flex rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
             Por qué Cosecha Creativa
           </span>
@@ -1436,7 +1436,7 @@ export function CosechaIaClient() {
 
       {/* CTA final */}
       <motion.section id="cta-ia" className={cn("relative scroll-mt-28 bg-black/55", SECTION_PAD)} {...sectionReveal}>
-        <div className="mx-auto max-w-[720px] px-6 text-center lg:px-12">
+        <div className="mx-auto max-w-[720px] px-4 text-center sm:px-6 lg:px-12">
           <h2 className="font-display text-3xl leading-tight text-white md:text-5xl">
             ¿Querés ver cómo la IA puede encajar en tu negocio?
           </h2>

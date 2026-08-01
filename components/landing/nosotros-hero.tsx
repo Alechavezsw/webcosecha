@@ -28,7 +28,7 @@ export function NosotrosHero({ className }: { className?: string }) {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_100%_60%,rgba(124,58,237,0.12),transparent_45%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:56px_56px]" />
 
-      <div className="relative z-10 mx-auto max-w-[1200px] px-6 lg:px-12">
+      <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12">
         {/* Banda visual: ocupa todo el ancho del contenedor y se ve claramente */}
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 16 }}

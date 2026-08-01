@@ -83,7 +83,7 @@ export function HowItWorksSection() {
       </div>
 
       <div
-        className="relative z-10 mx-auto max-w-[1200px] px-6 lg:px-10 will-change-transform"
+        className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-10 will-change-transform"
         style={{ transform: `translate3d(0, ${parallaxY * -0.3}px, 0)` }}
       >
         <div className="relative mb-10 grid items-end gap-4 lg:mb-12 lg:grid-cols-2 lg:gap-8">

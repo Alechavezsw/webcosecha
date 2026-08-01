@@ -35,7 +35,7 @@ export function CtaSection() {
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#eca8d6]/40 to-transparent" aria-hidden />
 
-      <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-6 text-center lg:px-8">
+      <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-4 text-center sm:px-6 lg:px-8">
         <span
           className={`cc-eyebrow mb-6 transition-all duration-700 ${
             isVisible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"

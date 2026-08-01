@@ -58,7 +58,7 @@ export function SecuritySection() {
 
   return (
     <section id="security" ref={sectionRef} className="cc-aura cc-aura-violet relative py-32 lg:py-40 overflow-hidden">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
         <div className="mb-20">
           <span className={`inline-flex items-center gap-4 text-sm font-mono text-muted-foreground mb-8 transition-all duration-700 ${
             isVisible ? "opacity-100" : "opacity-0"

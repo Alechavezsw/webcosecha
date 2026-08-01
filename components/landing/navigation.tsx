@@ -45,11 +45,20 @@ export function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <header
       className={`fixed z-50 transition-all duration-500 ${
         isScrolled 
-          ? "top-4 left-4 right-4" 
+          ? "top-3 left-3 right-3 sm:top-4 sm:left-4 sm:right-4" 
           : "top-0 left-0 right-0"
       }`}
     >
@@ -61,13 +70,13 @@ export function Navigation() {
         }`}
       >
         <div 
-          className={`flex items-center justify-between transition-all duration-500 px-6 lg:px-8 ${
-            isScrolled ? "h-14" : "h-20"
+          className={`flex items-center justify-between transition-all duration-500 px-4 sm:px-6 lg:px-8 ${
+            isScrolled ? "h-14" : "h-16 sm:h-20"
           }`}
         >
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 group">
-            <span className={`font-display tracking-tight transition-all duration-500 ${isScrolled ? "text-xl text-foreground" : "text-2xl text-white"}`}>
+          <a href="/" className="flex min-w-0 items-center gap-2 group">
+            <span className={`font-display tracking-tight transition-all duration-500 truncate ${isScrolled ? "text-lg text-foreground sm:text-xl" : "text-xl text-white sm:text-2xl"}`}>
               Cosecha Creativa
             </span>
           </a>
@@ -103,7 +112,7 @@ export function Navigation() {
 
                     {/* Dropdown Mega-Menu Box */}
                     <div
-                      className={`absolute left-1/2 -translate-x-1/2 mt-2 w-[540px] rounded-2xl border border-white/10 bg-black/95 p-3.5 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.55)] transition-all duration-300 grid grid-cols-2 gap-2.5 ${
+                      className={`absolute left-1/2 -translate-x-1/2 mt-2 w-[min(540px,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-black/95 p-3.5 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.55)] transition-all duration-300 grid grid-cols-2 gap-2.5 ${
                         isDropdownOpen 
                           ? "opacity-100 translate-y-0 pointer-events-auto" 
                           : "opacity-0 translate-y-2 pointer-events-none"
@@ -177,16 +186,16 @@ export function Navigation() {
         }`}
         style={{ top: 0 }}
       >
-        <div className="flex flex-col h-full px-8 pt-28 pb-8">
+        <div className="flex h-full flex-col px-5 pb-6 pt-24 sm:px-8 sm:pt-28 sm:pb-8">
           {/* Navigation Links */}
-          <div className="flex-1 flex flex-col justify-center gap-3 sm:gap-4 overflow-y-auto">
+          <div className="flex min-h-0 flex-1 flex-col justify-start gap-2 overflow-y-auto overscroll-contain sm:justify-center sm:gap-4">
             {navLinks.map((link, i) => {
               if (link.dropdown) {
                 return (
                   <div key={link.name} className="flex flex-col gap-1.5">
                     <button
                       onClick={() => setIsMobileServicesOpen(!isMobileServicesOpen)}
-                      className={`text-3xl sm:text-4xl font-display text-foreground flex items-center justify-between text-left transition-all duration-500 hover:text-muted-foreground w-full ${
+                      className={`flex w-full items-center justify-between text-left font-display text-2xl text-foreground transition-all duration-500 hover:text-muted-foreground sm:text-3xl md:text-4xl ${
                         isMobileMenuOpen 
                           ? "opacity-100 translate-y-0" 
                           : "opacity-0 translate-y-4"
@@ -195,7 +204,7 @@ export function Navigation() {
                     >
                       <span>{link.name}</span>
                       <svg
-                        className={`size-6 transition-transform duration-300 ${isMobileServicesOpen ? "rotate-180" : ""}`}
+                        className={`size-5 shrink-0 transition-transform duration-300 sm:size-6 ${isMobileServicesOpen ? "rotate-180" : ""}`}
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -206,8 +215,8 @@ export function Navigation() {
                     </button>
                     
                     <div
-                      className={`overflow-hidden transition-all duration-300 flex flex-col gap-2 pl-4 border-l border-[#eca8d6]/30 ${
-                        isMobileServicesOpen ? "max-h-[360px] opacity-100 mt-2 mb-2" : "max-h-0 opacity-0 pointer-events-none"
+                      className={`flex flex-col gap-1 overflow-y-auto overscroll-contain border-l border-[#eca8d6]/30 pl-3 transition-all duration-300 sm:gap-2 sm:pl-4 ${
+                        isMobileServicesOpen ? "mt-2 mb-2 max-h-[min(42vh,420px)] opacity-100" : "pointer-events-none max-h-0 opacity-0"
                       }`}
                     >
                       {link.dropdown.map((subItem) => (
@@ -215,7 +224,7 @@ export function Navigation() {
                           key={subItem.name}
                           href={subItem.href}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-base text-foreground/80 hover:text-[#eca8d6] transition-colors py-0.5"
+                          className="py-1 text-sm text-foreground/80 transition-colors hover:text-[#eca8d6] sm:text-base sm:py-0.5"
                         >
                           {subItem.name}
                         </a>
@@ -230,7 +239,7 @@ export function Navigation() {
                   key={link.name}
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`text-3xl sm:text-4xl font-display text-foreground transition-all duration-500 hover:text-muted-foreground ${
+                  className={`font-display text-2xl text-foreground transition-all duration-500 hover:text-muted-foreground sm:text-3xl md:text-4xl ${
                     isMobileMenuOpen 
                       ? "opacity-100 translate-y-0" 
                       : "opacity-0 translate-y-4"
@@ -244,7 +253,7 @@ export function Navigation() {
           </div>
           
           {/* Bottom CTAs */}
-          <div className={`flex gap-4 pt-6 border-t border-foreground/10 transition-all duration-500 ${
+          <div className={`flex shrink-0 gap-4 border-t border-foreground/10 pt-5 transition-all duration-500 sm:pt-6 ${
             isMobileMenuOpen 
               ? "opacity-100 translate-y-0" 
               : "opacity-0 translate-y-4"
@@ -253,7 +262,7 @@ export function Navigation() {
           >
             <Button 
               asChild
-              className="flex-1 bg-foreground text-background rounded-full h-14 text-base"
+              className="h-12 flex-1 rounded-full bg-foreground text-base text-background sm:h-14"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <a href="/contacto">Háblanos</a>

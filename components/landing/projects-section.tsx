@@ -33,7 +33,7 @@ export function ProjectsSection() {
       <div className="absolute -left-1/4 top-1/4 -z-10 h-[500px] w-[500px] rounded-full bg-purple-500/5 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
       <div className="absolute -right-1/4 bottom-1/4 -z-10 h-[500px] w-[500px] rounded-full bg-rose-500/5 blur-[120px] animate-pulse" style={{ animationDuration: '12s' }} />
 
-      <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
         <div className="mb-14 flex flex-col gap-6 lg:mb-20 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <span

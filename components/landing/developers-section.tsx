@@ -177,7 +177,7 @@ export function DevelopersSection() {
       </motion.div>
 
       <motion.div
-        className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12"
+        className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12"
         style={{ y: contentShiftY }}
       >
         <motion.div

@@ -87,7 +87,7 @@ export function TestimonialsSection() {
       id="feedbacks"
       className="cc-aura cc-aura-rose relative overflow-hidden py-32 text-white lg:py-40"
     >
-      <div className="relative z-10 mx-auto max-w-3xl px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <header className="text-center">
           <p
             className={`mb-4 font-mono text-xs font-semibold uppercase tracking-[0.35em] text-[#eca8d6]/70 transition-all duration-700 ${

@@ -169,7 +169,7 @@ export function EventosPageClient() {
       </header>
 
       {/* ── SIDEBAR HUD (MAIN INFORMATION CENTER - Desktop) ──────────────── */}
-      <section className="fixed left-6 top-24 bottom-6 z-20 w-[440px] rounded-2xl border border-white/15 bg-black/65 p-8 backdrop-blur-xl shadow-[0_24px_80px_rgba(0,0,0,0.95)] transition-all duration-500 hover:border-[#eca8d6]/30 hidden md:flex flex-col justify-between select-text">
+      <section className="fixed bottom-6 left-3 top-24 z-20 hidden w-[min(400px,calc(100vw-1.5rem))] flex-col justify-between rounded-2xl border border-white/15 bg-black/65 p-5 backdrop-blur-xl shadow-[0_24px_80px_rgba(0,0,0,0.95)] transition-all duration-500 hover:border-[#eca8d6]/30 select-text md:left-6 md:flex md:w-[min(420px,42vw)] md:p-6 lg:w-[440px] lg:p-8">
         <div className="flex-1 flex flex-col min-h-0">
           
           {/* Main Titles */}
@@ -338,7 +338,7 @@ export function EventosPageClient() {
       </section>
 
       {/* ── RESPONSIVE FLOATING HUD PANEL (Mobile) ───────────────────────── */}
-      <section className="fixed bottom-6 left-4 right-4 z-20 max-h-[50vh] rounded-2xl border border-white/12 bg-black/75 p-5 backdrop-blur-md shadow-[0_16px_48px_rgba(0,0,0,0.9)] flex flex-col justify-between md:hidden">
+      <section className="fixed bottom-6 left-3 right-3 z-20 flex max-h-[min(52vh,420px)] flex-col justify-between rounded-2xl border border-white/12 bg-black/75 p-4 backdrop-blur-md shadow-[0_16px_48px_rgba(0,0,0,0.9)] sm:left-4 sm:right-4 sm:p-5 md:hidden">
         
         {/* Selector Tabs Mobile */}
         <div className="flex justify-between gap-1 mb-4 p-1 rounded-lg border border-white/8 bg-white/[0.02]">

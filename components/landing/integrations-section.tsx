@@ -232,7 +232,7 @@ export function IntegrationsSection() {
 
       {/* Integration grid — compacto */}
       <div
-        className="relative z-10 mt-0 lg:-mt-16 max-w-[1200px] mx-auto px-6 lg:px-10 will-change-transform"
+        className="relative z-10 mt-0 lg:-mt-16 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-10 will-change-transform"
         style={{ transform: `translate3d(0, ${parallaxY * -0.32}px, 0)` }}
       >
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-10">

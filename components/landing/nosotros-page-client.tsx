@@ -221,7 +221,7 @@ export function NosotrosPageClient() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(161,0,242,0.12),transparent_70%)]" aria-hidden />
         <div className="pointer-events-none absolute inset-0 opacity-[0.25] [background-image:linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:44px_44px]" aria-hidden />
         
-        <div className="relative z-10 mx-auto max-w-[1200px] px-6 text-center lg:px-12">
+        <div className="relative z-10 mx-auto max-w-[1200px] px-4 text-center sm:px-4 sm:px-6 lg:px-12">
           <h2 className="font-display text-3xl font-semibold md:text-4xl">
             Resultados en el tiempo correcto
           </h2>
@@ -246,7 +246,7 @@ export function NosotrosPageClient() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(103,232,249,0.08),transparent_65%)]" aria-hidden />
         <div className="pointer-events-none absolute inset-0 opacity-[0.25] [background-image:linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:44px_44px]" aria-hidden />
 
-        <div className="relative z-10 mx-auto max-w-[720px] px-6 lg:px-12">
+        <div className="relative z-10 mx-auto max-w-[720px] px-4 sm:px-6 lg:px-12">
           <p className="text-center font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-[#eca8d6]/85">
             Nuestra línea de tiempo
           </p>
@@ -294,7 +294,7 @@ export function NosotrosPageClient() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(184,82,33,0.10),transparent_65%)]" aria-hidden />
         <div className="pointer-events-none absolute inset-0 opacity-[0.2] [background-image:linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:44px_44px]" aria-hidden />
 
-        <div className="relative z-10 mx-auto max-w-[1200px] px-6 lg:px-12">
+        <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12">
           <div className="rounded-[1.75rem] border border-[#eca8d6]/25 bg-gradient-to-br from-[#eca8d6]/15 via-transparent to-violet-900/20 px-8 py-12 md:px-14 md:py-14">
             <h2 className="font-display text-2xl font-semibold md:text-3xl">
               ¿Tu marca en el siguiente nivel?
