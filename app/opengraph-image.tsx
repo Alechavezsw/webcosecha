@@ -1,10 +1,11 @@
 import { ImageResponse } from "next/og"
 
-export const alt = "Cosecha Creativa — Agencia de Marketing Digital en San Juan"
+export const runtime = "edge"
+export const alt = "Cosecha Creativa — Agencia de marketing digital en San Juan"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
-export default function OpengraphImage() {
+export default function OpenGraphImage() {
   return new ImageResponse(
     (
       <div
@@ -14,37 +15,76 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "72px 80px",
-          background: "linear-gradient(135deg, #0a0508 0%, #1a0a12 55%, #3d1226 100%)",
-          color: "#f5efe9",
-          fontFamily: "serif",
+          padding: "64px 72px",
+          background:
+            "linear-gradient(145deg, #050505 0%, #120818 45%, #1a0a14 70%, #0a0a0a 100%)",
+          color: "white",
+          fontFamily: "Georgia, 'Times New Roman', serif",
         }}
       >
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 16,
-            fontSize: 28,
-            letterSpacing: 4,
+            gap: 14,
+            fontSize: 22,
+            letterSpacing: "0.18em",
             textTransform: "uppercase",
-            color: "#d9a8bf",
+            color: "rgba(255,255,255,0.55)",
+            fontFamily: "ui-sans-serif, system-ui, sans-serif",
           }}
         >
-          <div style={{ width: 48, height: 2, background: "#d9a8bf" }} />
-          Agencia de marketing digital en San Juan
+          <div
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: 999,
+              background: "#eca8d6",
+            }}
+          />
+          San Juan · Argentina
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div style={{ fontSize: 96, lineHeight: 1.05 }}>Cosecha Creativa</div>
-          <div style={{ fontSize: 34, color: "#cbbfc6", fontFamily: "sans-serif" }}>
-            Estrategia, creatividad y tecnología para potenciar tu presencia digital.
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div
+            style={{
+              fontSize: 84,
+              lineHeight: 1.02,
+              letterSpacing: "-0.03em",
+              color: "#ffffff",
+            }}
+          >
+            Cosecha Creativa
+          </div>
+          <div
+            style={{
+              fontSize: 34,
+              lineHeight: 1.25,
+              maxWidth: 900,
+              color: "rgba(255,255,255,0.78)",
+              fontFamily: "ui-sans-serif, system-ui, sans-serif",
+              fontWeight: 400,
+            }}
+          >
+            Agencia de marketing digital, diseño web, SEO e inteligencia artificial
           </div>
         </div>
-        <div style={{ display: "flex", fontSize: 26, color: "#8f7f88", fontFamily: "sans-serif" }}>
-          cosechacreativa.com.ar
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            fontFamily: "ui-sans-serif, system-ui, sans-serif",
+            fontSize: 22,
+            color: "rgba(255,255,255,0.5)",
+          }}
+        >
+          <span>cosechacreativa.com.ar</span>
+          <span style={{ color: "#eca8d6" }}>Estrategia · Creatividad · Tecnología</span>
         </div>
       </div>
     ),
-    size,
+    { ...size },
   )
 }

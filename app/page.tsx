@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { Navigation } from "@/components/landing/navigation";
 import { Ambient3DBackground } from "@/components/landing/ambient-3d";
 import { HeroSection } from "@/components/landing/hero-section";
@@ -14,6 +15,21 @@ import { CtaSection } from "@/components/landing/cta-section";
 import { FooterSection } from "@/components/landing/footer-section";
 import { SectionDivider } from "@/components/landing/section-divider";
 import { ScrollProgress } from "@/components/landing/scroll-progress";
+
+export const metadata: Metadata = {
+  title: "Cosecha Creativa | Agencia de Marketing Digital y Diseño Web en San Juan",
+  description:
+    "Agencia de marketing digital en San Juan: gestión de redes, diseño web, SEO, publicidad, branding, IA y automatizaciones. Estrategia creativa con resultados medibles.",
+  alternates: {
+    canonical: "https://cosechacreativa.com.ar",
+  },
+  openGraph: {
+    title: "Cosecha Creativa | Marketing digital y diseño web en San Juan",
+    description:
+      "Estrategia, creatividad y tecnología para potenciar tu presencia digital. Redes, web, SEO, IA y automatizaciones.",
+    url: "https://cosechacreativa.com.ar",
+  },
+}
 
 export default function Home() {
   return (

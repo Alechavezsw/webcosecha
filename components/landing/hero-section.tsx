@@ -164,47 +164,48 @@ export function HeroSection() {
         } transition-opacity duration-700`}
         style={{ transform: `translate3d(0, ${parallaxY * -0.22}px, 0)` }}
       >
-        <div className="w-full max-w-full lg:max-w-[55%]">
-        {/* Eyebrow */}
-        <div 
-          className={`mb-5 sm:mb-6 transition-all duration-700 ${
+        <div className="w-full max-w-full lg:max-w-[58%]">
+        {/* Brand — señal hero principal (SEO + marca) */}
+        <div
+          className={`mb-4 transition-all duration-700 sm:mb-5 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
-          <span className="inline-flex max-w-full flex-wrap items-center gap-2 text-xs font-mono text-white/60 sm:gap-3 sm:text-sm">
-            <span className="hidden h-px w-8 bg-white/30 sm:inline-block" />
-            Agencia de marketing digital en San Juan
-          </span>
-        </div>
-        
-        {/* Main headline */}
-        <div className="mb-5 sm:mb-6">
-          <h1 
-            className={`text-left font-display text-[clamp(2.15rem,9.5vw,6.5rem)] leading-[1.02] tracking-tight text-white transition-all duration-1000 sm:text-[clamp(2.5rem,6vw,6.5rem)] sm:leading-[1.0] ${
+          <p className="mb-3 text-[11px] font-mono uppercase tracking-[0.22em] text-white/50 sm:text-xs">
+            Agencia de marketing digital · San Juan
+          </p>
+          <h1
+            className={`font-display text-[clamp(2.6rem,11vw,5.75rem)] leading-[0.95] tracking-tight text-white transition-all duration-1000 sm:text-[clamp(3.25rem,8vw,6.25rem)] ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <span className="block sm:whitespace-nowrap">Hacemos que tu</span>
-            <span className="block sm:whitespace-nowrap">
-              marca{" "}
-              <span className="relative inline-block">
-                <BlurWord word={words[wordIndex]} trigger={wordIndex} />
-              </span>
-            </span>
+            Cosecha Creativa
           </h1>
         </div>
 
-        {/* Subtitle & Description */}
-        <div 
+        {/* Headline de apoyo */}
+        <div className="mb-5 sm:mb-6">
+          <p
+            className={`text-left font-display text-[clamp(1.35rem,4.8vw,2.65rem)] leading-[1.12] tracking-tight text-white/90 transition-all duration-1000 delay-150 sm:leading-[1.08] ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <span className="block sm:inline">Hacemos que tu marca </span>
+            <span className="relative inline-block">
+              <BlurWord word={words[wordIndex]} trigger={wordIndex} />
+            </span>
+          </p>
+        </div>
+
+        {/* Una sola frase de apoyo */}
+        <div
           className={`mb-8 max-w-xl transition-all duration-1000 delay-300 sm:mb-10 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <h2 className="mb-3 text-base font-normal text-white/85 sm:text-lg md:text-xl">
-            Estrategia, creatividad y tecnología para potenciar tu presencia digital.
-          </h2>
-          <p className="text-sm leading-relaxed text-white/55 sm:text-base md:text-lg">
-            Somos Cosecha Creativa. Transformamos ideas en resultados comerciales reales. Desde gestión de redes y diseño web, hasta automatizaciones con inteligencia artificial para que tu negocio no pare de crecer.
+          <p className="text-sm leading-relaxed text-white/60 sm:text-base md:text-lg">
+            Estrategia, creatividad y tecnología para potenciar tu presencia digital:
+            redes, diseño web, SEO, branding e inteligencia artificial.
           </p>
         </div>
 
