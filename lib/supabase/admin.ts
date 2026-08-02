@@ -4,34 +4,58 @@ let cachedAdmin: SupabaseClient | null = null
 let cachedAuthed: SupabaseClient | null = null
 let authPromise: Promise<SupabaseClient | null> | null = null
 
+function cleanEnv(value: string | undefined): string {
+  const v = value?.trim() ?? ""
+  if (
+    (v.startsWith('"') && v.endsWith('"')) ||
+    (v.startsWith("'") && v.endsWith("'"))
+  ) {
+    return v.slice(1, -1).trim()
+  }
+  return v
+}
+
 function getUrl() {
-  return process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? ""
+  return cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
 }
 
 function getAnonKey() {
-  return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? ""
+  return cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 }
 
 function getServiceRoleKey() {
-  return process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ?? ""
+  return cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY)
 }
 
 export function hasSupabaseServiceRole(): boolean {
   return Boolean(getUrl() && getServiceRoleKey())
 }
 
+/** True when we expect Supabase (URL set). On Vercel we must not fall back to disk. */
+export function wantsSupabase(): boolean {
+  return Boolean(getUrl())
+}
+
 export function isSupabaseConfigured(): boolean {
   if (!getUrl()) return false
   if (getServiceRoleKey()) return true
-  // Fallback: login con usuario CRM de Supabase Auth
   return Boolean(
     getAnonKey() &&
-      process.env.SUPABASE_CRM_EMAIL?.trim() &&
-      process.env.SUPABASE_CRM_PASSWORD?.trim(),
+      cleanEnv(process.env.SUPABASE_CRM_EMAIL) &&
+      cleanEnv(process.env.SUPABASE_CRM_PASSWORD),
   )
 }
 
-/** Client with service role (bypasses RLS). */
+export function supabaseConfigError(): string | null {
+  if (!getUrl()) return null
+  if (isSupabaseConfigured()) return null
+  return (
+    "Supabase URL configurada pero faltan credenciales de escritura. " +
+    "En Vercel agregá SUPABASE_SERVICE_ROLE_KEY (recomendado) o " +
+    "SUPABASE_CRM_EMAIL + SUPABASE_CRM_PASSWORD + NEXT_PUBLIC_SUPABASE_ANON_KEY."
+  )
+}
+
 function createServiceClient(): SupabaseClient | null {
   const url = getUrl()
   const key = getServiceRoleKey()
@@ -46,8 +70,8 @@ function createServiceClient(): SupabaseClient | null {
 async function createPasswordClient(): Promise<SupabaseClient | null> {
   const url = getUrl()
   const anon = getAnonKey()
-  const email = process.env.SUPABASE_CRM_EMAIL?.trim()
-  const password = process.env.SUPABASE_CRM_PASSWORD?.trim()
+  const email = cleanEnv(process.env.SUPABASE_CRM_EMAIL)
+  const password = cleanEnv(process.env.SUPABASE_CRM_PASSWORD)
   if (!url || !anon || !email || !password) return null
 
   if (cachedAuthed) return cachedAuthed
@@ -61,7 +85,7 @@ async function createPasswordClient(): Promise<SupabaseClient | null> {
     if (error) {
       console.error("[supabase] CRM auth failed:", error.message)
       authPromise = null
-      return null
+      throw new Error(`Supabase login CRM falló: ${error.message}`)
     }
     cachedAuthed = client
     return client
@@ -72,12 +96,16 @@ async function createPasswordClient(): Promise<SupabaseClient | null> {
 
 /** Server-only Supabase client for CRM reads/writes. */
 export async function getSupabaseAdmin(): Promise<SupabaseClient | null> {
+  const incomplete = supabaseConfigError()
+  if (incomplete) throw new Error(incomplete)
+
   const service = createServiceClient()
   if (service) return service
+
+  if (!isSupabaseConfigured()) return null
   return createPasswordClient()
 }
 
-/** Sync helper when caller already knows config is present and prefers service role. */
 export function getSupabaseServiceOrNull(): SupabaseClient | null {
   return createServiceClient()
 }

@@ -23,7 +23,14 @@ export async function POST(req: Request) {
     })
 
     return NextResponse.json(result)
-  } catch {
-    return NextResponse.json({ error: "No se pudo procesar el mensaje" }, { status: 500 })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "No se pudo procesar el mensaje"
+    console.error("[api/crm/chat]", err)
+    return NextResponse.json(
+      {
+        error: message || "No se pudo procesar el mensaje",
+      },
+      { status: 500 },
+    )
   }
 }

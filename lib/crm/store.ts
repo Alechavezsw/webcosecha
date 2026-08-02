@@ -9,7 +9,11 @@ import {
   type TaskRow,
 } from "@/lib/crm/supabase-map"
 import type { CrmHistoryEntry, CrmLead, LeadStatus } from "@/lib/crm/types"
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin"
+import {
+  getSupabaseAdmin,
+  isSupabaseConfigured,
+  supabaseConfigError,
+} from "@/lib/supabase/admin"
 import { randomUUID } from "crypto"
 import { mkdir, readFile, writeFile } from "fs/promises"
 import path from "path"
@@ -18,6 +22,16 @@ const DATA_DIR = path.join(process.cwd(), "data", "crm")
 const DATA_FILE = path.join(DATA_DIR, "leads.json")
 
 type FileStore = { leads: CrmLead[] }
+
+function assertDbReady() {
+  const err = supabaseConfigError()
+  if (err) throw new Error(err)
+  if (process.env.VERCEL && !isSupabaseConfigured()) {
+    throw new Error(
+      "En Vercel hace falta Supabase (SUPABASE_SERVICE_ROLE_KEY o SUPABASE_CRM_EMAIL/PASSWORD).",
+    )
+  }
+}
 
 async function ensureFileStore(): Promise<FileStore> {
   try {
@@ -128,6 +142,7 @@ async function syncChildren(lead: CrmLead) {
 }
 
 export async function listLeads(): Promise<CrmLead[]> {
+  assertDbReady()
   if (isSupabaseConfigured()) {
     const sb = await getSupabaseAdmin()
     if (!sb) throw new Error("Supabase no configurado")
@@ -146,6 +161,7 @@ export async function listLeads(): Promise<CrmLead[]> {
 }
 
 export async function getLeadBySessionId(sessionId: string): Promise<CrmLead | undefined> {
+  assertDbReady()
   if (isSupabaseConfigured()) {
     const sb = await getSupabaseAdmin()
     if (!sb) throw new Error("Supabase no configurado")
@@ -166,6 +182,7 @@ export async function getLeadBySessionId(sessionId: string): Promise<CrmLead | u
 }
 
 export async function getLeadById(id: string): Promise<CrmLead | undefined> {
+  assertDbReady()
   if (isSupabaseConfigured()) {
     const sb = await getSupabaseAdmin()
     if (!sb) throw new Error("Supabase no configurado")
@@ -182,6 +199,7 @@ export async function getLeadById(id: string): Promise<CrmLead | undefined> {
 }
 
 export async function upsertLead(lead: CrmLead): Promise<CrmLead> {
+  assertDbReady()
   const normalized = normalizeLead(lead)
 
   if (isSupabaseConfigured()) {
