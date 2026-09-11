@@ -1,7 +1,8 @@
 import React from 'react';
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import { asset } from '../lib/asset';
+import { assetOpt } from '../lib/asset';
 import Magnetic from './Magnetic';
+import SectionKicker from './SectionKicker';
 
 interface HeroProps {
   heroRef: React.RefObject<HTMLDivElement | null>;
@@ -11,13 +12,17 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ heroRef, onMouseEnter, onMouseLeave }) => {
   return (
-    <section ref={heroRef} className="relative min-h-screen flex items-start justify-center overflow-visible pt-24 lg:items-center lg:pt-36 pb-20">
+    <section ref={heroRef} className="relative flex min-h-screen items-start justify-center overflow-visible pb-20 pt-36 sm:pt-40 lg:items-center lg:pt-44">
       <div className="absolute inset-0 z-0 hero-img-container">
         <img
-          src={asset('cc%20(2).png')}
+          src={assetOpt('cc (2).png')}
           alt="Operación minera y ecosistema digital"
           className="hero-img h-full w-full object-cover object-center"
+          width={1600}
+          height={900}
           loading="eager"
+          fetchPriority="high"
+          decoding="async"
         />
         {/* Capas al tono marca: base fría + acento ámbar + lectura del texto */}
         <div
@@ -41,13 +46,14 @@ const Hero: React.FC<HeroProps> = ({ heroRef, onMouseEnter, onMouseLeave }) => {
       <div className="relative z-10 px-6 text-center">
         <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 lg:gap-10">
           <div className="flex flex-col items-center gap-4">
-            <span className="text-[11px] font-bold uppercase tracking-[0.55em] text-[#ffb800] bg-[rgba(255,184,0,0.1)] px-6 py-2.5 rounded-full border border-[#ffb800]/25 glow-amber-sm shadow-[0_0_30px_-10px_rgba(255,184,0,0.5)]">
-              Especialistas en Marketing Digital
-            </span>
+            <SectionKicker align="center">Especialistas en Marketing Digital</SectionKicker>
+            {/* Las coordenadas que había acá caían en Namibia. Éstas son las de
+                San Juan, que es donde trabaja la agencia y de dónde es el
+                público que las va a leer. */}
             <div className="flex gap-4 text-[10px] font-mono uppercase tracking-widest text-white/20">
-              <span>LAT: 22.2725° S</span>
-              <span>LNG: 15.2725° E</span>
-              <span className="text-[#ffb800]/40">ALT: 1,240M</span>
+              <span>LAT: 31.5375° S</span>
+              <span>LNG: 68.5364° O</span>
+              <span className="text-[#ffb800]/40">SAN JUAN · AR</span>
             </div>
           </div>
 
@@ -73,7 +79,7 @@ const Hero: React.FC<HeroProps> = ({ heroRef, onMouseEnter, onMouseLeave }) => {
               <Magnetic>
                 <a
                   href="#services"
-                  className="group inline-flex items-center gap-4 rounded-full bg-[#ffb800] px-12 py-6 text-xs font-bold uppercase tracking-[0.2em] text-black transition-all duration-500 hover:bg-white hover:shadow-[0_0_50px_-10px_rgba(255,184,0,0.6)] sm:text-sm"
+                  className="group inline-flex items-center gap-4 whitespace-nowrap rounded-full bg-[#ffb800] px-9 py-5 text-xs font-bold uppercase tracking-[0.2em] text-black transition-all duration-500 hover:bg-white hover:shadow-[0_0_50px_-10px_rgba(255,184,0,0.6)] sm:px-12 sm:py-6 sm:text-sm"
                   onMouseEnter={onMouseEnter}
                   onMouseLeave={onMouseLeave}
                 >
@@ -85,7 +91,7 @@ const Hero: React.FC<HeroProps> = ({ heroRef, onMouseEnter, onMouseLeave }) => {
                   href="https://wa.me/542645468012"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-full border border-white/25 px-12 py-6 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all duration-500 hover:border-[#ffb800]/80 hover:bg-white/[0.04] sm:text-sm"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-white/25 px-9 py-5 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all duration-500 hover:border-[#ffb800]/80 hover:bg-white/[0.04] sm:px-12 sm:py-6 sm:text-sm"
                   onMouseEnter={onMouseEnter}
                   onMouseLeave={onMouseLeave}
                   aria-label="Abrir WhatsApp para hablar con Cosecha Creativa"

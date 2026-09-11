@@ -201,7 +201,7 @@ const VITRINA_PRODUCTS = [
     badge: "Top ventas",
   },
   {
-    img: "/MOCUP/carrusel-1080x1350_01.jpg",
+    img: "/_lite/carrusel-1080x1350_01.webp",
     cat: "Gastronomía",
     name: "Combo 2 Burgers + Fritas",
     price: "$14.000",

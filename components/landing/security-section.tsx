@@ -2,31 +2,32 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Shield, Lock, Eye, FileCheck } from "lucide-react";
+import { opt } from "@/lib/optimized-images";
 
 const securityFeatures = [
   {
     icon: Shield,
     title: "Ejecución aislada",
     description: "Cada agente corre en su propio entorno seguro y aislado.",
-    image: "/images/isolated.jpg",
+    image: opt("/images/isolated.jpg"),
   },
   {
     icon: Lock,
     title: "Memoria cifrada",
     description: "Datos cifrados en reposo y en tránsito.",
-    image: "/images/encrypted.jpg",
+    image: opt("/images/encrypted.jpg"),
   },
   {
     icon: Eye,
     title: "Auditoría completa",
     description: "Cada acción queda registrada y es revisable.",
-    image: "/images/audit.jpg",
+    image: opt("/images/audit.jpg"),
   },
   {
     icon: FileCheck,
     title: "Límites de permisos",
     description: "Principio de mínimo privilegio por diseño.",
-    image: "/images/permissions.jpg",
+    image: opt("/images/permissions.jpg"),
   },
 ];
 
@@ -101,6 +102,8 @@ export function SecuritySection() {
                   src={feature.image}
                   alt={feature.title}
                   className="absolute h-3/4 w-3/4 object-contain object-right transition-opacity duration-500"
+                  loading="lazy"
+                  decoding="async"
                   style={{ opacity: activeFeature === index ? 0.85 : 0 }}
                 />
               ))}

@@ -42,6 +42,1393 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "automatizacion-n8n-procesos-pymes",
+    title: "n8n en la Práctica: Cómo Automatizar los Procesos que le Comen el Día a tu Equipo",
+    excerpt: "Cargar datos a mano, reenviar mails, pasar información de un sistema a otro. Te mostramos cómo identificar las tareas repetitivas de tu empresa y automatizarlas con n8n, sin cambiar los sistemas que ya usás.",
+    category: "IA",
+    coverImage: "https://images.unsplash.com/photo-1555421689-491a97ff2040?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "04 de Septiembre, 2026",
+    readTime: "7 min de lectura",
+    tags: ["n8n", "Automatización", "Procesos", "Productividad"],
+    content: `
+Hay un costo que ninguna empresa tiene registrado en su balance: **las horas que su equipo pierde moviendo información de un lado a otro**. Copiar los datos de un formulario web a una planilla. Reenviar el mismo mail de confirmación veinte veces por día. Cargar a mano en el sistema de facturación lo que ya está cargado en el CRM.
+
+Nadie lo anota, pero se paga todos los meses en sueldos, errores de tipeo y tareas que se hacen tarde porque a la persona no le dio el día.
+
+### Qué es n8n y por qué lo elegimos
+
+n8n es una plataforma de automatización que conecta las herramientas que ya usás — Gmail, Google Sheets, WhatsApp, tu CRM, tu sistema de facturación, tu web — y ejecuta flujos de trabajo entre ellas sin intervención humana.
+
+La diferencia con otras opciones del mercado está en tres cosas concretas:
+
+- **Se puede alojar en tu propia infraestructura.** Tus datos no viajan al servidor de un tercero. Para estudios contables, consultorios o empresas con información sensible, esto no es un detalle.
+- **No cobra por ejecución.** Las plataformas por suscripción cobran por tarea corrida: a medida que automatizás más, la factura crece. Con n8n autoalojado, el costo es el del servidor.
+- **No tiene techo.** Cuando un flujo necesita algo que no viene resuelto, se le agrega un bloque de código. No te quedás trabado en las limitaciones de la herramienta.
+
+### Cómo detectar qué automatizar primero
+
+El error más común es querer automatizar lo más complejo. Nosotros arrancamos al revés: buscamos la tarea **más aburrida, más frecuente y más mecánica**. Tres preguntas alcanzan para encontrarla:
+
+1. ¿Qué tarea hace alguien todos los días, siempre igual, sin tomar ninguna decisión?
+2. ¿Dónde se cargan los mismos datos dos veces en sistemas distintos?
+3. ¿Qué se olvida de hacerse cuando el equipo está desbordado?
+
+Lo que aparece en esas respuestas es el primer flujo. Casi nunca es lo más vistoso, pero es lo que devuelve horas desde la primera semana.
+
+### Tres automatizaciones que implementamos seguido
+
+**Del formulario al seguimiento.** Un interesado completa el formulario de la web. El flujo valida los datos, lo carga en el CRM, le manda un mail con la información que pidió, avisa por WhatsApp al vendedor de la zona y agenda un recordatorio a las 48 horas si nadie lo contactó. Todo eso pasa en menos de diez segundos y no depende de que alguien esté mirando la casilla.
+
+**Reportes que se arman solos.** Todos los lunes a las 8, el flujo consulta Google Analytics, Meta Ads y Google Ads, arma un resumen con inversión, resultados y comparación contra la semana anterior, y lo deja en el chat del equipo. Reemplaza dos horas de alguien armando una planilla.
+
+**Cobranzas sin recordatorios manuales.** El sistema revisa las facturas vencidas, arma el mensaje con el detalle de cada cliente y lo envía por el canal que corresponda, escalando el tono según los días de mora. Solo llega a manos humanas lo que ya requiere una llamada.
+
+### Automatización con IA: el paso siguiente
+
+Los flujos clásicos siguen reglas fijas. Cuando le sumás un modelo de lenguaje a n8n, empiezan a manejar tareas que antes exigían criterio:
+
+- **Clasificar consultas entrantes** por tema y urgencia, y derivarlas al área correcta.
+- **Resumir reuniones o llamadas** y cargar los puntos de acción directamente en el CRM.
+- **Redactar borradores de respuesta** con la información de tu base de conocimientos, para que una persona solo revise y envíe.
+- **Leer documentos y extraer datos** de facturas, remitos o presupuestos en PDF.
+
+Acá aparece la regla que aplicamos siempre: **la IA propone, la persona dispone**. En procesos que involucran plata, contratos o reclamos, el flujo prepara todo y deja el clic final a un humano.
+
+### Lo que hay que tener en cuenta antes de arrancar
+
+Automatizar un proceso desordenado no lo mejora: lo acelera hacia el mismo lugar. Antes de tocar una sola conexión hay que mapear cómo funciona hoy la tarea, quién la hace y qué pasa cuando falla. En muchos casos, la mitad del valor del proyecto aparece en esa etapa, cuando el equipo ve escrito por primera vez su propio proceso.
+
+También hace falta pensar el error: qué hace el flujo cuando un sistema no responde, cuándo reintenta y a quién avisa. Una automatización silenciosa que falla sin que nadie se entere es peor que no tenerla.
+
+*En Cosecha Creativa relevamos, diseñamos e implementamos automatizaciones con n8n para empresas de San Juan, con el servidor alojado donde vos decidas. Contanos qué tarea te está comiendo el día y te decimos si se puede automatizar.*
+    `,
+  },
+  {
+    slug: "velocidad-web-core-web-vitals-ventas",
+    title: "Core Web Vitals: Por Qué un Sitio Lento te Está Costando Ventas (y Posiciones en Google)",
+    excerpt: "Cada segundo de demora en cargar tu web se traduce en visitantes que se van. Explicamos qué mide Google exactamente, cómo saber cómo está tu sitio hoy y qué se puede corregir sin rehacerlo todo.",
+    category: "Web",
+    coverImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "01 de Septiembre, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Core Web Vitals", "Performance", "SEO", "Desarrollo Web"],
+    content: `
+Invertiste en publicidad, la gente hace clic, entra a tu sitio… y se va antes de ver nada. No es que el producto no le interese: es que la página tardó cuatro segundos en mostrar algo y perdió la paciencia.
+
+La velocidad no es un capricho técnico. Es la primera impresión de tu negocio en digital, y Google la mide con métricas concretas que afectan directamente tu posicionamiento.
+
+### Las tres métricas que Google mira
+
+**LCP — ¿cuándo se ve el contenido principal?**
+Mide cuánto tarda en aparecer el elemento más grande de la pantalla, normalmente la imagen o el título del encabezado. El objetivo es **por debajo de 2,5 segundos**. Arriba de 4, Google lo considera deficiente. En la práctica el culpable casi siempre es el mismo: una imagen enorme sin optimizar.
+
+**INP — ¿cuánto tarda en responderte?**
+Mide el retraso entre que el usuario toca algo (un botón, un menú, un campo) y la página reacciona. El objetivo es **menos de 200 milisegundos**. Un sitio que se ve rápido pero se siente trabado al tocarlo tiene problema de INP, y suele ser exceso de código ejecutándose al mismo tiempo.
+
+**CLS — ¿se mueve todo mientras cargás?**
+Es esa sensación de ir a tocar un botón y que en ese instante la página salte porque terminó de cargar un banner. El objetivo es **menos de 0,1**. Se corrige reservando el espacio de imágenes, avisos y fuentes antes de que carguen.
+
+### Cómo medir tu sitio hoy, en cinco minutos
+
+Entrá a PageSpeed Insights de Google, pegá la dirección de tu web y miralo en la pestaña de móvil. Ahí está la diferencia importante: **casi todos los sitios rinden bien en escritorio y mal en celular**, y el celular es donde está la mayor parte de tu tráfico real.
+
+Prestá atención a los datos de campo, la sección que corresponde a usuarios reales de los últimos 28 días. Esa es tu nota verdadera; la simulación de laboratorio sirve para diagnosticar, no para evaluarte.
+
+### Las cinco causas que explican casi todos los casos
+
+- **Imágenes sin optimizar.** Es la número uno por lejos: una foto de 4 MB subida directo desde el celular al gestor de contenidos. Se resuelve sirviendo formatos modernos, redimensionando al tamaño real de la pantalla y cargando en diferido lo que está más abajo.
+- **Demasiados plugins.** En sitios de WordPress es habitual encontrar treinta extensiones activas, cada una sumando su propio código a cada visita. La mitad no se usa hace años.
+- **Hosting compartido saturado.** Si el servidor tarda un segundo entero en devolver la primera respuesta, ninguna optimización de imágenes te salva. Es un problema de infraestructura, no de la web.
+- **Fuentes tipográficas mal cargadas.** Traer tres familias con seis pesos cada una desde un servidor externo bloquea el dibujado del texto. Con dos pesos bien elegidos y precargados alcanza.
+- **Scripts de terceros.** Chats, mapas embebidos, píxeles de seguimiento, contadores. Cada uno pesa. La solución no es eliminarlos sino cargarlos después de que la página ya sea usable.
+
+### Qué gana el negocio
+
+La relación entre velocidad y facturación está bien documentada: un sitio que carga en un segundo convierte varias veces más que uno que carga en cinco, y más de la mitad de los visitantes de celular abandona una página que tarda más de tres segundos.
+
+Y hay un efecto que se subestima: si tu web es lenta, **el clic de Google Ads te sale más caro**. La plataforma penaliza el nivel de calidad de las páginas de destino lentas, así que estás pagando doble por el mismo problema.
+
+### ¿Hay que rehacer el sitio?
+
+No siempre. Un buen porcentaje de los casos se resuelve con optimización de imágenes, limpieza de código innecesario y un cambio de hosting: tres o cuatro días de trabajo y una mejora visible.
+
+Rehacer se justifica cuando la arquitectura es el problema — un tema pesado, capas de plugins acumuladas durante años, un sitio que ya nadie sabe cómo tocar sin romper. Ahí, migrar a un desarrollo moderno no es un gasto estético: es dejar de pagar todos los meses el costo de la lentitud.
+
+*En Cosecha Creativa auditamos la performance de tu sitio y te decimos con franqueza qué se arregla y qué conviene rehacer.*
+    `,
+  },
+  {
+    slug: "calendario-de-contenidos-90-dias",
+    title: "Cómo Armar un Calendario de Contenidos de 90 Días y Dejar de Publicar a las Corridas",
+    excerpt: "Publicar cuando hay tiempo es la razón número uno por la que las redes de una empresa no funcionan. Te compartimos el método que usamos para planificar un trimestre completo en una sola jornada de trabajo.",
+    category: "Redes",
+    coverImage: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "28 de Agosto, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Contenidos", "Redes Sociales", "Planificación", "Estrategia"],
+    content: `
+La escena se repite en todas las empresas que manejan sus redes por dentro: son las seis de la tarde, no se publicó nada en toda la semana y alguien pregunta en el grupo *¿qué subimos?*. Se improvisa una foto, se le pone una frase y se sube. Al mes siguiente, el informe muestra que las redes no dan resultado.
+
+El problema casi nunca es la creatividad. **Es la falta de un plan que llegue más lejos que el día de hoy.**
+
+### Por qué 90 días y no un mes
+
+Un mes es demasiado corto para ver patrones y demasiado frecuente para planificar bien: terminás haciendo la misma reunión doce veces al año. Un trimestre te da margen para sostener una idea, medirla y ajustarla, y encaja con los ciclos reales de un negocio: temporada alta, fechas comerciales, lanzamientos.
+
+La regla práctica es simple: **una jornada de planificación cada tres meses reemplaza noventa decisiones apuradas.**
+
+### Paso 1: definir los pilares de contenido
+
+Antes de pensar publicaciones, definí entre tres y cinco temas de los que tu marca va a hablar siempre. Todo lo que publiques tiene que entrar en alguno. Para una empresa de servicios en San Juan podría ser:
+
+- **Autoridad:** lo que sabés y el cliente no. Consejos, errores comunes, explicaciones.
+- **Prueba:** trabajos hechos, casos, testimonios, antes y después.
+- **Detrás de escena:** el equipo, el proceso, la cocina del negocio.
+- **Oferta:** lo que vendés, con precio o llamada a la acción explícita.
+- **Comunidad:** lo local, las fechas de la provincia, lo que le pasa a tu público.
+
+Con los pilares definidos, la pregunta deja de ser *qué subimos* y pasa a ser *qué toca hoy*. Es una diferencia enorme.
+
+### Paso 2: fijar la cadencia real
+
+Acá se cae la mayoría de los planes: se define una frecuencia que el equipo no puede sostener. **Es mejor publicar tres veces por semana durante un año que siete veces por semana durante tres semanas.**
+
+Definí la cadencia según la capacidad real de producción, no según la aspiración. Y repartí los pilares en esa grilla: por ejemplo lunes autoridad, miércoles prueba, viernes comunidad, y una publicación de oferta cada diez.
+
+### Paso 3: la jornada de planificación
+
+Bloqueá medio día con el equipo y seguí este orden:
+
+1. **Revisar el trimestre anterior.** Qué funcionó de verdad — no lo que tuvo más me gusta, sino lo que generó consultas.
+2. **Marcar las fechas fijas.** Feriados, vacaciones de invierno, fiestas provinciales, aniversario de la empresa, temporada alta de tu rubro.
+3. **Definir un eje por mes.** Un tema que ordene: un servicio a impulsar, un lanzamiento, una campaña de posicionamiento.
+4. **Bajar a títulos.** No guiones completos: títulos. En dos horas se sacan cuarenta ideas si nadie se detiene a perfeccionarlas.
+5. **Asignar formato y responsable.** Quién produce cada pieza y cuándo tiene que estar lista.
+
+### Paso 4: producir por lotes
+
+Este es el cambio que más tiempo libera. En vez de crear una publicación por día, **producí todo junto**: una sesión de fotos por mes, una jornada de grabación de videos cortos, una tanda de textos escritos de corrido.
+
+Grabar diez videos seguidos cuesta muchísimo menos esfuerzo que grabar uno por semana durante diez semanas. La cámara ya está armada, la luz también, y el equipo entra en ritmo.
+
+### Paso 5: dejar aire para lo que no se planifica
+
+Un calendario cerrado por completo se rompe con la primera noticia relevante. Dejá un 20% libre para reaccionar: una novedad del rubro, un comentario de un cliente que merece respuesta pública, algo que pasó en la provincia y te toca de cerca.
+
+La estructura está para que puedas improvisar sin quedarte en blanco, no para prohibirte improvisar.
+
+### Cómo medir si el plan sirve
+
+Al cierre del trimestre mirá tres cosas y no doce:
+
+- **Alcance de personas nuevas:** ¿le estás llegando a alguien más allá de los de siempre?
+- **Guardados y compartidos:** son la señal real de que el contenido tuvo valor.
+- **Consultas atribuibles:** cuánta gente escribió mencionando algo que vio publicado.
+
+Los seguidores son la métrica más visible y la menos útil. Un perfil de mil seguidores locales que te compran vale más que uno de diez mil dispersos.
+
+*En Cosecha Creativa planificamos y producimos contenido para empresas de San Juan, con calendario trimestral y producción por lotes. Si tu equipo publica a las corridas, hablemos.*
+    `,
+  },
+  {
+    slug: "datos-y-encuestas-en-campana",
+    title: "Datos Antes que Intuición: Encuestas y Escucha Digital en una Campaña Moderna",
+    excerpt: "Una campaña que se guía por lo que dicen los propios en el grupo de WhatsApp pierde. Cómo combinar encuestas, escucha en redes y datos territoriales para tomar decisiones con evidencia y no con corazonadas.",
+    category: "Compol",
+    coverImage: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "25 de Agosto, 2026",
+    readTime: "7 min de lectura",
+    tags: ["Comunicación Política", "Encuestas", "Datos", "Estrategia"],
+    content: `
+Hay una trampa que se repite en toda campaña: el candidato y su círculo pasan el día entre gente que los apoya, leen los mensajes que los felicitan y concluyen que la elección está encaminada. Después llegan los resultados y nadie entiende qué pasó.
+
+El nombre técnico es sesgo de confirmación. El nombre práctico es **gobernar la estrategia con la sensación en vez de con la evidencia**.
+
+### Las tres fuentes que hay que cruzar
+
+Ninguna sirve sola. La lectura útil aparece cuando se cruzan.
+
+**1. Encuestas.** Dan la foto cuantitativa: intención de voto, imagen, conocimiento del candidato, agenda de preocupaciones. Su valor no está en el número de la tapa sino en los cruces: cómo se comporta cada segmento de edad, cada departamento, cada nivel educativo.
+
+**2. Escucha digital.** Da la textura cualitativa: qué palabras usa la gente para hablar del problema, qué tono tiene la conversación, qué temas suben y bajan sin que nadie los empuje. Una encuesta te dice que la seguridad preocupa; la escucha te dice si la gente habla de patrulleros, de iluminación o de jóvenes sin trabajo.
+
+**3. Datos territoriales.** Resultados históricos por mesa, padrón, densidad, obras hechas y pendientes. Es lo que convierte una estrategia general en una decisión sobre dónde poner el recurso escaso: los timbreos, los actos, la pauta.
+
+### Qué preguntar (y qué no) en una encuesta
+
+La calidad de una encuesta se define antes de salir a campo, en el cuestionario. Errores frecuentes:
+
+- **Preguntar solo intención de voto.** Es el dato menos accionable de todos. Saber que estás diez puntos abajo no te dice qué hacer.
+- **Preguntas que inducen la respuesta.** Si preguntás si la gente apoya una obra necesaria, todos apoyan. La pregunta útil es qué prioridad tiene esa obra frente a otras cinco.
+- **No medir intensidad.** No es lo mismo alguien que te vota convencido que alguien que te vota resignado. La intensidad predice si ese voto se sostiene o se fuga.
+- **Olvidar la agenda propia del votante.** La pregunta abierta sobre el principal problema del distrito, sin opciones, suele ser la más reveladora del cuestionario.
+
+### Escucha digital: cómo hacerla sin autoengañarse
+
+La conversación en redes **no es una muestra representativa** y tratarla como tal es un error caro. Los que hablan de política en redes son una minoría intensa, más polarizada y más joven que el padrón.
+
+Sirve, y mucho, para otra cosa:
+
+- **Detectar temas emergentes** antes de que lleguen a la encuesta. Un reclamo barrial que crece en grupos locales aparece en redes semanas antes de aparecer en un sondeo.
+- **Entender el lenguaje real.** La forma en que la gente nombra un problema es la forma en que hay que hablarlo. Traducir el tecnicismo de gestión al vocabulario del vecino cambia la efectividad de un mensaje.
+- **Mapear a quién le creen.** Referentes barriales, medios locales, cuentas vecinales. La red de intermediación importa más que el alcance bruto.
+- **Monitorear crisis.** Ver crecer un tema negativo en tiempo real da la ventana para responder antes de que escale.
+
+### El tablero: de los datos a la decisión
+
+Los datos sin un lugar donde ordenarse se vuelven anécdotas sueltas en una reunión. Nosotros trabajamos con un tablero único donde conviven las tres fuentes y que se revisa con una frecuencia fija, no cuando alguien se acuerda.
+
+Ese tablero tiene que responder cinco preguntas, siempre las mismas:
+
+1. ¿Cómo evolucionó la imagen del candidato desde la última medición?
+2. ¿Qué segmento está creciendo y cuál se está cayendo?
+3. ¿Qué temas dominan la agenda pública esta semana?
+4. ¿Dónde, geográficamente, hay más margen de crecimiento?
+5. ¿Qué mensaje probamos y cómo rindió?
+
+Si una medición no cambia ninguna decisión, no había que hacerla.
+
+### Ética y transparencia
+
+Trabajar con datos en política obliga a un estándar que no siempre se respeta. Nosotros sostenemos tres reglas: no se publica una encuesta propia como si fuera de un tercero independiente, no se usan datos personales obtenidos sin consentimiento para segmentar, y no se difunden mediciones recortadas para simular una tendencia que los datos completos no muestran.
+
+Además de ser lo correcto, es lo pragmático: una campaña que fabrica datos pierde credibilidad justo cuando más la necesita.
+
+*En Cosecha Creativa acompañamos campañas y gestiones con diseño de encuestas, escucha digital y tableros de decisión. La estrategia se discute con datos sobre la mesa.*
+    `,
+  },
+  {
+    slug: "ia-para-analizar-datos-de-tu-negocio",
+    title: "Del Excel al Insight: Usar IA para Leer los Datos que tu Negocio Ya Está Generando",
+    excerpt: "Tu empresa acumula ventas, consultas, stock y gastos en planillas que nadie mira. Cómo usar inteligencia artificial para convertir esos datos dormidos en decisiones concretas, sin ser analista ni programador.",
+    category: "IA",
+    coverImage: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "21 de Agosto, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Inteligencia Artificial", "Datos", "PyMEs", "Análisis"],
+    content: `
+Toda empresa, por chica que sea, genera datos todos los días. Ventas por producto, horarios de mayor consulta, motivos de reclamo, proveedores que se demoran, clientes que dejaron de comprar. El problema no es la falta de información: **es que esa información está desparramada en planillas que nadie abre.**
+
+La inteligencia artificial cambió esta ecuación de manera concreta. Hoy no hace falta un analista de datos ni saber programar para preguntarle a tus propios números qué está pasando.
+
+### Empezá por la pregunta, no por la herramienta
+
+El error clásico es contratar una herramienta de tableros y después buscarle una utilidad. Al revés funciona mucho mejor: escribí las cinco preguntas que hoy no podés responder con certeza sobre tu negocio.
+
+Suelen ser preguntas como estas:
+
+- ¿Qué productos me dejan margen y cuáles solo movimiento?
+- ¿Qué clientes que compraban seguido dejaron de hacerlo en los últimos tres meses?
+- ¿En qué días y horarios entran las consultas que después se convierten en venta?
+- ¿Cuánto tarda en promedio mi equipo en responder, y cambia eso el resultado?
+- ¿De dónde vienen los clientes que más gastan?
+
+Cada una de esas preguntas ya tiene la respuesta escondida en datos que tenés. Solo hay que ir a buscarla.
+
+### Nivel 1: preguntarle a tus propias planillas
+
+El punto de partida más barato es también el más subestimado. Los modelos de IA actuales leen planillas y responden en lenguaje natural. Le cargás el archivo de ventas del año y le preguntás directamente qué patrón encuentra, qué producto cayó y en qué mes.
+
+Tres advertencias importantes acá:
+
+- **Limpiá los datos antes.** Si la misma ciudad está escrita de cuatro formas distintas, el análisis va a estar mal. La calidad del dato define la calidad de la respuesta.
+- **Pedile que muestre el cálculo.** Un número sin explicación no se puede auditar. Si te dice que las ventas cayeron 12%, tiene que poder decirte contra qué período y con qué filas.
+- **No subas datos personales de clientes** a herramientas públicas. Nombres, teléfonos y documentos se anonimizan antes o se trabaja en un entorno privado.
+
+### Nivel 2: conectar las fuentes y automatizar el reporte
+
+Cuando las preguntas se vuelven recurrentes, hay que dejar de hacerlo a mano. Acá conectamos las fuentes reales — el sistema de gestión, la plataforma de comercio electrónico, las cuentas publicitarias, el CRM — y un flujo automatizado arma el análisis con la frecuencia que definas.
+
+El resultado no es un tablero lleno de gráficos que nadie interpreta. Es un texto corto, todos los lunes, que dice qué cambió, por qué y qué conviene revisar. La IA hace el trabajo de leer los números; vos tomás la decisión.
+
+### Nivel 3: anticipar en vez de mirar para atrás
+
+Con historial suficiente aparecen los usos que realmente mueven la aguja:
+
+- **Predicción de demanda.** Cuánto stock vas a necesitar el mes que viene según estacionalidad, tendencia y contexto. Menos capital inmovilizado y menos ventas perdidas por faltante.
+- **Detección de fuga de clientes.** Identificar quién está por dejar de comprarte, según el cambio en su patrón de compra, y actuar antes de perderlo.
+- **Segmentación automática.** Agrupar clientes por comportamiento real y no por intuición, para hablarle distinto a cada grupo.
+- **Análisis de sentimiento.** Leer cientos de comentarios, reseñas y mensajes y devolver los tres motivos concretos de queja más frecuentes.
+
+### El error más caro: confiar sin verificar
+
+Un modelo de lenguaje puede darte un número equivocado con total seguridad. En análisis financiero o de stock, eso no es una molestia: es una decisión mal tomada.
+
+La forma de trabajar que recomendamos es **usar la IA para encontrar la pregunta, y una fórmula verificable para responderla**. La IA detecta que algo raro pasó en marzo con un producto; después el cálculo exacto lo hace una consulta que siempre da el mismo resultado. Exploración con IA, cierre con datos duros.
+
+### Por dónde empezar esta semana
+
+No hace falta un proyecto de seis meses. Tomá el archivo de ventas del último año, limpialo, y hacele tres preguntas a un modelo de IA. Si de ahí sale una sola decisión que hoy no habrías tomado, ya justificaste el tiempo invertido.
+
+*En Cosecha Creativa ayudamos a empresas de San Juan a ordenar sus datos y a montar reportes automáticos que se entienden sin ser analista. Si tenés información y no sabés qué hacer con ella, hablemos.*
+    `,
+  },
+  {
+    slug: "landing-pages-que-convierten-anatomia",
+    title: "Anatomía de una Landing Page que Convierte: los 8 Bloques que No Pueden Faltar",
+    excerpt: "Mandar el tráfico de tus anuncios a la página de inicio es tirar plata. Desarmamos la estructura de una página de aterrizaje efectiva, bloque por bloque, con lo que sí mueve la conversión y lo que solo decora.",
+    category: "Web",
+    coverImage: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "18 de Agosto, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Landing Page", "Conversión", "Diseño Web", "Publicidad"],
+    content: `
+Hay un error que se repite en casi todas las cuentas publicitarias que auditamos: la campaña está bien armada, la segmentación es correcta, el anuncio genera clics… y todo ese tráfico aterriza en la página de inicio del sitio.
+
+Es como invitar a alguien a tu local para mostrarle un producto puntual y dejarlo parado en la puerta, con veinte carteles y ninguna indicación. **Una campaña sin página de aterrizaje propia desperdicia buena parte de lo que invertiste.**
+
+### Qué hace distinta a una landing page
+
+Una landing page tiene un solo objetivo y ninguna distracción. No tiene menú de navegación con doce opciones, no tiene enlaces al blog, no ofrece cinco servicios. Ofrece uno, y la única acción posible es avanzar hacia él.
+
+Esa restricción es exactamente lo que la hace funcionar.
+
+### Los 8 bloques, en orden
+
+**1. El titular que confirma la promesa**
+Tiene que decir lo mismo que decía el anuncio en el que la persona hizo clic. Si el aviso prometía presupuesto de cerramientos en 24 horas, el titular no puede hablar de soluciones integrales para el hogar. Esa desconexión es la primera causa de abandono.
+
+**2. El subtítulo que explica el cómo**
+Una línea que baje la promesa a algo concreto: para quién es, en qué plazo, con qué alcance. El titular vende, el subtítulo hace creíble.
+
+**3. La llamada a la acción visible sin scrollear**
+El botón tiene que estar arriba, no al final. Con texto en primera persona y específico: *Quiero mi presupuesto* funciona mejor que *Enviar*. Y el mismo botón se repite dos o tres veces más a lo largo de la página, porque cada visitante decide en un momento distinto.
+
+**4. La prueba, apenas empieza**
+Logos de clientes, cantidad de trabajos hechos, años en el rubro, una reseña con nombre y foto. Va arriba, no abajo: la desconfianza aparece temprano y hay que desactivarla ahí.
+
+**5. El problema, contado como lo cuenta el cliente**
+Antes de hablar de tu solución, mostrale que entendés su situación. Tres o cuatro puntos escritos con sus palabras, no con las tuyas. Cuando alguien se ve reflejado, sigue leyendo.
+
+**6. Los beneficios, no las características**
+Nadie compra hosting con almacenamiento en disco sólido; compra que su web no se caiga un sábado a la noche. Traducí cada característica técnica a lo que cambia en la vida del cliente.
+
+**7. Las objeciones, respondidas de frente**
+Es el bloque que más se omite y el que más levanta la conversión. Preguntas frecuentes reales: cuánto cuesta, cuánto tarda, qué pasa si no me gusta, tengo que firmar algo. Si no las respondés vos, la persona se va a buscarlas a otro lado y no vuelve.
+
+**8. El formulario más corto que puedas tolerar**
+Cada campo extra cuesta conversiones. Pedí lo mínimo para hacer el primer contacto: nombre, teléfono y una línea de consulta. El resto se pregunta después, cuando ya hay conversación.
+
+### Los detalles que definen el resultado
+
+- **Velocidad.** Una landing lenta pierde la mitad del tráfico pago antes de mostrarse. Es el requisito previo a cualquier otra optimización.
+- **Diseño pensado para el pulgar.** La mayoría de tus visitantes llega desde el celular, con una mano. Botones grandes, texto legible, formularios que no obliguen a hacer zoom.
+- **Coherencia visual con el anuncio.** Misma imagen, mismo color, mismo tono. La continuidad visual reduce la fricción del primer segundo.
+- **Un solo objetivo.** Si la página ofrece pedir presupuesto y además suscribirse al newsletter y además seguir en Instagram, no ofrece nada.
+
+### Medir y ajustar
+
+Una landing no se lanza: se itera. Instalá el seguimiento de conversiones bien configurado y mirá dos cosas: **qué porcentaje de visitantes completa el formulario** y **hasta dónde llegan los que no lo completan**. Si la mayoría abandona en el mismo bloque, ahí está el problema.
+
+Los cambios se prueban de a uno. Cambiar el titular, el botón y la imagen al mismo tiempo te deja sin saber qué funcionó.
+
+*En Cosecha Creativa diseñamos y medimos páginas de aterrizaje para campañas de empresas de San Juan. Si estás invirtiendo en publicidad y el tráfico cae en tu página de inicio, ahí hay conversiones esperando.*
+    `,
+  },
+  {
+    slug: "instagram-alcance-organico-2026",
+    title: "Alcance Orgánico en Instagram 2026: Qué Cambió y Qué Sigue Funcionando",
+    excerpt: "El alcance sin pauta bajó, pero no desapareció. Analizamos qué prioriza hoy el algoritmo, por qué los seguidores importan menos que antes y qué tipo de contenido sigue llegando a gente nueva.",
+    category: "Redes",
+    coverImage: "https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "14 de Agosto, 2026",
+    readTime: "5 min de lectura",
+    tags: ["Instagram", "Alcance Orgánico", "Algoritmo", "Contenidos"],
+    content: `
+Es el reclamo más frecuente que escuchamos: *antes publicaba y me veía todo el mundo, ahora no me ve nadie*. Y es cierto a medias. El alcance orgánico bajó, sí, pero lo que cambió de fondo es **a quién le muestra tu contenido la plataforma**.
+
+Entender ese cambio vale más que cualquier truco de horarios o cantidad de etiquetas.
+
+### El cambio de fondo: de red social a sistema de recomendación
+
+Instagram dejó de ser una lista de lo que publica la gente que seguís. Hoy funciona como un motor de recomendación: la mayor parte de lo que ves en el feed y en los videos cortos viene de cuentas que **no** seguís, elegidas porque el sistema cree que te van a interesar.
+
+Esto tiene dos consecuencias directas para una marca:
+
+- **Tener muchos seguidores ya no garantiza alcance.** Una cuenta de quinientos seguidores puede llegar a veinte mil personas con una pieza buena.
+- **Cada publicación compite con todo el catálogo de la plataforma**, no solo con lo que publicaron tus competidores esa mañana.
+
+Es una mala noticia para las cuentas que vivían de una comunidad acumulada, y una excelente noticia para las marcas nuevas que hacen buen contenido.
+
+### Qué mira el algoritmo, en orden de peso
+
+**1. Cuánto tiempo se queda la gente.** Es la señal más fuerte. Un video que retiene a la persona hasta el final vale mucho más que uno con muchos me gusta y abandono temprano. Los primeros dos segundos definen el resto.
+
+**2. Compartidos por mensaje directo.** Cuando alguien le manda tu publicación a un amigo, la plataforma lo lee como la máxima señal de valor. Es hoy la métrica más correlacionada con alcance amplio.
+
+**3. Guardados.** Indican contenido útil, del que la persona quiere volver a ver. Los formatos de guía, checklist y explicación funcionan especialmente bien acá.
+
+**4. Comentarios con sustancia.** Un comentario largo pesa más que un emoji. Preguntar algo concreto al final de la pieza sigue siendo efectivo, siempre que la pregunta no sea de relleno.
+
+**5. Me gusta.** Sigue contando, pero es la señal más débil de todas. Es la métrica que todavía se mira en las reuniones y la que menos explica los resultados.
+
+### Qué sigue funcionando para llegar a gente nueva
+
+- **Video corto con gancho inmediato.** No hay reemplazo: es el formato con más distribución. La clave está en decir lo interesante en el primer segundo, sin introducción ni presentación.
+- **Contenido que enseña algo puntual.** Cómo se hace, qué errores evitar, cuánto cuesta realmente. Es el contenido que se guarda y se comparte.
+- **Lo local bien explotado.** Para un negocio de San Juan, hablar de San Juan multiplica la relevancia. La plataforma reconoce la señal geográfica y la conversación local tiene menos competencia que la genérica.
+- **Carruseles con densidad.** Volvieron a rendir muy bien cuando cada placa aporta información nueva y obliga a deslizar. Funcionan mejor que el video para temas que necesitan detalle.
+- **Colaboraciones.** Publicar en conjunto con otra cuenta pone tu contenido frente a dos audiencias completas. Es la forma más rápida de crecer sin pauta.
+
+### Qué dejó de funcionar
+
+- Publicar solo por cumplir la frecuencia. La plataforma penaliza el contenido que la gente saltea; publicar de más con piezas flojas baja el rendimiento de las buenas.
+- Las listas de treinta etiquetas. Hoy suman poco; tres a cinco bien elegidas alcanzan.
+- Los textos largos sin razón. Si el valor está en el texto, funciona; si es relleno, la gente no se detiene.
+- Reciclar contenido de otras plataformas con la marca de agua visible. Se distribuye peor.
+
+### La conclusión honesta
+
+El orgánico sirve para construir marca, autoridad y comunidad, y hoy puede traer gente nueva como no lo hacía hace unos años. Pero **no es un canal de venta previsible**: no podés planificar un mes de facturación en función de si una pieza rinde o no.
+
+La combinación que funciona es la de siempre, con los roles claros: orgánico para construir confianza y probar qué mensajes enganchan, pauta para llevar volumen predecible a los mensajes que ya demostraron funcionar.
+
+*En Cosecha Creativa gestionamos redes con esa lógica: contenido que construye marca y pauta que sostiene resultados. Contanos qué está pasando con tu cuenta y la revisamos.*
+    `,
+  },
+  {
+    slug: "accesibilidad-web-por-que-importa",
+    title: "Accesibilidad Web: los Visitantes que Hoy No Pueden Usar tu Sitio (y Te Están Buscando)",
+    excerpt: "Contraste bajo, imágenes sin descripción, formularios imposibles de completar con teclado. La accesibilidad no es solo una obligación ética: es tráfico, posicionamiento y ventas que estás dejando pasar.",
+    category: "Web",
+    coverImage: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "11 de Agosto, 2026",
+    readTime: "5 min de lectura",
+    tags: ["Accesibilidad", "Diseño Web", "UX", "Inclusión"],
+    content: `
+Cuando hablamos de accesibilidad web con un cliente, la primera reacción suele ser la misma: *mis clientes no tienen discapacidad*. Es una suposición que casi siempre está equivocada, y que además define mal el problema.
+
+La accesibilidad no es solo para personas ciegas. Es para **el señor de 68 años que no llega a leer tu tipografía gris claro**, para la persona que navega con el celular al sol y no distingue los botones, para quien tiene una mano ocupada, para el que perdió el mouse y navega con teclado. Es, en la práctica, **para todos en algún momento.**
+
+### El problema, en números concretos
+
+Aproximadamente una de cada seis personas vive con alguna forma de discapacidad. Sumale la población mayor de 65 años, que crece todos los años y tiene poder de compra. Estamos hablando de una porción del mercado que ningún negocio descartaría a propósito — pero que muchos sitios descartan por descuido.
+
+Y hay un efecto colateral que conviene mirar: **Google lee tu sitio de forma parecida a como lo hace un lector de pantalla**. Un sitio accesible se posiciona mejor porque tiene estructura semántica clara, textos alternativos en las imágenes y jerarquía de encabezados coherente. Es la misma tarea con dos beneficios.
+
+### Los cinco problemas que encontramos siempre
+
+**1. Contraste insuficiente.** Texto gris claro sobre fondo blanco, o texto blanco sobre una foto. Se ve elegante en la pantalla del diseñador y es ilegible en un celular a la intemperie. La relación mínima recomendada es de 4,5 a 1 para texto normal, y hay herramientas gratuitas que lo miden en segundos.
+
+**2. Imágenes sin texto alternativo.** Cada imagen con contenido informativo necesita una descripción. Si la foto muestra el producto, la descripción dice qué producto es. Las decorativas se marcan como tales para que el lector de pantalla las saltee.
+
+**3. Formularios sin etiquetas reales.** Poner el nombre del campo solo como texto de ejemplo dentro de la caja tiene dos problemas: desaparece al empezar a escribir, y los lectores de pantalla no siempre lo anuncian. Cada campo necesita su etiqueta visible y asociada.
+
+**4. Sitios que no se pueden navegar con teclado.** Probalo ahora mismo en tu web: recorré la página usando solo la tecla de tabulación. Si no ves dónde estás parado, o si hay botones a los que nunca llegás, tenés un problema que afecta a mucha más gente de la que imaginás.
+
+**5. Videos sin subtítulos.** Además de lo obvio, la mayoría de la gente mira video en redes sin sonido. Un video sin subtítulos pierde audiencia por partida doble.
+
+### Cómo auditarlo sin ser especialista
+
+Hay tres chequeos que cualquiera puede hacer en veinte minutos:
+
+1. **Navegá con el teclado.** Solo tabulación y enter, de arriba a abajo. Anotá dónde te perdés.
+2. **Alejá la vista.** Achicá la pantalla o miralo de lejos: si algo no se distingue, el contraste es insuficiente.
+3. **Pasá un validador automático.** Herramientas gratuitas detectan buena parte de los errores técnicos. No reemplazan la revisión humana, pero te dan el mapa inicial.
+
+Los validadores automáticos encuentran cerca de un tercio de los problemas reales. El resto aparece usando el sitio de verdad, que es lo que conviene hacer con al menos una persona ajena al proyecto.
+
+### Lo que gana el negocio
+
+Además de dejar de excluir clientes, un sitio accesible es **más claro para todo el mundo**. Los textos alternativos mejoran el posicionamiento en búsqueda de imágenes. La jerarquía de encabezados ayuda a Google a entender tu contenido. Los formularios bien etiquetados se completan más y se abandonan menos.
+
+En otras palabras: casi todo lo que hacés por accesibilidad también mejora la conversión general. Es de las pocas cosas en desarrollo web donde hacer lo correcto y hacer lo rentable coinciden por completo.
+
+*En Cosecha Creativa incorporamos criterios de accesibilidad en cada sitio que desarrollamos, y auditamos sitios existentes para detectar qué está excluyendo visitantes. Si tenés dudas sobre el tuyo, lo revisamos.*
+    `,
+  },
+  {
+    slug: "prompts-efectivos-para-equipos-de-trabajo",
+    title: "Prompts que Sirven: Cómo Escribirle a la IA para que Trabaje Bien de Verdad",
+    excerpt: "La diferencia entre una respuesta genérica e inservible y una que ahorra dos horas está casi siempre en cómo se pide. Una guía práctica para que tu equipo le saque provecho real a la inteligencia artificial.",
+    category: "IA",
+    coverImage: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "07 de Agosto, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Inteligencia Artificial", "Productividad", "Equipos", "Prompts"],
+    content: `
+La escena más común en una empresa que empezó a usar IA: alguien escribe *hacé un texto para Instagram sobre nuestro producto*, recibe un párrafo lleno de lugares comunes y frases vacías, y concluye que la herramienta no sirve.
+
+La herramienta sirve. Lo que falló fue el pedido. **Un modelo de lenguaje responde con el nivel de precisión con el que le hablás**, y la mayoría de la gente le habla como le hablaría a un buscador.
+
+### Los cuatro elementos de un buen pedido
+
+Casi todos los prompts que funcionan tienen estas cuatro partes, aunque no estén escritas en ese orden:
+
+**Contexto.** Quién sos, a quién le hablás y en qué situación. *Somos una agencia de marketing en San Juan; le escribimos a dueños de PyMEs de entre 35 y 55 años que no manejan jerga técnica.*
+
+**Tarea.** Qué querés exactamente, con el verbo preciso. No es lo mismo resumir que reescribir, ni analizar que opinar.
+
+**Formato.** Extensión, estructura, tono. *Tres párrafos, sin viñetas, en segunda persona, tuteo argentino, sin signos de exclamación.*
+
+**Restricciones.** Lo que no querés. Esta parte es la que más rendimiento agrega y la que más se olvida. *No uses las palabras revolucionario, innovador ni solución integral. No inventes datos ni estadísticas.*
+
+### Técnicas que cambian el resultado
+
+**Dale un rol concreto.** Pedirle que responda como un contador con veinte años de experiencia en PyMEs argentinas produce una respuesta distinta a la genérica. El rol activa un registro y un vocabulario específicos.
+
+**Mostrale un ejemplo.** Es la técnica con mejor relación esfuerzo-resultado. Pegá un texto tuyo anterior y pedile que siga ese estilo. Un ejemplo comunica más sobre tu tono que tres párrafos de instrucciones.
+
+**Pedile el razonamiento antes que la conclusión.** Para tareas de análisis, pedir que explique el paso a paso antes de dar el resultado mejora notablemente la calidad de ese resultado.
+
+**Trabajá por iteración, no de una.** El primer borrador casi nunca es el bueno. Pedile que lo acorte, que cambie el tono del segundo párrafo, que reemplace el ejemplo por uno del rubro gastronómico. La conversación es la herramienta, no el primer mensaje.
+
+**Pedile que te haga preguntas.** Cerrar el pedido con *antes de responder, hacéme las preguntas que necesites* evita la mitad de las respuestas fuera de foco.
+
+### Lo que no hay que hacer
+
+- **Pedir varias cosas distintas en un mismo mensaje.** Un pedido, una tarea. Si necesitás cinco piezas, son cinco pedidos.
+- **Aceptar datos sin verificar.** Los modelos pueden afirmar con total seguridad un número que no existe. Cualquier dato, cifra, ley o cita que vaya a publicarse se verifica en la fuente original. Sin excepciones.
+- **Cargar información confidencial en herramientas públicas.** Datos de clientes, contratos, información financiera. Si el equipo va a trabajar con eso, tiene que ser en un entorno con las garantías correspondientes.
+- **Publicar sin editar.** Se nota. El texto sale correcto pero sin voz propia, y el lector lo percibe aunque no sepa nombrarlo.
+
+### Cómo ordenarlo a nivel equipo
+
+Cuando varias personas usan IA en una empresa, cada una desarrolla su propio método y los resultados quedan disparejos. Lo que recomendamos es armar una **biblioteca de prompts**: un documento compartido con los pedidos que ya funcionaron, listos para reutilizar.
+
+Cinco o seis plantillas alcanzan para cubrir la mayor parte del trabajo diario: responder una consulta comercial, resumir una reunión, redactar una publicación, revisar un texto, analizar una planilla. Cada plantilla tiene el contexto de la empresa ya escrito, así nadie lo repite.
+
+Y una regla que conviene dejar por escrito desde el arranque: **qué tareas pueden salir con IA y cuáles necesitan revisión humana obligatoria** antes de llegar al cliente.
+
+### La medida del éxito
+
+No es cuántas veces se usa la herramienta. Es cuántas horas dejó de dedicarle el equipo a tareas que no requieren criterio, y si esas horas se redirigieron a algo que sí genera valor. Si la IA solo agregó una tarea más al día, algo está mal planteado.
+
+*En Cosecha Creativa capacitamos equipos para que la IA deje de ser un juguete y pase a ser parte del proceso de trabajo. Si en tu empresa la están usando a medias, podemos ordenarlo.*
+    `,
+  },
+  {
+    slug: "email-marketing-sigue-vivo",
+    title: "Email Marketing: el Canal que Todos Dan por Muerto y Sigue Liderando el Retorno",
+    excerpt: "Mientras el alcance en redes depende del algoritmo de turno, tu lista de correos es tuya. Cómo construirla desde cero, qué mandar y por qué sigue siendo el canal más rentable para una PyME.",
+    category: "Redes",
+    coverImage: "https://images.unsplash.com/photo-1611262588024-d12430b98920?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "04 de Agosto, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Email Marketing", "Fidelización", "Automatización", "Ventas"],
+    content: `
+Cada vez que proponemos armar una estrategia de correo la reacción es parecida: *el mail ya no lo lee nadie*. Después miramos los números de las cuentas que lo trabajan en serio y aparece la contradicción: **es, por lejos, el canal con mejor retorno por peso invertido** de todo el mix digital.
+
+La razón es estructural y vale la pena entenderla.
+
+### Por qué sigue funcionando
+
+**Tu lista es tuya.** Si mañana Instagram cambia el algoritmo o te suspende la cuenta, perdés el acceso a tu audiencia de un día para el otro. Tu base de correos no depende de ninguna plataforma: es un activo de la empresa, como la cartera de clientes.
+
+**Llega completo.** Un correo entra a la bandeja de entrada. No compite con un feed infinito ni depende de que el sistema decida mostrarlo. La persona lo ve, aunque después no lo abra.
+
+**Habla con gente que ya te conoce.** Nadie deja su correo por casualidad. Es una audiencia que ya mostró interés, lo que explica que convierta tanto mejor que el tráfico frío.
+
+### Cómo construir la lista sin comprar bases
+
+Empecemos por lo que no hay que hacer: **no compres listas**. Además de ser ilegal en términos de protección de datos, te destruye la reputación de envío y termina mandando todo a correo no deseado. Una lista de doscientos contactos propios rinde más que una de veinte mil comprada.
+
+Las formas que funcionan:
+
+- **Dar algo a cambio.** Nadie deja su mail por un boletín de novedades de tu empresa. Sí lo deja por una guía útil, una lista de precios, un descuento en la primera compra o una plantilla que le resuelve algo.
+- **Pedirlo en el momento de la compra.** El cliente que acaba de comprar es el más dispuesto a dejarte su correo. Es el momento de máxima confianza y casi nadie lo aprovecha.
+- **Usar la web como captador permanente.** Un formulario bien ubicado, sin ventanas emergentes agresivas que aparecen a los dos segundos.
+- **Aprovechar el mostrador.** Para un negocio con local, pedir el correo al emitir la factura suma decenas de contactos por semana sin costo alguno.
+
+### Qué mandar (y con qué frecuencia)
+
+La pregunta más frecuente es cuántas veces escribir. La respuesta honesta: **importa más la utilidad que la frecuencia**. Un correo por semana que aporta algo genera menos bajas que uno por mes que solo vende.
+
+Una estructura que funciona para la mayoría de las PyMEs:
+
+- **80% valor, 20% oferta.** Consejos, novedades del rubro que le sirvan al cliente, casos resueltos, respuestas a preguntas frecuentes. Y cada tanto, la venta explícita.
+- **Un solo tema por correo.** El correo que trae cinco temas no se lee entero. Uno claro, con un solo botón, rinde más.
+- **Asunto concreto, no ingenioso.** El asunto vago pierde ante el específico. Decir qué hay adentro funciona mejor que intrigar.
+
+### Las secuencias automáticas que sí valen la pena
+
+Acá está la parte que más resultados da y menos trabajo continuo exige. Se arman una vez y funcionan solas:
+
+**Bienvenida.** Tres correos en la primera semana: quiénes somos, qué problema resolvemos, y una oferta de primer contacto. Es la secuencia con mayor tasa de apertura de todas, porque la persona te acaba de conocer.
+
+**Carrito abandonado.** Para comercio electrónico, es la automatización que más factura por sí sola. Un recordatorio a las pocas horas y otro al día siguiente recuperan una porción significativa de las ventas perdidas.
+
+**Reactivación.** A los clientes que no compran hace seis meses, un correo que reconozca la ausencia y ofrezca un motivo concreto para volver. Recuperar un cliente cuesta bastante menos que conseguir uno nuevo.
+
+**Post-venta.** Unos días después de la compra: cómo aprovechar mejor lo que compró, y un pedido de reseña. Sirve para fidelizar y para construir prueba social al mismo tiempo.
+
+### Las métricas que importan
+
+Mirá tres y no diez:
+
+- **Tasa de apertura:** habla de tu asunto y de tu reputación como remitente.
+- **Clics sobre aperturas:** habla del contenido. Si abren y no hacen clic, el correo no cumplió lo que prometía el asunto.
+- **Bajas y reportes de correo no deseado:** son la alarma. Una suba sostenida significa que estás mandando de más o mandando mal.
+
+La cantidad de suscriptores, otra vez, es la métrica más visible y la menos útil. Una lista limpia de mil contactos activos vale más que una de diez mil con la mitad inactiva, que además te empeora la entregabilidad.
+
+### El aspecto legal
+
+En Argentina rige la ley de protección de datos personales: la persona tiene que haber consentido recibir tus correos, y cada envío debe incluir una forma clara de darse de baja. Cumplirlo no es solo evitar problemas: una lista de gente que quiere estar ahí es exactamente lo que hace rentable al canal.
+
+*En Cosecha Creativa armamos estrategias de correo con secuencias automáticas para empresas de San Juan. Si tenés una base de clientes juntando polvo en una planilla, ahí hay ventas esperando.*
+    `,
+  },
+  {
+    slug: "micro-segmentacion-territorial-campanas",
+    title: "Micro-segmentación Territorial: Por Qué Hay que Hablarle Distinto a Cada Barrio",
+    excerpt: "El mensaje único para toda la provincia no le habla a nadie en particular. Cómo trabajar la comunicación política por unidad territorial, con datos reales, sin caer en decir cosas distintas según quién escucha.",
+    category: "Compol",
+    coverImage: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "31 de Julio, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Comunicación Política", "Segmentación", "Territorio", "Campañas"],
+    content: `
+Una campaña provincial que comunica lo mismo en Rawson que en Iglesia está desperdiciando la mitad de su presupuesto. No porque el candidato deba tener dos discursos, sino porque **las prioridades reales de cada territorio son distintas**, y hablar de lo que a la gente no le preocupa es equivalente a no hablar.
+
+La micro-segmentación bien entendida no es decir cosas diferentes según quién escuche. Es **elegir, de todo lo que el candidato genuinamente propone, aquello que le importa a cada lugar.**
+
+### La diferencia entre segmentar y ser inconsistente
+
+Es la objeción legítima que aparece siempre, y conviene responderla de entrada.
+
+Un candidato tiene una plataforma con, digamos, quince propuestas. Hablar de conectividad y transporte en un departamento alejado, y de seguridad y espacio público en el centro urbano, no es contradecirse: es priorizar. Las quince propuestas siguen siendo públicas y verificables.
+
+La línea se cruza cuando se dice A en un lugar y no-A en otro. Eso no es segmentación, es doble discurso, y en la era de las capturas de pantalla dura poco y se paga caro.
+
+### Qué datos usar para segmentar
+
+**Resultados históricos por mesa.** Es el dato más valioso y el más disponible. Te dice dónde tenés voto propio consolidado, dónde estás al límite y dónde no tenés nada. Esa clasificación define toda la asignación de recursos.
+
+**Composición demográfica.** Edad, ocupación predominante, nivel educativo. Un barrio de jóvenes con primer empleo y uno de jubilados no comparten agenda ni canal.
+
+**Infraestructura y obra pública.** Qué hay y qué falta en cada zona: agua, cloacas, asfalto, alumbrado, transporte, centro de salud. La agenda concreta de un vecino suele estar a tres cuadras de su casa.
+
+**Escucha local.** Grupos vecinales, medios de cada departamento, referentes barriales. Es lo que da el matiz que ningún dato agregado te muestra.
+
+### Cómo se traduce en decisiones
+
+Con esa información, cada unidad territorial entra en una de tres categorías, y cada categoría tiene una estrategia distinta:
+
+**Zonas propias.** El objetivo no es convencer sino **movilizar**. El riesgo real acá es la abstención, no la fuga. El mensaje es de continuidad, reconocimiento y participación, y el recurso principal es la estructura territorial, no la pauta.
+
+**Zonas competitivas.** Es donde se define la elección y donde va la mayor parte del presupuesto. El objetivo es **persuadir**, y eso exige entender con precisión qué preocupa ahí. Es la zona donde la pauta segmentada y la presencia territorial se refuerzan mutuamente.
+
+**Zonas adversas.** No se abandonan, pero se trabaja con expectativa realista: reducir la diferencia, no ganar. El mensaje es de gestión y de temas transversales, no de confrontación.
+
+### Los canales cambian con el territorio
+
+Un error frecuente es segmentar el mensaje y no el canal. En la práctica:
+
+- En zonas urbanas jóvenes, el video corto y la conversación en redes tienen peso real.
+- En departamentos alejados, la radio local y el referente de la zona siguen siendo el canal de mayor credibilidad, muy por encima de cualquier plataforma digital.
+- El grupo de WhatsApp vecinal es, en toda la provincia, el espacio donde efectivamente circula la información política del día a día. Ignorarlo es ignorar el canal principal.
+
+### Los límites que nos ponemos
+
+Trabajar con segmentación territorial en política obliga a marcar límites claros, porque la herramienta se presta al abuso:
+
+- **No usamos datos personales obtenidos sin consentimiento** para armar segmentos.
+- **No hacemos publicidad que oculte quién la paga.** Cada pieza segmentada tiene identificación visible del responsable.
+- **No adaptamos posiciones de fondo por zona.** Se prioriza lo que se dice, no se cambia lo que se piensa.
+
+Estas reglas no son solo éticas: son la diferencia entre una campaña que construye credibilidad y una que gana una semana y pierde la confianza para siempre.
+
+### El error más común
+
+Segmentar y después no medir. Cada zona debería tener su propia lectura de resultado — evolución de imagen, temas que subieron, efectividad de cada mensaje probado — para poder corregir a tiempo. Una estrategia territorial que se define en marzo y no se toca hasta octubre no es una estrategia: es una apuesta.
+
+*En Cosecha Creativa trabajamos comunicación política con lectura territorial, datos propios y reglas claras. Si estás armando una campaña en San Juan, conversemos con los números sobre la mesa.*
+    `,
+  },
+  {
+    slug: "google-business-profile-ficha-google-san-juan",
+    title: "Tu Ficha de Google: el Activo Digital Gratuito que Casi Todos Abandonan",
+    excerpt: "Es lo primero que ve alguien que busca tu negocio, define si te llaman o llaman al competidor de al lado, y no cuesta nada. Guía completa para dejar tu ficha de Google trabajando a favor tuyo.",
+    category: "Web",
+    coverImage: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "28 de Julio, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Google", "SEO Local", "San Juan", "Reseñas"],
+    content: `
+Alguien busca en el celular *cerrajero cerca* o *panadería San Juan*. Antes de ver un solo sitio web aparece un bloque con tres negocios: nombre, estrellas, horario, botón de llamar y botón de cómo llegar.
+
+Ese bloque decide la mayoría de las búsquedas locales. Y está armado, casi enteramente, con la información de tu **ficha de empresa en Google** — el mismo perfil que la mayoría de los negocios completa una vez y no vuelve a tocar nunca.
+
+### Por qué importa tanto
+
+Una búsqueda local tiene una característica que la hace especialmente valiosa: **la persona está decidiendo ahora**. No está investigando para el mes que viene; está eligiendo a quién llamar en los próximos cinco minutos.
+
+Si tu ficha no aparece, o aparece con el horario viejo, sin fotos y con dos reseñas de 2021, la llamada se la lleva el de al lado. No porque sea mejor, sino porque estaba mejor presentado en el momento exacto de la decisión.
+
+### Lo que Google mira para ordenar los resultados
+
+Son tres factores, y ninguno es un misterio:
+
+**Relevancia.** Qué tan bien coincide tu ficha con lo que la persona buscó. Acá pesa que la categoría principal esté bien elegida y que la descripción y los servicios cargados usen las palabras que tus clientes realmente escriben.
+
+**Distancia.** Qué tan cerca estás de quien busca. No lo podés cambiar, pero sí podés definir bien tu área de servicio si trabajás a domicilio.
+
+**Prominencia.** Qué tan conocido sos. Acá entran las reseñas, las menciones de tu negocio en otros sitios y directorios, y el posicionamiento general de tu web.
+
+### El checklist de la ficha completa
+
+- **Categoría principal precisa.** Es el campo de mayor impacto. *Estudio contable* rinde distinto que *asesor financiero*. Elegí la que describe exactamente lo que hacés y sumá las secundarias.
+- **Nombre exacto del negocio.** Sin agregarle palabras clave. Google penaliza *Panadería La Espiga - Las Mejores Facturas de San Juan* y puede suspender la ficha.
+- **Horario real, incluidos los feriados especiales.** Nada genera peor experiencia que llegar a un local cerrado que figuraba abierto. Google también lo registra.
+- **Teléfono local y enlace a la web.** Con el seguimiento configurado para saber cuántas visitas llegan desde ahí.
+- **Fotos propias y actualizadas.** Frente del local, interior, equipo, productos, trabajos hechos. Las fichas con fotos reciben muchísimas más solicitudes de indicaciones y llamadas. Subí algunas por mes: la actividad reciente también cuenta.
+- **Servicios y productos cargados uno por uno.** Cada uno con su descripción. Es contenido indexable que la mayoría de los competidores deja vacío.
+- **Publicaciones.** La ficha permite publicar novedades, ofertas y eventos. Es de los espacios menos aprovechados y da señal de negocio activo.
+- **Preguntas frecuentes.** Cualquiera puede preguntar en tu ficha, y cualquiera puede responder. Conviene que cargues vos las preguntas más comunes con su respuesta correcta, antes de que responda alguien mal informado.
+
+### Reseñas: el factor que más pesa y más cuesta
+
+Las reseñas son, en la práctica, el diferencial más grande entre dos negocios equivalentes. Tres cosas a tener claras:
+
+**Pedilas de forma sistemática.** El cliente contento no deja reseña por iniciativa propia; el enojado sí. Si no las pedís, tu promedio va a estar sesgado hacia abajo. El mejor momento es justo después de resolver bien algo, con un enlace directo que no obligue a buscar nada.
+
+**Respondé todas, buenas y malas.** Responder muestra que hay alguien atento del otro lado. En las negativas, la respuesta no es para quien se quejó: es para los cincuenta que la van a leer antes de decidir. Tono sereno, reconocer lo que corresponda, ofrecer resolverlo por privado.
+
+**No las compres ni las inventes.** Google detecta patrones de reseñas falsas y la sanción va desde ocultarlas hasta suspender la ficha completa. El riesgo no compensa.
+
+### El error de fondo
+
+La ficha no es un formulario que se completa una vez. Es un canal vivo: fotos nuevas, publicaciones, reseñas respondidas, horarios actualizados. Google premia la actividad reciente, y el cliente también la nota.
+
+Es, además, la única herramienta de marketing local que **no cuesta un peso** y que la mayoría de los competidores tiene abandonada. Es donde mejor rinde una hora de trabajo por mes.
+
+*En Cosecha Creativa optimizamos fichas de Google y estrategias de posicionamiento local para negocios de San Juan. Si tu ficha está incompleta o desactualizada, empecemos por ahí.*
+    `,
+  },
+  {
+    slug: "ia-y-seo-como-aparecer-en-respuestas-chatgpt",
+    title: "Cuando la Gente le Pregunta a la IA en Vez de Buscar: Cómo Lograr que te Recomiende",
+    excerpt: "Cada vez más consultas empiezan en un asistente de IA y no en el buscador. Qué cambia para tu negocio, por qué el SEO clásico sigue siendo la base y qué se puede hacer hoy para aparecer en esas respuestas.",
+    category: "IA",
+    coverImage: "https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "24 de Julio, 2026",
+    readTime: "6 min de lectura",
+    tags: ["SEO", "Inteligencia Artificial", "Posicionamiento", "Contenidos"],
+    content: `
+Hasta hace poco, el recorrido era conocido: la persona buscaba en Google, veía diez resultados, entraba a dos o tres y elegía. Hoy una parte creciente de esas consultas termina de otra forma: **la persona le pregunta a un asistente de IA y recibe una respuesta directa, con dos o tres recomendaciones y sin lista de enlaces.**
+
+Para un negocio, la pregunta se vuelve concreta: si el asistente recomienda tres proveedores de tu rubro en San Juan, ¿estás entre esos tres?
+
+### Qué cambia de fondo
+
+**El clic deja de ser el objetivo único.** Si el asistente responde con tu información y menciona tu marca, ganaste algo aunque nadie entre a tu sitio: quedaste posicionado como referencia en el momento de la decisión.
+
+**Las consultas se vuelven más largas y específicas.** Nadie le escribe *diseño web san juan* a un asistente. Le escribe *necesito una web para mi estudio contable, con turnos online, cuánto puede costar y a quién le pregunto en San Juan*. El contenido que responde preguntas concretas gana peso.
+
+**La confianza se concentra.** Una respuesta con tres nombres es mucho más excluyente que una página con diez resultados y un montón de anuncios. El premio por estar es más grande y el costo de no estar también.
+
+### La base sigue siendo la misma
+
+Acá viene la parte que conviene decir sin vueltas, porque hay mucho humo dando vueltas: **los asistentes de IA se alimentan, en gran medida, del mismo contenido que indexa el buscador**. No hay una puerta secreta.
+
+Si tu sitio no está indexado, si carga mal, si no tiene contenido que responda preguntas reales, no vas a aparecer en las respuestas de IA por más que optimices para eso. **El SEO técnico y de contenidos sigue siendo el piso.** Lo que cambia es qué se construye arriba.
+
+### Qué hacer concretamente
+
+**Escribí para responder preguntas, no para repetir palabras clave.** El contenido que los modelos citan es el que responde con claridad y en pocas líneas. Estructurá con preguntas como títulos y la respuesta directa en el primer párrafo debajo, antes del desarrollo.
+
+**Sé específico y verificable.** Datos concretos, plazos, rangos de precio, alcance geográfico. El contenido vago no se cita porque no aporta nada al que responde. Decir que trabajás en San Juan capital y alrededores con entrega en 72 horas es citable; decir que ofrecés soluciones a medida no.
+
+**Usá datos estructurados.** Marcar en el código qué es tu empresa, qué servicios ofrecés, dónde estás, cuál es tu horario y qué preguntas frecuentes respondés le da a cualquier sistema una lectura sin ambigüedad de tu información.
+
+**Construí presencia fuera de tu sitio.** Los modelos ponderan menciones en fuentes que consideran confiables: directorios locales, cámaras empresarias, medios de la provincia, reseñas. Una marca mencionada en varios lugares tiene más probabilidad de aparecer que una que solo existe en su propia web.
+
+**Mantené la coherencia de tus datos.** Nombre, dirección y teléfono idénticos en todos lados. Las contradicciones entre fuentes hacen que el sistema no confíe en ninguna.
+
+**Publicá contenido con fecha y autor.** La señal de quién lo escribió y cuándo pesa cada vez más, tanto para el buscador como para los modelos.
+
+### Cómo saber si estás apareciendo
+
+No hay todavía una herramienta de medición estándar, así que lo hacemos a mano y funciona bien: armá una lista de veinte preguntas que un cliente potencial le haría a un asistente sobre tu rubro y tu zona, y probalas una vez por mes en los principales asistentes.
+
+Anotá si aparecés, con qué información y si es correcta. Ese registro simple te dice más que cualquier promesa de posicionamiento en IA.
+
+### Una advertencia
+
+Están apareciendo servicios que prometen posicionarte en las respuestas de IA con métodos propios. Conviene ser escéptico: **no existe un panel de control donde comprar ese lugar**. Lo que sí existe es hacer bien lo de siempre — contenido útil, sitio sano, presencia consistente, reputación real — con la estructura adecuada para que un modelo lo pueda leer y citar.
+
+Que es, dicho de otro modo, el mismo trabajo de fondo que ya venía funcionando, con un motivo más para hacerlo bien.
+
+*En Cosecha Creativa trabajamos posicionamiento con esa lógica: base técnica sólida, contenido que responde preguntas reales y presencia local consistente. Si querés saber cómo te está mencionando la IA hoy, lo medimos.*
+    `,
+  },
+  {
+    slug: "ugc-y-testimonios-prueba-social",
+    title: "Prueba Social: Cómo Convertir a tus Clientes Contentos en tu Mejor Publicidad",
+    excerpt: "Lo que decís de vos vale poco; lo que dicen tus clientes vale todo. Cómo pedir, producir y usar testimonios, reseñas y contenido de clientes sin que quede armado ni forzado.",
+    category: "Redes",
+    coverImage: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "21 de Julio, 2026",
+    readTime: "5 min de lectura",
+    tags: ["Testimonios", "Prueba Social", "Reseñas", "Contenidos"],
+    content: `
+Podés escribir el mejor texto de venta del mundo y no va a pesar tanto como una persona común diciendo, con sus palabras, que le funcionó. Es el mecanismo más viejo del comercio y sigue intacto: **antes de comprar, buscamos a alguien parecido a nosotros que ya haya comprado.**
+
+En una provincia como San Juan, donde el boca a boca todavía manda, esto se multiplica. La diferencia es que hoy ese boca a boca también se produce, se ordena y se muestra.
+
+### Los tres tipos de prueba social y para qué sirve cada uno
+
+**Reseñas.** Son las de mayor peso en la decisión de compra porque se perciben como espontáneas y verificables. Su lugar natural es Google y las plataformas del rubro. Sirven sobre todo para captar a quien está buscando activamente.
+
+**Testimonios.** Más elaborados: un cliente contando su caso con nombre, cara y contexto. Sirven para vencer objeciones específicas en la etapa de consideración. Un buen testimonio no dice que sos excelente; dice qué problema tenía y cómo se resolvió.
+
+**Contenido de clientes.** Fotos, videos o publicaciones que hacen ellos mismos usando tu producto. Es el formato con más credibilidad y el más difícil de fabricar, justamente porque se nota cuando está armado.
+
+### Cómo pedir un testimonio que sirva
+
+El pedido genérico — *¿nos dejás un comentario?* — produce respuestas genéricas: *muy buena atención, los recomiendo*. No sirven para nada porque no dicen nada.
+
+La técnica que funciona es **preguntar en vez de pedir**. Cuatro preguntas, por escrito o en video:
+
+1. ¿Qué problema tenías antes de contratarnos?
+2. ¿Qué te hacía dudar antes de decidirte?
+3. ¿Qué cambió concretamente después?
+4. ¿A quién se lo recomendarías?
+
+La segunda pregunta es la más valiosa de las cuatro. Cuando un cliente cuenta que dudaba por el precio o por si iban a cumplir los plazos, está respondiendo la objeción exacta que tiene el próximo, y con mucha más autoridad que vos.
+
+### El momento del pedido
+
+Hay una ventana corta: **justo después de que el cliente experimentó el resultado**. La obra terminada, el sistema funcionando, la primera venta que le entró por la web nueva. Ahí la satisfacción es concreta y reciente.
+
+Un mes después, ya lo naturalizó y el testimonio sale tibio.
+
+### Producción sin que quede plástico
+
+- **Menos producción es más creíble.** Un video grabado con el celular, con el ruido del local de fondo, transmite más verdad que uno con iluminación de estudio y guion leído.
+- **Nada de guiones.** Se nota siempre. Preguntas y conversación; el recorte se hace en la edición.
+- **Dejá los detalles específicos.** Los números, el nombre del barrio, el problema puntual. La especificidad es lo que hace creíble un testimonio; las frases generales lo vuelven sospechoso.
+- **Mostrá también lo que costó.** Un testimonio que menciona una dificultad del proceso y cómo se resolvió es más creíble que uno donde todo fue perfecto.
+
+### Dónde ponerlos
+
+El error habitual es armar una página de testimonios que nadie visita. La prueba social funciona **donde aparece la duda**:
+
+- Junto al precio, donde se decide.
+- En la página de cada servicio, con un caso de ese servicio en particular.
+- Antes del formulario de contacto.
+- En los anuncios: un testimonio real como creatividad publicitaria suele rendir mejor que una pieza de diseño.
+- En la respuesta comercial por WhatsApp, cuando el cliente pide referencias.
+
+### Los permisos, por escrito
+
+Antes de publicar la cara, el nombre o el negocio de un cliente, pedí autorización explícita y guardala. Un mensaje donde el cliente diga que autoriza el uso alcanza. Es un trámite de dos minutos que evita un problema serio.
+
+### Lo que no hay que hacer
+
+Inventar testimonios, comprar reseñas o usar fotos de bancos de imágenes con nombres ficticios. Además de las sanciones de las plataformas, en un mercado local chico **alguien siempre se da cuenta**, y la credibilidad perdida no se recupera con publicidad.
+
+*En Cosecha Creativa producimos testimonios y casos de clientes para empresas de San Juan, desde el pedido hasta la pieza terminada. Si tenés clientes contentos y ninguna prueba de eso, estás dejando ventas afuera.*
+    `,
+  },
+  {
+    slug: "migrar-de-wordpress-a-nextjs",
+    title: "De WordPress a Next.js: Cuándo Conviene Migrar y Cuándo Es Tirar Plata",
+    excerpt: "No todo sitio necesita rehacerse. Explicamos con franqueza qué gana un negocio al migrar a un desarrollo moderno, qué pierde, cuánto lleva y en qué casos lo más inteligente es quedarse donde está.",
+    category: "Web",
+    coverImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "17 de Julio, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Next.js", "WordPress", "Desarrollo Web", "Migración"],
+    content: `
+Cada tanto nos llega la consulta: *me dijeron que WordPress quedó viejo y que tengo que pasarme a algo moderno*. Y la respuesta honesta, que no siempre es la que conviene comercialmente, es: **depende, y en muchos casos no.**
+
+Vamos a las condiciones concretas, sin fanatismo por ninguna tecnología.
+
+### Qué hace bien cada uno
+
+**WordPress** sigue siendo una herramienta excelente para un caso muy claro: un sitio de contenido que actualiza gente no técnica, con un panel conocido, un ecosistema enorme de extensiones y cualquier persona del mercado capaz de mantenerlo. Para un blog, un sitio institucional que cambia seguido o una tienda estándar, funciona y funciona bien.
+
+**Next.js** es un marco de desarrollo moderno que genera sitios rápidos por diseño, con control total sobre cada detalle de la experiencia. No tiene un panel de administración incorporado: lo que se administra se define en el proyecto, conectándolo a un gestor de contenidos aparte cuando hace falta.
+
+Son herramientas para problemas distintos. El error es preguntarse cuál es mejor en abstracto.
+
+### Cuándo migrar sí tiene sentido
+
+**Cuando la velocidad es un problema de negocio.** Si tu sitio carga lento con el celular, ya optimizaste imágenes y hosting, y el peso viene del tema y de veinte plugins acumulados, la mejora en un desarrollo moderno no es marginal: es de otro orden. Y se traduce directo en conversión y en costo por clic.
+
+**Cuando la experiencia importa de verdad.** Configuradores de producto, calculadoras, simuladores, aplicaciones dentro del sitio, animaciones que forman parte de la marca. En WordPress se hacen a fuerza de parches; en un desarrollo a medida son el terreno natural.
+
+**Cuando el sitio se volvió imposible de mantener.** Ese momento en que nadie se anima a actualizar un plugin porque la última vez se rompió el sitio. Cuando el mantenimiento pasó de ser rutina a ser riesgo, la deuda técnica ya se está cobrando.
+
+**Cuando la seguridad es crítica.** Un sitio con datos sensibles y treinta extensiones de terceros tiene una superficie de ataque grande por definición. Un desarrollo propio reduce esa superficie de manera considerable.
+
+**Cuando el sitio tiene que integrarse con tus sistemas.** Stock en tiempo real, sistema de gestión propio, turnos conectados a una agenda interna. Las integraciones a medida se sostienen mucho mejor en un desarrollo propio.
+
+### Cuándo NO conviene migrar
+
+- **Si tu sitio funciona, carga bien y cumple su función.** Migrar por moda es gastar sin beneficio medible.
+- **Si el contenido lo actualiza a diario alguien sin perfil técnico** y no hay presupuesto para conectar un gestor de contenidos como corresponde.
+- **Si el presupuesto real alcanza para migrar pero no para mantener.** Un desarrollo a medida abandonado envejece peor que un WordPress bien cuidado.
+- **Si el verdadero problema es otro.** Muchas veces el sitio no convierte por textos flojos, mala estructura o falta de tráfico. Rehacerlo en otra tecnología no arregla nada de eso, y sale caro descubrirlo.
+
+### Cómo se hace una migración sin perder posicionamiento
+
+Es la parte donde más migraciones se arruinan. Un sitio bien posicionado que migra mal puede perder buena parte de su tráfico orgánico y tardar meses en recuperarlo.
+
+Lo que no puede faltar:
+
+1. **Inventario completo de direcciones actuales**, con su tráfico y su posicionamiento.
+2. **Mapa de redirecciones permanentes** de cada dirección vieja a su equivalente nueva. Todas, incluso las que parecen no tener tráfico.
+3. **Conservar la estructura de contenido** que ya funciona. No es el momento de reescribir todo al mismo tiempo.
+4. **Migrar los metadatos**: títulos, descripciones, datos estructurados, direcciones canónicas.
+5. **Mapa del sitio nuevo enviado** al buscador el día del lanzamiento.
+6. **Monitoreo diario las primeras cuatro semanas**, mirando errores de rastreo y evolución de posiciones.
+
+### Plazos y costos, sin vueltas
+
+Una migración seria de un sitio institucional mediano lleva entre cuatro y ocho semanas: relevamiento, diseño, desarrollo, migración de contenido, pruebas y lanzamiento controlado. Un comercio electrónico con integraciones lleva más.
+
+El costo es sensiblemente mayor al de un sitio armado sobre una plantilla. Lo que se compra a cambio es rendimiento, control y un sitio que no depende de que veinte extensiones de terceros sigan existiendo el año que viene.
+
+### La pregunta que hay que responder antes
+
+No es *¿qué tecnología es mejor?* sino **¿qué problema de negocio quiero resolver?**. Si la respuesta es concreta y medible — el sitio es lento y pierdo ventas, no puedo integrar el stock, no puedo tocarlo sin romperlo — la migración se justifica sola. Si la respuesta es que quedó viejo, primero conviene revisar si el problema no está en otro lado.
+
+*En Cosecha Creativa desarrollamos tanto sobre WordPress como a medida con Next.js, y decimos con franqueza cuál conviene en cada caso. Si estás evaluando rehacer tu sitio, lo analizamos antes de proponerte nada.*
+    `,
+  },
+  {
+    slug: "linkedin-para-empresas-b2b-san-juan",
+    title: "LinkedIn para Empresas B2B de San Juan: el Canal que Casi Nadie Está Usando Bien",
+    excerpt: "Si tu cliente es otra empresa, tu público no está en Instagram: está tomando decisiones de compra en LinkedIn. Cómo trabajarlo cuando tu mercado es la minería, la construcción, los servicios profesionales o la industria.",
+    category: "Redes",
+    coverImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "14 de Julio, 2026",
+    readTime: "5 min de lectura",
+    tags: ["LinkedIn", "B2B", "Minería", "San Juan"],
+    content: `
+Si vendés a consumidores finales, Instagram tiene sentido. Pero si tu cliente es una empresa — proveedor minero, constructora, estudio profesional, industria, servicios corporativos — estás dedicando el esfuerzo al canal equivocado.
+
+Los que deciden tus compras están en **LinkedIn**, y en San Juan ese espacio está notablemente vacío. Eso es una oportunidad con fecha de vencimiento.
+
+### Por qué funciona distinto
+
+En LinkedIn la gente entra con la cabeza puesta en el trabajo. No está esperando entretenerse: está mirando qué pasa en su industria, quién se movió de puesto, qué proveedor apareció.
+
+Eso cambia todo:
+
+- **Tu contenido técnico no aburre.** Lo que en Instagram sería demasiado específico, acá es exactamente lo que la audiencia quiere leer.
+- **Podés llegar por cargo.** Es la única plataforma donde segmentás por puesto, empresa, industria y antigüedad. Podés apuntarle al jefe de compras de una minera o al gerente de operaciones de una constructora.
+- **El ciclo es largo y eso está bien.** Una venta B2B no se cierra por una publicación. Se construye durante meses de presencia consistente hasta que la necesidad aparece y sos el nombre que le viene a la cabeza.
+
+### El error más común: comportarse como una marca de consumo
+
+La página de empresa con publicaciones institucionales — el saludo por el día del trabajador, la foto del equipo, el aviso genérico — no funciona en LinkedIn. Tiene alcance mínimo y no genera ninguna conversación.
+
+**Lo que funciona es el perfil personal.** El contenido de una persona real, con nombre y cara, alcanza muchísimo más que el de una página corporativa. La gente sigue personas.
+
+Para una empresa esto significa una decisión de fondo: **el director, el gerente comercial o el especialista técnico tienen que publicar desde su perfil**. La página de empresa acompaña; no lidera.
+
+### Qué publicar
+
+- **Explicar cómo se resuelve un problema técnico del rubro.** Sin vender. La demostración de conocimiento es la venta.
+- **Casos con números.** Qué problema tenía el cliente, qué se hizo, qué resultado dio. Este formato es el que más consultas genera.
+- **Opinión fundada sobre el sector.** Una posición sobre un cambio regulatorio, una tendencia del mercado, una discusión de la industria. Genera conversación real con pares.
+- **Detrás de escena técnico.** El proceso, la logística, cómo se hace lo que hacen. En rubros industriales tiene muchísimo interés.
+- **Errores propios y aprendizajes.** Es el contenido que más credibilidad construye, y el que menos gente se anima a publicar.
+
+Frecuencia realista: dos publicaciones por semana sostenidas durante seis meses producen más que una campaña intensiva de tres semanas.
+
+### La parte comercial, sin ser invasivo
+
+El uso de LinkedIn como canal de venta directa tiene mala fama y con razón: el mensaje de venta apenas alguien acepta la conexión es la práctica más rechazada de la plataforma.
+
+La secuencia que sí funciona es más lenta y bastante más efectiva:
+
+1. **Identificá las cuentas objetivo.** Cincuenta empresas concretas, con nombre y apellido de quien decide.
+2. **Interactuá antes de escribir.** Comentá con criterio sus publicaciones durante algunas semanas. Que tu nombre le resulte familiar antes del primer mensaje.
+3. **Conectá con una nota breve y personal**, que mencione algo específico de esa persona o su empresa.
+4. **No vendas en el primer mensaje.** Ni en el segundo. Aportá algo primero: un dato, un contacto útil, una observación del sector.
+5. **Dejá que el contenido haga el trabajo.** Una vez conectado, tus publicaciones aparecen en su feed. Ese es el verdadero canal de venta.
+
+### Publicidad en LinkedIn
+
+Es más cara por clic que Meta o Google, sin vueltas. Se justifica cuando el valor de un cliente lo amerita: si una cuenta nueva significa un contrato anual importante, pagar más por llegar exactamente al que decide es negocio.
+
+Para presupuestos chicos, conviene priorizar el contenido orgánico, que en esta plataforma todavía tiene un alcance que en otras ya se perdió.
+
+### La oportunidad local
+
+Buena parte del ecosistema empresario de San Juan — minería, servicios asociados, construcción, agroindustria — está subrepresentado en LinkedIn. Las empresas que empiezan hoy con presencia consistente van a ocupar un espacio que en dos o tres años va a estar mucho más disputado.
+
+*En Cosecha Creativa desarrollamos estrategias B2B en LinkedIn para empresas y proveedores de San Juan, incluyendo el contenido de los perfiles directivos. Si tu cliente es otra empresa, hablemos.*
+    `,
+  },
+  {
+    slug: "costos-reales-implementar-ia-pyme",
+    title: "¿Cuánto Cuesta Realmente Implementar IA en una PyME? Números Sin Humo",
+    excerpt: "Entre las promesas de que la IA es gratis y las cotizaciones corporativas de seis cifras hay un rango real. Desglosamos los costos concretos de cada tipo de proyecto y qué esperar de retorno en cada caso.",
+    category: "IA",
+    coverImage: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "10 de Julio, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Inteligencia Artificial", "Costos", "PyMEs", "Inversión"],
+    content: `
+Es la pregunta que aparece cinco minutos después de la primera reunión, y la que casi nunca se responde con claridad. Hay dos discursos dando vueltas y los dos confunden: el que dice que la IA ya es gratis y está al alcance de cualquiera, y el que la presenta como un proyecto de transformación digital de escala corporativa.
+
+La realidad de una PyME está en el medio, y conviene desarmarla por partes.
+
+### Los cuatro componentes de costo
+
+Todo proyecto de IA, chico o grande, tiene los mismos cuatro rubros. Entenderlos evita comparar presupuestos que no son comparables.
+
+**1. Licencias de herramientas.** Es el costo más visible y casi siempre el menor. Las cuentas profesionales de asistentes de IA por usuario, o el consumo por uso cuando se integra a un sistema propio. Para una empresa chica, suele ser el rubro menos significativo del total.
+
+**2. Infraestructura.** Si el proyecto vive en la nube pública del proveedor, es marginal. Si necesitás alojar la automatización en tu propio servidor — por privacidad o por costos de escala — hay un servidor virtual a pagar todos los meses. Sigue siendo un monto modesto comparado con el resto.
+
+**3. Implementación.** Acá está el grueso. Es el trabajo humano de relevar el proceso, diseñar el flujo, conectar los sistemas, cargar la base de conocimientos, probar y corregir. **Es donde se define si el proyecto sirve o no**, y es lo que más varía entre presupuestos.
+
+**4. Mantenimiento.** El que más se subestima. Los procesos cambian, los sistemas se actualizan, aparecen casos que el flujo no contemplaba. Un proyecto sin presupuesto de mantenimiento se degrada en pocos meses.
+
+### Tres escalas de proyecto
+
+**Escala 1: capacitación y uso asistido.**
+No hay desarrollo: se trata de que el equipo aprenda a usar bien las herramientas que ya existen. Biblioteca de prompts, criterios de uso, qué se puede y qué no. Es la inversión más baja de todas y la de retorno más rápido, porque el ahorro empieza la semana siguiente.
+
+Conviene siempre empezar acá, incluso si el plan es más ambicioso.
+
+**Escala 2: automatización de un proceso puntual.**
+Un flujo concreto: el agente de WhatsApp que responde consultas, el reporte semanal automático, la clasificación de correos entrantes, la carga de datos entre dos sistemas. Semanas de trabajo, alcance acotado, resultado medible.
+
+Es el punto donde la mayoría de las PyMEs debería empezar a invertir en desarrollo. El retorno se calcula fácil: horas ahorradas por mes contra el costo del proyecto.
+
+**Escala 3: sistema integrado.**
+Varios procesos conectados, con base de conocimientos propia, integración a los sistemas de gestión y tableros de seguimiento. Meses de trabajo y una inversión considerablemente mayor.
+
+Tiene sentido cuando ya validaste la escala 2 y sabés con datos qué te devuelve. Arrancar directo acá es la forma más rápida de gastar mucho en algo que nadie usa.
+
+### Cómo calcular si conviene
+
+La cuenta es más simple de lo que parece. Necesitás tres números:
+
+1. **Horas por mes** que se dedican hoy a la tarea.
+2. **Costo por hora** de la persona que la hace, con cargas incluidas.
+3. **Qué porcentaje** de esa tarea se puede automatizar de manera realista — nunca el 100%.
+
+Con eso tenés el ahorro mensual. Dividí el costo del proyecto por ese ahorro y obtenés en cuántos meses se paga. **Si el resultado supera los doce meses, conviene revisar el alcance**: probablemente estás automatizando algo que no era el cuello de botella.
+
+Y hay un beneficio que no entra en la cuenta pero pesa: las ventas que hoy se pierden por responder tarde. En negocios donde la velocidad de respuesta define la venta, ese número suele ser mayor que el ahorro de horas.
+
+### Los costos ocultos que nadie menciona
+
+- **El tiempo de tu equipo durante la implementación.** Alguien de la empresa tiene que explicar cómo funciona el proceso, revisar las pruebas y corregir. No es gratis.
+- **La resistencia interna.** Si el equipo percibe la IA como amenaza, el proyecto se sabotea solo. La comunicación interna es parte del costo del proyecto.
+- **La limpieza de datos previa.** Muchas veces el primer mes se va en ordenar información que estaba dispersa o inconsistente. Es trabajo necesario que hay que presupuestar.
+
+### La recomendación
+
+Empezá chico, medí, y escalá con evidencia. Un proyecto acotado que devuelve horas desde el primer mes construye el caso interno para el siguiente. Un proyecto grande que tarda seis meses en mostrar algo, además de arriesgado, quema la confianza del equipo en la herramienta.
+
+*En Cosecha Creativa presupuestamos proyectos de IA con el cálculo de retorno sobre la mesa y arrancamos por lo que se paga solo. Si te cotizaron algo y no entendés qué estás pagando, lo revisamos con vos.*
+    `,
+  },
+  {
+    slug: "crisis-en-redes-como-responder",
+    title: "Cuando Explota en Redes: Protocolo para Manejar una Crisis Sin Empeorarla",
+    excerpt: "Un cliente enojado, un error propio, una captura que se viraliza. Las primeras dos horas definen si la cosa se apaga o escala. Qué hacer, qué no hacer y cómo dejar todo preparado antes de que pase.",
+    category: "Redes",
+    coverImage: "https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "09 de Julio, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Crisis", "Reputación", "Redes Sociales", "Comunicación"],
+    content: `
+Le pasa a todos en algún momento: un cliente publica una queja que se comparte más de la cuenta, un empleado sube algo desafortunado, un error de facturación se hace público, una respuesta destemplada del community manager queda capturada.
+
+Lo que define el desenlace no es la gravedad del hecho. Es **la calidad de la respuesta en las primeras horas**, y esa calidad depende casi por completo de cuánto se preparó antes.
+
+### Primero: distinguir qué es una crisis y qué no
+
+No todo comentario negativo es una crisis, y tratar cada queja como si lo fuera desgasta al equipo y genera sobrerreacciones. Tres preguntas rápidas:
+
+1. ¿Está creciendo el alcance por sí solo, sin que nadie lo empuje?
+2. ¿Se sumaron terceros que no tienen relación directa con el hecho?
+3. ¿Hay riesgo de que llegue a medios o de que tenga consecuencias legales?
+
+Con dos respuestas afirmativas, es crisis. Con una sola, es una queja que se atiende bien por los canales habituales y se termina ahí.
+
+### Las primeras dos horas
+
+**Frená todo lo programado.** Lo primero, antes que cualquier otra cosa. Nada peor que una publicación promocional alegre saliendo automáticamente en medio del incendio. Pausá la programación y la pauta activa.
+
+**Entendé el hecho antes de hablar.** Qué pasó exactamente, quién estuvo involucrado, si es cierto, si es parcialmente cierto. Responder sin información es la forma más rápida de tener que desdecirse después, que siempre es peor.
+
+**Reconocé rápido, aunque no tengas la respuesta completa.** El silencio se lee como indiferencia o como culpa. Un mensaje breve que diga que tomaron conocimiento, que están revisando y que van a informar, compra el tiempo necesario sin admitir nada que todavía no sabés.
+
+**Respondé donde pasó.** Si estalló en Instagram, la respuesta va en Instagram. Contestar en otro canal o mandar un comunicado formal a un problema de redes suena a evasión.
+
+### Qué no hacer, nunca
+
+- **Borrar comentarios o publicaciones.** Alguien ya sacó la captura. Borrar convierte un problema en dos, y el segundo — el encubrimiento — es siempre más grande que el primero.
+- **Discutir en público.** Aunque tengas razón. Nadie gana una discusión en los comentarios; el que discute pierde por el solo hecho de discutir.
+- **Responder con lenguaje corporativo vacío.** *Lamentamos los inconvenientes ocasionados* enfurece más de lo que calma. La gente detecta la plantilla al instante.
+- **Culpar al cliente, al empleado o al proveedor.** Aun cuando la responsabilidad sea de otro, señalarlo en público se lee como falta de hacerse cargo.
+- **Responder de madrugada, en caliente.** Casi todas las respuestas que empeoran una crisis se escribieron con bronca y sin consultar a nadie.
+
+### La estructura de una buena respuesta
+
+Cuatro partes, en este orden:
+
+1. **Reconocimiento del hecho.** Concreto, sin rodeos. Qué pasó.
+2. **Asunción de responsabilidad, en la medida que corresponda.** Ni más ni menos. Si el error fue propio, se dice.
+3. **Acción concreta.** Qué se hizo o se va a hacer, con plazo. Esta parte es la que más pesa y la que más se omite.
+4. **Canal directo.** A dónde puede escribir quien tenga el mismo problema.
+
+Sin la tercera parte, la disculpa es un texto. Con la tercera parte, es una respuesta.
+
+### La preparación previa, que es lo que realmente importa
+
+Todo lo anterior funciona solo si estaba armado de antes. Lo mínimo que una empresa debería tener por escrito, hoy, antes de necesitarlo:
+
+- **Quién decide.** Una persona con autoridad para aprobar una respuesta pública en menos de una hora, y su reemplazo. Si la respuesta tiene que pasar por cuatro aprobaciones, llega tarde siempre.
+- **Quién escribe y quién revisa.** Nunca la misma persona sola.
+- **Un grupo de contacto rápido** con esa gente, que se activa apenas se detecta algo.
+- **Escenarios probables escritos de antemano.** Los tres o cuatro problemas más plausibles de tu rubro, con un borrador de respuesta ya pensado en frío.
+- **Monitoreo activo.** Alertas por menciones de la marca. Enterarte tarde es la peor manera de empezar.
+
+### Después: la parte que casi nadie hace
+
+Cuando pasó, hacé una revisión con el equipo: qué falló en el proceso que llevó al hecho, qué funcionó y qué no de la respuesta, y qué se cambia para que no vuelva a pasar. Escribilo.
+
+Una crisis bien manejada y bien revisada deja a la empresa mejor parada que antes. Muchas marcas construyeron reputación justamente por cómo respondieron cuando se equivocaron.
+
+*En Cosecha Creativa armamos protocolos de crisis y acompañamos a empresas y gestiones cuando el tema ya explotó. Si no tenés nada escrito, ese es el momento de escribirlo: cuando no lo necesitás.*
+    `,
+  },
+  {
+    slug: "analitica-web-que-metricas-mirar",
+    title: "Analítica Web: las 6 Métricas que Sí Importan (y las que Te Están Distrayendo)",
+    excerpt: "Los tableros muestran cincuenta números y casi ninguno cambia una decisión. Cuáles mirar de verdad, cómo interpretarlas y por qué las visitas totales son la métrica más sobrevalorada del marketing digital.",
+    category: "Web",
+    coverImage: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "08 de Julio, 2026",
+    readTime: "5 min de lectura",
+    tags: ["Analítica", "Métricas", "Conversión", "Datos"],
+    content: `
+Abrís el panel de analítica y hay cincuenta números. Visitas, usuarios, sesiones, tasa de interacción, duración media, páginas por sesión. Mirás un rato, ves que las visitas subieron un 8%, cerrás la pestaña y no cambiás absolutamente nada de lo que ibas a hacer.
+
+Si eso te suena conocido, el problema no es la herramienta. Es que **estás mirando métricas que no responden ninguna pregunta de negocio.**
+
+### La pregunta que ordena todo
+
+Antes de abrir cualquier tablero: ¿qué decisión voy a tomar con este dato? Si no hay respuesta, la métrica sobra.
+
+Con ese filtro, la lista se reduce muchísimo.
+
+### Las 6 que importan
+
+**1. Conversiones, por fuente.**
+No cuánta gente entró, sino cuánta hizo lo que querías: completó el formulario, escribió por WhatsApp, llamó, compró. Y de dónde vino cada una. Es la métrica que decide dónde poner el próximo peso de presupuesto, y la única que le importa al dueño del negocio.
+
+**2. Costo por conversión, por canal.**
+Cuánto te cuesta cada consulta según venga de Google Ads, Meta, orgánico o directo. Es lo que te dice si la campaña es rentable o si estás comprando clics caros que no cierran.
+
+**3. Tráfico orgánico y su tendencia.**
+No el número de un mes, sino la curva de varios meses. El posicionamiento se mueve lento; una lectura semanal genera reacciones equivocadas. Lo que importa es si la tendencia de seis meses sube, baja o está plana.
+
+**4. Páginas de entrada más frecuentes.**
+Por dónde entra la gente a tu sitio. Casi nunca es la página de inicio. Saberlo cambia dónde ponés la información importante y las llamadas a la acción.
+
+**5. Abandono en el paso crítico.**
+Dónde se va la gente en el camino a la conversión. En una tienda, qué porcentaje abandona en el carrito y cuál en el pago. En un sitio de servicios, cuántos llegan al formulario y cuántos lo envían. Es la métrica que más ventas recupera cuando se corrige.
+
+**6. Velocidad real en celular.**
+Los datos de campo, de usuarios reales. Afecta directamente a todas las anteriores y suele ser la causa oculta de números malos en el resto del tablero.
+
+### Las que distraen
+
+**Visitas totales.** La métrica más celebrada y la menos accionable. Mil visitas de gente que no te va a comprar valen menos que cincuenta del público correcto. Solo sirve mirada junto a la tasa de conversión.
+
+**Tasa de rebote, sola.** Un rebote alto puede ser terrible o excelente. Si alguien entró, encontró tu teléfono, llamó y cerró la pestaña, eso figura como rebote y fue un éxito rotundo.
+
+**Duración media de sesión.** Que la gente pase más tiempo puede significar que le interesa o que no encuentra lo que busca. Sin contexto no dice nada.
+
+**Seguidores en redes.** Es la métrica de vanidad por excelencia. No paga sueldos.
+
+**Posición promedio de palabras clave.** Estar primero en un término que nadie busca no aporta. Lo que importa es el tráfico y las conversiones que trae ese posicionamiento.
+
+### El requisito previo: medir bien
+
+Todo esto vale cero si la medición está mal configurada, y en la mayoría de los sitios que auditamos lo está. Los tres errores más frecuentes:
+
+- **Conversiones no configuradas.** El sitio mide visitas pero nadie definió qué cuenta como consulta. Sin eso, no hay analítica posible.
+- **Clics de WhatsApp sin registrar.** En Argentina, buena parte de las consultas se van por ahí. Si ese clic no se mide, tu canal principal es invisible en el tablero.
+- **Tráfico propio contaminando los datos.** El equipo entrando todos los días al sitio infla los números y ensucia todo. Se excluye y listo.
+
+### Cómo usarlo en la práctica
+
+Una revisión mensual de una hora, con estas seis métricas y tres preguntas: qué mejoró, qué empeoró, y qué vamos a cambiar este mes. Anotado, para poder comparar contra la revisión anterior.
+
+Eso rinde muchísimo más que abrir el panel todos los días y mirar el número de visitas.
+
+*En Cosecha Creativa configuramos la medición y armamos reportes que se leen en cinco minutos y sirven para decidir. Si tu tablero no te está ayudando a tomar decisiones, algo está mal configurado.*
+    `,
+  },
+  {
+    slug: "comunicacion-de-gestion-entre-elecciones",
+    title: "Comunicar la Gestión Entre Elecciones: el Trabajo Silencioso que Define la Próxima",
+    excerpt: "La campaña dura tres meses; la gestión, cuatro años. Cómo construir un vínculo sostenido con el vecino sin caer en el acto permanente ni en la rendición de cuentas que nadie lee.",
+    category: "Compol",
+    coverImage: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=800&auto=format&fit=crop",
+    author: {
+      name: "Ale Chávez",
+      role: "Director & Fundador",
+      avatar: "/_lite/ale-chavez.webp",
+    },
+    date: "07 de Julio, 2026",
+    readTime: "6 min de lectura",
+    tags: ["Comunicación Política", "Gestión Pública", "Vínculo Ciudadano", "Estrategia"],
+    content: `
+Hay una asimetría que explica muchas derrotas: se invierte enormemente en los tres meses de campaña y prácticamente nada en los cuarenta y cinco meses restantes. Después, cuando llega la próxima elección, hay que reconstruir desde cero un vínculo que se dejó enfriar.
+
+**La elección no se gana en la campaña. Se gana en el período en que nadie está mirando.**
+
+### Los tres errores de la comunicación de gestión
+
+**El acto permanente.** Comunicar solo inauguraciones, entregas y cortes de cinta. Genera saturación y una lectura inmediata en el vecino: están en campaña todo el tiempo. Además deja fuera el 90% del trabajo real de una gestión.
+
+**La rendición de cuentas ilegible.** El informe con cifras de ejecución presupuestaria, metros de asfalto y cantidad de prestaciones. Es información valiosa, pero presentada en un formato que solo entienden los que ya están convencidos.
+
+**El silencio entre picos.** Comunicar intensamente durante dos semanas y desaparecer dos meses. La construcción de vínculo depende de la constancia, no de la intensidad.
+
+### Qué comunicar cuando no hay nada que inaugurar
+
+Es la pregunta difícil y donde se define la diferencia. Hay material todos los días si se sabe dónde mirar:
+
+- **El proceso, no solo el resultado.** La obra que está en licitación, la que arrancó, la que va por la mitad. Mostrar el camino genera expectativa y explica las demoras antes de que se conviertan en reclamo.
+- **La gente que hace el trabajo.** El equipo de recolección, la enfermera del centro de salud, el inspector. Humaniza la gestión y reconoce a quien casi nunca aparece.
+- **Lo que no se ve.** El mantenimiento, la logística, la reparación que evitó un problema mayor. Es el trabajo que solo se nota cuando falla.
+- **Las respuestas a reclamos concretos.** Un vecino reclamó, se resolvió, se muestra. Es el contenido con mayor efecto sobre la percepción de que la gestión escucha.
+- **La información útil.** Horarios, trámites, cómo hacer una gestión, dónde reclamar. El contenido de servicio construye una relación distinta a la del contenido político.
+
+### El equilibrio entre gestión y política
+
+Es una tensión real y conviene manejarla de forma explícita. Una cuenta institucional que hace política partidaria pierde credibilidad y expone a la gestión. Una cuenta que solo informa horarios no construye ningún capital político.
+
+La forma que mejor funciona es separar los canales con roles claros: **la cuenta institucional informa y sirve; la cuenta personal del funcionario opina, discute y construye figura**. Cada una con su tono y su lógica.
+
+### Escuchar, no solo emitir
+
+La parte más subestimada de la comunicación de gestión no es lo que se dice: es lo que se escucha. Un sistema simple que registre qué reclama la gente, dónde y con qué frecuencia — comentarios, mensajes, grupos vecinales, medios locales — es una herramienta de gestión antes que de comunicación.
+
+Sirve para tres cosas concretas:
+
+1. **Detectar problemas antes de que escalen.** El reclamo barrial que crece en un grupo de WhatsApp llega a la prensa dos semanas después.
+2. **Priorizar con criterio.** Lo que más se reclama no siempre coincide con lo que la gestión cree que es urgente.
+3. **Cerrar el círculo.** Responder públicamente un reclamo que se resolvió tiene un efecto desproporcionado respecto de su costo.
+
+### La cadencia
+
+Una regla práctica que funciona: **presencia constante de bajo volumen es mejor que picos de alto volumen**. Publicaciones sostenidas durante todo el año, con contenido de servicio, proceso y equipo, y una intensificación natural cuando hay algo importante.
+
+Lo que hay que evitar es el patrón que el vecino identifica al instante: silencio prolongado seguido de actividad frenética seis meses antes de la elección. Esa curva es legible y descuenta credibilidad.
+
+### La medida del éxito
+
+No es el alcance ni la cantidad de reacciones. Son tres cosas más difíciles de medir y mucho más importantes: si la gente sabe qué está haciendo la gestión, si siente que puede plantear un problema y ser escuchada, y si le atribuye a la gestión las cosas buenas que efectivamente hizo.
+
+Ese último punto es clave y suele fallar: gestiones que hicieron mucho y no lograron que se les reconozca. La obra que nadie asocia con quien la hizo, políticamente, es como si no existiera.
+
+*En Cosecha Creativa acompañamos gestiones públicas en comunicación sostenida, escucha ciudadana y contenido de servicio. El trabajo entre elecciones es el que menos se ve y el que más rinde.*
+    `,
+  },
+  {
     slug: "whatsapp-business-ia-ventas-automaticas",
     title: "WhatsApp + IA: Cómo Convertir el Chat Más Usado de Argentina en tu Mejor Vendedor",
     excerpt: "El 90% de tus clientes ya está en WhatsApp. Te mostramos cómo un agente de IA conectado a tu negocio puede responder consultas, calificar leads y cerrar ventas las 24 horas, sin contratar más personal.",
@@ -50,7 +1437,7 @@ export const blogPosts: BlogPost[] = [
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "06 de Julio, 2026",
     readTime: "6 min de lectura",
@@ -106,7 +1493,7 @@ No hace falta cambiar de número ni instalar nada raro. Trabajamos sobre la API 
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "22 de Junio, 2026",
     readTime: "6 min de lectura",
@@ -161,7 +1548,7 @@ Sea cual sea la plataforma, el 80% del resultado se define **después** de lanza
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "08 de Junio, 2026",
     readTime: "7 min de lectura",
@@ -217,7 +1604,7 @@ La comunicación pública seria se gestiona con datos: evolución del sentimient
     "author": {
       "name": "Ale Chávez",
       "role": "Director & Fundador",
-      "avatar": "/ale-chavez.png"
+      "avatar": "/_lite/ale-chavez.webp"
     },
     "date": "25 de Mayo, 2026",
     "readTime": "6 min de lectura",
@@ -239,7 +1626,7 @@ La comunicación pública seria se gestiona con datos: evolución del sentimient
     "author": {
       "name": "Ale Chávez",
       "role": "Director & Fundador",
-      "avatar": "/ale-chavez.png"
+      "avatar": "/_lite/ale-chavez.webp"
     },
     "date": "18 de Mayo, 2026",
     "readTime": "5 min de lectura",
@@ -260,7 +1647,7 @@ La comunicación pública seria se gestiona con datos: evolución del sentimient
     "author": {
       "name": "Ale Chávez",
       "role": "Director & Fundador",
-      "avatar": "/ale-chavez.png"
+      "avatar": "/_lite/ale-chavez.webp"
     },
     "date": "10 de Mayo, 2026",
     "readTime": "4 min de lectura",
@@ -281,7 +1668,7 @@ La comunicación pública seria se gestiona con datos: evolución del sentimient
     "author": {
       "name": "Ale Chávez",
       "role": "Director & Fundador",
-      "avatar": "/ale-chavez.png"
+      "avatar": "/_lite/ale-chavez.webp"
     },
     "date": "02 de Mayo, 2026",
     "readTime": "7 min de lectura",
@@ -302,7 +1689,7 @@ La comunicación pública seria se gestiona con datos: evolución del sentimient
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "25 de Enero, 2025",
     readTime: "4 min de lectura",
@@ -353,7 +1740,7 @@ Con estrategia, buenas piezas y optimización constante, la publicidad paga logr
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "21 de Febrero, 2026",
     readTime: "4 min de lectura",
@@ -403,7 +1790,7 @@ A lo largo de nuestra trayectoria desarrollamos desde tableros interactivos de s
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "16 de Agosto, 2025",
     readTime: "4 min de lectura",
@@ -456,7 +1843,7 @@ Empresas de servicios, estudios profesionales, tiendas online, inmobiliarias, ce
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "13 de Febrero, 2025",
     readTime: "4 min de lectura",
@@ -506,7 +1893,7 @@ Una web lenta, desactualizada o que no aparece en Google no es neutral: le está
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "14 de Octubre, 2024",
     readTime: "3 min de lectura",
@@ -554,7 +1941,7 @@ La relación entre UX y facturación es más directa de lo que parece:
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "14 de Octubre, 2024",
     readTime: "3 min de lectura",
@@ -596,7 +1983,7 @@ Conocemos las particularidades del mercado sanjuanino — cómo se busca, cómo 
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "11 de Febrero, 2025",
     readTime: "3 min de lectura",
@@ -638,7 +2025,7 @@ Los celulares mejoraron muchísimo, y para el día a día alcanzan. Pero una ses
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "1 de Febrero, 2025",
     readTime: "4 min de lectura",
@@ -682,7 +2069,7 @@ Combinamos experiencia en campañas electorales, comunicación institucional y g
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "15 de Enero, 2025",
     readTime: "4 min de lectura",
@@ -729,7 +2116,7 @@ Trabajamos con negocios locales de rubros muy distintos — gastronomía, moda, 
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "10 de Junio, 2026",
     readTime: "5 min de lectura",
@@ -796,7 +2183,7 @@ El SEO es inversión a mediano plazo, pero a diferencia de la publicidad paga, l
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "3 de Junio, 2026",
     readTime: "6 min de lectura",
@@ -860,7 +2247,7 @@ Esta es la pregunta más frecuente y no tiene una respuesta única. Depende de t
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "28 de Mayo, 2026",
     readTime: "7 min de lectura",
@@ -923,7 +2310,7 @@ El hecho de que "todo el mundo tenga acceso a la IA" no significa que todo el mu
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "20 de Mayo, 2026",
     readTime: "5 min de lectura",
@@ -983,7 +2370,7 @@ Según el comportamiento de audiencias locales, los formatos con mejor performan
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "15 de Mayo, 2026",
     readTime: "5 min de lectura",
@@ -1045,7 +2432,7 @@ Cada contrato que pierde un proveedor por no haber sido considerado siquiera cue
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "8 de Mayo, 2026",
     readTime: "6 min de lectura",
@@ -1121,7 +2508,7 @@ Esto ya no es territorio exclusivo de empresas grandes. Con los costos actuales 
     author: {
       name: "Ale Chávez",
       role: "Director & Fundador",
-      avatar: "/ale-chavez.png",
+      avatar: "/_lite/ale-chavez.webp",
     },
     date: "1 de Noviembre, 2024",
     readTime: "3 min de lectura",

@@ -121,7 +121,7 @@ export function ImageCursorTrail({
         handlePointer(t.clientX, t.clientY)
       }}
       className={cn(
-        "relative grid min-h-[280px] w-full touch-manipulation place-content-center overflow-hidden rounded-3xl md:min-h-[420px]",
+        "relative grid min-h-[280px] w-full touch-manipulation place-content-center overflow-hidden md:min-h-[420px]",
         className,
       )}
       aria-label="Galería interactiva de capturas"
@@ -132,9 +132,9 @@ export function ImageCursorTrail({
           key={`${item}-${index}`}
           ref={imageRefs[index]}
           className={cn(
-            "pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 scale-0 rounded-3xl object-cover opacity-0 transition-[opacity,transform,box-shadow] duration-300 ease-out data-[status=active]:pointer-events-auto data-[status=active]:duration-500 data-[status=active]:ease-out data-[status=active]:opacity-100 data-[status=active]:scale-100",
+            "pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 scale-0 object-cover opacity-0 transition-[opacity,transform,box-shadow] duration-300 ease-out data-[status=active]:pointer-events-auto data-[status=active]:duration-500 data-[status=active]:ease-out data-[status=active]:opacity-100 data-[status=active]:scale-100",
             poppedIndex === index &&
-              "!scale-[1.42] shadow-[0_28px_80px_-20px_rgba(103,232,249,0.45)] ring-2 ring-cyan-400/50 duration-300",
+              "!scale-[1.42] shadow-[0_28px_80px_-20px_rgba(0,0,0,0.8)] ring-2 ring-[#C8FF00]/60 duration-300",
             imgClass,
           )}
           data-index={index}

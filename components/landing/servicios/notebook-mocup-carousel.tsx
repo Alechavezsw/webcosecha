@@ -11,10 +11,11 @@ import {
 } from "@/components/landing/servicios/service-section-motion"
 import { cn } from "@/lib/utils"
 
-const FALLBACK_SLIDES = ["/images/bridge.png", "/images/audit.jpg"] as const
+const FALLBACK_SLIDES = ["/_lite/bridge.webp", "/images/audit.jpg"] as const
 
 /** Archivo en `public/videos/` (sin espacios en la URL). Mantenerlo igual que `Nueva carpeta/este.mp4` si actualizás el clip. */
-const MOCKUP_SECTION_BG_VIDEO = "/videos/gestion-mockup-bg.mp4"
+const MOCKUP_SECTION_BG_VIDEO = "/videos/gestion-mockup-bg-lite.mp4"
+const MOCKUP_SECTION_BG_POSTER = "/videos/gestion-mockup-bg-poster.jpg"
 
 function MarqueeSlide({
   src,
@@ -131,11 +132,12 @@ export function NotebookMocupCarousel() {
           <video
             ref={videoRef}
             src={MOCKUP_SECTION_BG_VIDEO}
+            poster={MOCKUP_SECTION_BG_POSTER}
             autoPlay
             muted
             loop
             playsInline
-            preload="auto"
+            preload="metadata"
             className="h-full w-full object-cover object-[center_38%]"
           />
         </motion.div>

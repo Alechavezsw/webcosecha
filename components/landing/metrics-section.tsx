@@ -375,14 +375,24 @@ function StoriesShowcase() {
     <div className="relative -mx-6 overflow-hidden lg:-mx-12">
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-background to-transparent" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-background to-transparent" />
-      <div className="flex w-max animate-marquee gap-3 py-1 [animation-duration:50s] hover:[animation-play-state:paused]">
+      {/* La cinta NO se frena con el mouse encima: el hover levanta la pieza que
+          estás mirando, pero el desfile sigue. */}
+      <div className="flex w-max animate-marquee gap-3 py-4 [animation-duration:50s]">
+        {/* OJO: en Tailwind v4, -translate-y y scale escriben las propiedades CSS
+            `translate` y `scale`, NO `transform` — la transición va sobre ésas. */}
         {track.map((src, i) => (
           <div
             key={`${src}-${i}`}
-            className="relative h-[min(42vh,380px)] w-[min(22vw,168px)] shrink-0 overflow-hidden rounded-xl border border-foreground/10 bg-foreground/[0.02]"
+            className="relative h-[min(42vh,380px)] w-[min(22vw,168px)] shrink-0 overflow-hidden rounded-xl border border-foreground/10 bg-foreground/[0.02] transition-[translate,scale,border-color,box-shadow] duration-500 ease-out hover:-translate-y-2 hover:scale-[1.04] hover:border-[#eca8d6]/45 hover:shadow-[0_18px_40px_-16px_rgba(236,168,214,0.5)] motion-reduce:translate-none motion-reduce:scale-100"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt="" className="h-full w-full object-cover" loading="lazy" draggable={false} />
+            <img
+              src={src}
+              alt=""
+              className="h-full w-full object-cover transition-[filter] duration-500 hover:brightness-110"
+              loading="lazy"
+              draggable={false}
+            />
           </div>
         ))}
       </div>
@@ -500,6 +510,8 @@ export function MetricsSection({ variant = "ai" }: { variant?: MetricsSectionVar
                   alt=""
                   aria-hidden="true"
                   className="absolute left-0 top-[-12%] h-[124%] w-full object-cover object-center will-change-transform"
+                  loading="lazy"
+                  decoding="async"
                   style={{ transform: `translate3d(0, ${parallaxY}px, 0) scale(1.1)` }}
                 />
               </div>

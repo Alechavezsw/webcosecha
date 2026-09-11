@@ -54,7 +54,17 @@ const nextConfig = {
         },
       ]
     }
-    return []
+    return [
+      {
+        source: '/_opt/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ]
   },
 }
 

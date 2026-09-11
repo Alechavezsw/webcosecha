@@ -80,13 +80,13 @@ const STEPS = [
 
 function CodeLine({ line }: { line: (typeof STEPS)[0]["code"][0] }) {
   if (line.type === "gap") return <div className="h-3" />
-  if (line.type === "comment") return <div className="text-[#9ca3af]">{line.text}</div>
+  if (line.type === "comment") return <div className="text-[#6b7280]">{line.text}</div>
   if (line.type === "output") return <div className="text-[#6b7280]">{line.text}</div>
-  if (line.type === "success") return <div className="text-[#16a34a]">{line.text}</div>
+  if (line.type === "success") return <div className="text-[#15803d]">{line.text}</div>
   if (line.type === "url") return <div className="text-[#2563eb] underline">{line.text}</div>
   if (line.type === "command") return (
     <div>
-      <span className="text-[#16a34a]">$ </span>
+      <span className="text-[#15803d]">$ </span>
       <span className="text-[#111]">{line.text}</span>
     </div>
   )
@@ -95,7 +95,7 @@ function CodeLine({ line }: { line: (typeof STEPS)[0]["code"][0] }) {
     <div>
       <span className="text-[#2563eb]">{line.key}</span>
       <span className="text-[#111]">: </span>
-      <span className="text-[#16a34a]">{line.val}</span>
+      <span className="text-[#15803d]">{line.val}</span>
       <span className="text-[#111]">,</span>
     </div>
   )
@@ -107,7 +107,7 @@ function CodeLine({ line }: { line: (typeof STEPS)[0]["code"][0] }) {
       {line.keyword3 && <span className="text-[#7c3aed]">{line.keyword3}</span>}
       {line.fn && <span className="text-[#b45309]">{line.fn}</span>}
       {line.args && <span className="text-[#111]">{line.args}</span>}
-      {line.string && <span className="text-[#16a34a]">{line.string}</span>}
+      {line.string && <span className="text-[#15803d]">{line.string}</span>}
     </div>
   )
   return null
@@ -144,7 +144,7 @@ export function DevExSection() {
     <section id="devex" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]">
       <div className="max-w-6xl mx-auto">
         <div className="mb-16">
-          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/[0.05] border border-black/[0.06] text-[10px] tracking-widest text-black/40 uppercase">
+          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/[0.05] border border-black/[0.06] text-[10px] tracking-widest text-black/60 uppercase">
             METODOLOGÍA COSECHA
           </div>
           <h2 className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
@@ -173,7 +173,7 @@ export function DevExSection() {
                     className="flex items-center justify-center w-8 h-8 rounded-lg text-xs font-light shrink-0 transition-colors duration-200"
                     style={{
                       background: active === i ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.04)",
-                      color: active === i ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0.35)",
+                      color: active === i ? "rgba(0,0,0,0.78)" : "rgba(0,0,0,0.55)",
                     }}
                   >
                     {s.num}
@@ -181,11 +181,11 @@ export function DevExSection() {
                   <div className="min-w-0">
                     <p
                        className="text-sm font-medium transition-colors duration-200"
-                      style={{ color: active === i ? "rgba(0,0,0,0.8)" : "rgba(0,0,0,0.5)" }}
+                      style={{ color: active === i ? "rgba(0,0,0,0.86)" : "rgba(0,0,0,0.65)" }}
                     >
                       {s.title}
                     </p>
-                    <p className="text-xs mt-0.5" style={{ color: "rgba(0,0,0,0.28)" }}>{s.desc}</p>
+                    <p className="text-xs mt-0.5" style={{ color: "rgba(0,0,0,0.55)" }}>{s.desc}</p>
                   </div>
                 </div>
               </button>

@@ -124,9 +124,11 @@ export function FooterSection() {
       {/* Background Image behind the entire footer content and links */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none">
         <img
-          src="/footer-bg.png"
-          alt="Bioluminescent landscape"
+          src="/_opt/footer-bg.png.webp"
+          alt=""
           className="w-full h-full object-cover object-center opacity-75 saturate-[1.1] brightness-[0.75]"
+          loading="lazy"
+          decoding="async"
         />
         {/* Gradients to blend smoothly with black sections above and below and ensure high readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/60 to-black/95" />

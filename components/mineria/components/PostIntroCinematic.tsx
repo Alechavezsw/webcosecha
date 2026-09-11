@@ -1,10 +1,16 @@
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { asset } from '../lib/asset';
+import { assetVideo, assetVideoPoster } from '../lib/asset';
 import type { LucideIcon } from 'lucide-react';
 import { Activity, Cpu, Globe2, Layers3, Pickaxe, Radio } from 'lucide-react';
 import IndustrialVideoHud from './IndustrialVideoHud';
 import CinematicStyleOverlays from './CinematicStyleOverlays';
+
+/**
+ * Derivado liviano del cinematic de apertura (1,3 MB, h264 con `+faststart`).
+ * Se exporta para que `App` lo precargue mientras corre el preloader.
+ */
+export const INTRO_VIDEO_MP4 = '/mineria/cinematic-intro.mp4';
 
 type SectionId = 'services' | 'about' | 'presencia' | 'showreel' | 'cases' | 'contact';
 
@@ -13,6 +19,12 @@ interface PostIntroCinematicProps {
   onSectionNavigate: (sectionId: string) => void;
   /** Se dispara a mitad de la salida para que el Hero empiece bajo el overlay (continuidad). */
   onRevealStart?: () => void;
+  /**
+   * Pasa a true cuando el preloader terminó de salir. El video arranca al
+   * montar (para que la cortina descubra metraje en movimiento), pero la
+   * entrada del HUD espera a esto: si no, las dos intros se pisan.
+   */
+  uiReady?: boolean;
 }
 
 const SECTION_CHIPS: Array<{ Icon: LucideIcon; label: string; id: SectionId }> = [
@@ -24,7 +36,12 @@ const SECTION_CHIPS: Array<{ Icon: LucideIcon; label: string; id: SectionId }> =
   { Icon: Activity, label: 'Contacto', id: 'contact' },
 ];
 
-const PostIntroCinematic: React.FC<PostIntroCinematicProps> = ({ onEnded, onSectionNavigate, onRevealStart }) => {
+const PostIntroCinematic: React.FC<PostIntroCinematicProps> = ({
+  onEnded,
+  onSectionNavigate,
+  onRevealStart,
+  uiReady = true,
+}) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const onEndedRef = useRef(onEnded);
@@ -273,6 +290,12 @@ const PostIntroCinematic: React.FC<PostIntroCinematicProps> = ({ onEnded, onSect
     void video.play().catch(() => {
       finishOverlay(() => onEndedRef.current?.());
     });
+  }, []);
+
+  // Entrada de la interfaz: recién cuando la cortina del preloader terminó.
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root || !uiReady) return;
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
@@ -323,12 +346,13 @@ const PostIntroCinematic: React.FC<PostIntroCinematicProps> = ({ onEnded, onSect
     return () => {
       ctx.revert();
     };
-  }, []);
+  }, [uiReady]);
 
   return (
     <div
       ref={rootRef}
       className="post-cinematic-root fixed inset-0 z-[190] overflow-hidden bg-[#07080a]"
+      data-ui-ready={uiReady ? 'true' : 'false'}
       role="dialog"
       aria-modal="true"
       aria-label="Ecosistema digital minero. Usá scroll hacia abajo, flecha abajo o Escape para pasar al sitio."
@@ -362,7 +386,7 @@ const PostIntroCinematic: React.FC<PostIntroCinematicProps> = ({ onEnded, onSect
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 z-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.08]"
+        className="pointer-events-none absolute inset-0 z-0 bg-[url('/mineria/noise.svg')] opacity-[0.08]"
         aria-hidden
       />
 
@@ -400,10 +424,15 @@ const PostIntroCinematic: React.FC<PostIntroCinematicProps> = ({ onEnded, onSect
           playsInline
           loop={false}
           preload="auto"
+          poster={assetVideoPoster('cinematic_202604191001.webm')}
           onEnded={runExit}
           onError={runExit}
         >
-          <source src={asset('cinematic_202604191001.webm')} type="video/webm" />
+          {/* El .mp4 va primero: pesa 1,3 MB contra 4,8 del .webm y tiene el
+              moov al principio (`+faststart`), así que empieza casi al toque.
+              El .webm queda de respaldo para quien no pueda con h264. */}
+          <source src={INTRO_VIDEO_MP4} type="video/mp4" />
+          <source src={assetVideo('cinematic_202604191001.webm')} type="video/webm" />
         </video>
         <CinematicStyleOverlays />
       </div>

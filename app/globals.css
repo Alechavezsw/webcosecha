@@ -902,3 +902,408 @@ html.lenis body {
     background-position: 220% 50%;
   }
 }
+
+/* ============================================================
+   BANDAS DE SECCIÓN
+   La home se leía como un único plano negro: mismo fondo, misma
+   aura y mismo ritmo en todos los bloques. Cada banda le da al
+   bloque una superficie propia, con su propia PROFUNDIDAD —
+   planos hundidos, una hoja elevada que proyecta sombra sobre
+   sus vecinas, túneles en perspectiva — para que el scroll se
+   lea como capas y no como franjas.
+
+   Se aplican desde `app/page.tsx` vía `<SectionBand surface="…">`,
+   que además monta un `.cc-band-fx`: una capa decorativa que va
+   primero en el DOM (queda debajo de la sección) y que junto a
+   sus ::before / ::after da tres planos por banda.
+   ============================================================ */
+
+.cc-band {
+  position: relative;
+}
+
+.cc-band-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.cc-band-fx::before,
+.cc-band-fx::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+/* ── VOID · atmósfera profunda ──────────────────────────────
+   No pinta fondo: el campo 3D se ve entero. La viñeta cierra los
+   bordes y el suelo oscuro le da un horizonte, así el vacío se
+   lee hondo en vez de plano. */
+.cc-band-void > .cc-band-fx {
+  background: radial-gradient(ellipse 85% 65% at 50% 45%, transparent 32%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.cc-band-void > .cc-band-fx::before {
+  inset: auto 0 0 0;
+  height: 42%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 100%);
+}
+
+.cc-band-void > .cc-band-fx::after {
+  inset: auto 0 0 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(236, 168, 214, 0.28), transparent);
+}
+
+/* ── SLAB · losa de grafito hundida ─────────────────────────
+   Bisel claro arriba, canto negro abajo y sombra interior en los
+   dos bordes: el bloque se hunde respecto de la atmósfera. */
+.cc-band-slab {
+  background: linear-gradient(180deg, #1a1a24 0%, #101018 46%, #1a1a24 100%);
+}
+
+.cc-band-slab > .cc-band-fx {
+  background:
+    radial-gradient(ellipse 120% 60% at 50% 0%, rgba(236, 168, 214, 0.08) 0%, transparent 60%),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.016) 0 2px, transparent 2px 8px);
+  box-shadow:
+    inset 0 46px 80px -46px rgba(0, 0, 0, 0.95),
+    inset 0 -46px 80px -46px rgba(0, 0, 0, 0.95);
+}
+
+.cc-band-slab > .cc-band-fx::before {
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.cc-band-slab > .cc-band-fx::after {
+  inset: auto 0 0 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.95), transparent);
+}
+
+/* ── DEEP · banda honda con luz al centro ───────────────────
+   Negro más profundo que la atmósfera, con un haz cian ancho en
+   el medio y los bordes cerrados: la sección se lee como un hueco
+   iluminado, sin ninguna textura que compita con el contenido. */
+.cc-band-deep {
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 50%, rgba(103, 232, 249, 0.1) 0%, transparent 70%),
+    #04040a;
+}
+
+.cc-band-deep > .cc-band-fx {
+  background: radial-gradient(ellipse 80% 34% at 50% 50%, rgba(103, 232, 249, 0.16) 0%, transparent 74%);
+  box-shadow: inset 0 0 220px 90px rgba(0, 0, 0, 0.85);
+}
+
+.cc-band-deep > .cc-band-fx::before {
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(103, 232, 249, 0.45), transparent);
+}
+
+.cc-band-deep > .cc-band-fx::after {
+  inset: auto 0 0 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(103, 232, 249, 0.28), transparent);
+}
+
+/* ── BONE · hoja de papel elevada ───────────────────────────
+   La única banda clara y la única cortada en diagonal. Va por
+   encima de sus vecinas (z-index) y proyecta sombra sobre ellas,
+   así se lee como una hoja apoyada sobre la página y no como
+   otra franja más. */
+.cc-band-bone {
+  --cc-ink: #15151d;
+  color: var(--cc-ink);
+  z-index: 1;
+}
+
+.cc-band-bone > .cc-band-fx {
+  inset: -2.6vw 0;
+  /* La sombra va acá y el recorte en el hijo: al revés, clip-path
+     recortaría también la sombra. */
+  filter:
+    drop-shadow(0 -16px 34px rgba(0, 0, 0, 0.8))
+    drop-shadow(0 22px 46px rgba(0, 0, 0, 0.8));
+}
+
+.cc-band-bone > .cc-band-fx::before {
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 55% at 8% 0%, rgba(236, 168, 214, 0.34) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 55% at 95% 100%, rgba(103, 232, 249, 0.26) 0%, transparent 58%),
+    linear-gradient(180deg, #f8f5f0 0%, #e7e2d8 100%);
+  clip-path: polygon(0 2.6vw, 100% 0, 100% calc(100% - 2.6vw), 0 100%);
+}
+
+.cc-band-bone > .cc-band-fx::after {
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(21, 21, 29, 0.07) 1px, transparent 0);
+  background-size: 22px 22px;
+  clip-path: polygon(0 2.6vw, 100% 0, 100% calc(100% - 2.6vw), 0 100%);
+}
+
+/* ── WELL · pozo con luz cenital ────────────────────────────
+   Paredes negras, haz de luz que cae desde el borde superior y el
+   contenido flotando en el fondo del pozo. */
+.cc-band-well {
+  background: linear-gradient(180deg, #07070d 0%, #0c0c15 50%, #07070d 100%);
+}
+
+.cc-band-well > .cc-band-fx {
+  background: radial-gradient(ellipse 55% 60% at 50% 42%, rgba(236, 168, 214, 0.16) 0%, transparent 65%);
+  box-shadow: inset 0 0 190px 70px rgba(0, 0, 0, 0.92);
+}
+
+.cc-band-well > .cc-band-fx::before {
+  inset: 0 0 auto 0;
+  height: 72%;
+  background: conic-gradient(
+    from 0deg at 50% 0%,
+    transparent 42%,
+    rgba(236, 168, 214, 0.09) 46%,
+    rgba(236, 168, 214, 0.26) 50%,
+    rgba(236, 168, 214, 0.09) 54%,
+    transparent 58%
+  );
+}
+
+.cc-band-well > .cc-band-fx::after {
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(236, 168, 214, 0.5), transparent);
+}
+
+/* ── SIGNATURE · horizonte del cierre ───────────────────────
+   Violeta que sube desde abajo, con una grilla que se pierde en
+   la distancia: el final del recorrido. */
+.cc-band-signature {
+  background: linear-gradient(180deg, #08060f 0%, #120a1d 55%, #180c26 100%);
+}
+
+.cc-band-signature > .cc-band-fx {
+  background:
+    radial-gradient(ellipse 75% 55% at 50% 116%, rgba(161, 0, 242, 0.42) 0%, rgba(161, 0, 242, 0.1) 46%, transparent 72%),
+    radial-gradient(ellipse 45% 26% at 50% 108%, rgba(236, 168, 214, 0.38) 0%, transparent 62%);
+}
+
+.cc-band-signature > .cc-band-fx::before {
+  inset: auto 0 0 0;
+  height: 46%;
+  background: radial-gradient(ellipse 60% 100% at 50% 100%, rgba(236, 168, 214, 0.22) 0%, transparent 72%);
+}
+
+.cc-band-signature > .cc-band-fx::after {
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(236, 168, 214, 0.5), transparent);
+}
+
+/* El resplandor de esta banda nace por debajo del corte (los radiales van
+   a `50% 108%` / `50% 116%`), así que llega a su punto más brillante justo
+   en el borde inferior. El footer arranca en negro puro, con lo cual ese
+   máximo quedaba guillotinado: un salto duro entre el violeta y el negro.
+   Esta capa prolonga el mismo resplandor dentro del footer y lo apaga
+   en los primeros ~300px, para que el corte se lea como un horizonte y no como
+   un filo. Los alfas están calibrados para igualar el brillo del borde
+   inferior de la banda: si suben, el footer arranca más claro que la
+   banda y el salto vuelve, invertido.
+   Solo aplica cuando la banda signature precede al footer (la home): el
+   resto de las páginas cierra en oscuro y no necesita la continuación. */
+.cc-band-signature ~ footer::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: clamp(170px, 26vw, 320px);
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 45% 70% at 50% 0%, rgba(236, 168, 214, 0.2) 0%, transparent 64%),
+    radial-gradient(ellipse 75% 100% at 50% 0%, rgba(161, 0, 242, 0.24) 0%, rgba(161, 0, 242, 0.07) 44%, transparent 76%),
+    linear-gradient(180deg, rgba(24, 12, 38, 0.95) 0%, transparent 100%);
+}
+
+/* ============================================================
+   FILAMENTOS DE `IntegrationsSection`
+   Pulsos que recorren los hilos de luz de la foto de las manos.
+   `pathLength: 1` normaliza cada trazo, así un solo keyframe sirve
+   para los tres sin importar cuánto mida cada uno; lo que los
+   desincroniza son la duración y el delay negativo de cada path.
+   ============================================================ */
+.cc-filament {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Un pulso corto y mucho vacío: se lee como un paquete de energía
+     viajando, no como una línea punteada girando. */
+  stroke-dasharray: 0.085 0.915;
+  animation-name: cc-filament-pulse;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes cc-filament-pulse {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.cc-filament-halo {
+  stroke: rgba(255, 186, 164, 0.62);
+  stroke-width: 30;
+  filter: blur(10px);
+}
+
+.cc-filament-core {
+  stroke: rgba(255, 246, 238, 0.95);
+  stroke-width: 7;
+  filter: blur(1.6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-filament {
+    animation: none;
+    /* Sin movimiento no aporta nada: la foto ya trae los hilos. */
+    display: none;
+  }
+}
+
+/* ============================================================
+   UMBRALES ENTRE BANDAS
+   Cada corte tiene un resplandor que se enciende al cruzarlo y
+   la superficie de la banda que entra se prende con él. Va con
+   `animation-timeline: view()`, o sea atado al scroll real y sin
+   JavaScript: si el navegador no lo soporta, todo queda en su
+   estado final (encendido) y no se pierde nada.
+   ============================================================ */
+
+/* Caja alta y transparente montada a caballo del corte. El alto NO es
+   decorativo: `view()` mide el progreso contra el tamaño del elemento, y
+   con 1px el rango de entrada era instantáneo y la animación saltaba.
+   Con 42vh el umbral se enciende a lo largo de medio scroll de pantalla. */
+.cc-band-seam {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 42vh;
+  translate: 0 -21vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Resplandor centrado en el corte: la mitad cae sobre la banda que
+   termina y la otra mitad sobre la que empieza. */
+.cc-band-seam::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(92vw, 1180px);
+  height: 260px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 62% 50% at 50% 50%,
+    var(--cc-seam, rgba(236, 168, 214, 0.55)) 0%,
+    transparent 72%
+  );
+  filter: blur(34px);
+  opacity: 0.5;
+}
+
+/* Filamento que se dibuja de adentro hacia afuera, justo sobre el corte. */
+.cc-band-seam::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--cc-seam, rgba(236, 168, 214, 0.55)),
+    transparent
+  );
+  opacity: 0.7;
+}
+
+/* Acento por superficie: el umbral anuncia el color de lo que viene. */
+.cc-band-void { --cc-seam: rgba(236, 168, 214, 0.4); }
+.cc-band-slab { --cc-seam: rgba(255, 255, 255, 0.42); }
+.cc-band-deep { --cc-seam: rgba(103, 232, 249, 0.55); }
+.cc-band-well { --cc-seam: rgba(236, 168, 214, 0.5); }
+.cc-band-bone { --cc-seam: rgba(255, 236, 248, 0.6); }
+.cc-band-signature { --cc-seam: rgba(161, 0, 242, 0.6); }
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* El resplandor crece al entrar el corte y se apaga a la mitad
+       cuando ya lo dejaste atrás: se siente como cruzar un umbral. */
+    .cc-band-seam::before {
+      animation: cc-seam-bloom linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 92%;
+    }
+
+    .cc-band-seam::after {
+      animation: cc-seam-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 80%;
+    }
+
+    /* Y la superficie de la banda se prende junto con el umbral.
+       `bone` queda afuera: es la banda clara y bajarle la opacidad
+       la haría parpadear en oscuro al entrar. */
+    .cc-band-void > .cc-band-fx,
+    .cc-band-slab > .cc-band-fx,
+    .cc-band-deep > .cc-band-fx,
+    .cc-band-well > .cc-band-fx,
+    .cc-band-signature > .cc-band-fx {
+      animation: cc-band-ignite linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+@keyframes cc-seam-bloom {
+  0% {
+    opacity: 0;
+    scale: 0.35 0.6;
+  }
+  55% {
+    opacity: 1;
+    scale: 1 1;
+  }
+  100% {
+    opacity: 0.45;
+    scale: 1 1;
+  }
+}
+
+@keyframes cc-seam-draw {
+  0% {
+    opacity: 0;
+    scale: 0.15 1;
+  }
+  100% {
+    opacity: 0.85;
+    scale: 1 1;
+  }
+}
+
+@keyframes cc-band-ignite {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}

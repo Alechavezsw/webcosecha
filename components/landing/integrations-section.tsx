@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ConnectionFilaments } from "@/components/landing/connection-filaments";
 
 const logos: Record<string, React.ReactNode> = {
   OpenAI: (
@@ -175,7 +176,7 @@ export function IntegrationsSection() {
   }, []);
 
   return (
-    <section id="integrations" ref={sectionRef} className="cc-aura cc-aura-rose relative overflow-hidden">
+    <section id="integrations" ref={sectionRef} className="relative overflow-hidden">
 
       {/* Header — compacto */}
       <div
@@ -218,15 +219,21 @@ export function IntegrationsSection() {
         isVisible ? "opacity-100" : "opacity-0"
       }`}>
         <div
-          className="will-change-transform"
+          className="relative will-change-transform"
           style={{ transform: `translate3d(0, ${parallaxY * 0.55}px, 0) scale(1.08)` }}
         >
           <img
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/connection-KeJwWPQvn6l0a7C48tCARYtNEdC92H.png"
             alt=""
             aria-hidden="true"
-            className="w-full h-auto object-cover"
+            /* `block` para que la caja del contenedor mida exactamente lo que
+               mide la imagen: los pulsos se posicionan contra esa caja. */
+            className="block w-full h-auto object-cover"
+            loading="lazy"
+            decoding="async"
           />
+          {/* Los hilos de luz de la foto, recorridos por pulsos. */}
+          <ConnectionFilaments />
         </div>
       </div>
 

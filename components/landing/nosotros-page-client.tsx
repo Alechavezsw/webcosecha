@@ -4,20 +4,26 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowUpRight,
+  Bot,
   Camera,
+  Gauge,
+  Handshake,
   Megaphone,
+  MessageCircle,
   Rocket,
   Search,
   Share2,
   Target,
   Users,
-  Zap,
 } from "lucide-react";
 import { Navigation } from "@/components/landing/navigation";
 import { NosotrosHero } from "@/components/landing/nosotros-hero";
+import { NosotrosMarquee } from "@/components/landing/nosotros-marquee";
+import { NosotrosStatsBand } from "@/components/landing/nosotros-stats-band";
 import { NosotrosIaServicesSection } from "@/components/landing/nosotros-ia-services-section";
-import { NosotrosPillarsSection } from "@/components/landing/nosotros-pillars-section";
-import { NosotrosSolutionsSection } from "@/components/landing/nosotros-solutions-section";
+import { NosotrosProcessSection } from "@/components/landing/nosotros-process-section";
+import { NosotrosPrinciplesSection } from "@/components/landing/nosotros-principles-section";
+import { NosotrosTimelineSection } from "@/components/landing/nosotros-timeline-section";
 import { FooterSection } from "@/components/landing/footer-section";
 import { NosotrosTeamKineticSection } from "@/components/landing/nosotros-team-kinetic";
 import { SectionDivider } from "@/components/landing/section-divider";
@@ -26,75 +32,137 @@ import { Ambient3DBackground } from "@/components/landing/ambient-3d";
 
 const easePremium = [0.22, 1, 0.36, 1] as const;
 
-const pillars = [
+const WHATSAPP_URL = "https://wa.me/542645468012";
+
+const marqueeItems = [
+  "Inteligencia artificial",
+  "Desarrollo web",
+  "SEO",
+  "Publicidad digital",
+  "Redes sociales",
+  "Fotografía",
+  "Automatización",
+  "Comunicación política",
+];
+
+const stats = [
   {
-    icon: Users,
-    title: "Equipo multidisciplinario",
-    body:
-      "Expertos en desarrollo web, aplicaciones, diseño gráfico, fotografía y marketing digital trabajando en conjunto para resultados sólidos.",
+    value: 20,
+    prefix: "+",
+    label: "Años de trayectoria",
+    detail: "Desde 2003 haciendo web y comunicación en San Juan.",
   },
   {
-    icon: Zap,
-    title: "Tecnología de vanguardia",
+    value: 6,
+    label: "Especialistas in-house",
+    detail: "Dirección, marketing, comunidad, fotografía y diseño.",
+  },
+  {
+    value: 14,
+    label: "Servicios activos",
+    detail: "De IA aplicada y desarrollo a redes, foto e infraestructura.",
+  },
+  {
+    value: 3,
+    label: "Marcas fundadas",
+    detail: "I-media 86, SW Diario y Cosecha Creativa.",
+  },
+];
+
+/** "Por qué nosotros": capacidades + criterio, en una sola lista editorial. */
+const principles = [
+  {
+    icon: Users,
+    title: "Un solo equipo, de punta a punta",
     body:
-      "Stack moderno, IA aplicada a procesos y entregas que escalan con tu negocio.",
+      "Estrategia, diseño, desarrollo, contenido y fotografía en la misma mesa. Un interlocutor y una factura, sin coordinar tres proveedores.",
   },
   {
     icon: Target,
-    title: "Enfoque en resultados",
+    title: "Primero el negocio, después la tecnología",
     body:
-      "Soluciones digitales visualmente fuertes y medibles: tráfico, conversiones y presencia de marca.",
+      "Antes de proponer un desarrollo, una campaña o un agente de IA, entendemos qué problema comercial resuelve y cómo se va a medir.",
+  },
+  {
+    icon: Gauge,
+    title: "Lo que no se mide, no se mejora",
+    body:
+      "Cada proyecto sale con la medición configurada desde el día uno. Preferimos un número incómodo antes que un informe decorativo.",
+  },
+  {
+    icon: Handshake,
+    title: "Decimos que no cuando corresponde",
+    body:
+      "Si tu sitio funciona, no te vendemos uno nuevo. Si el presupuesto no alcanza para hacerlo bien, lo decimos antes de empezar.",
   },
 ];
 
 const iaServices = [
   {
-    title: "Desarrollo web",
+    title: "Inteligencia artificial aplicada",
     body:
-      "Sitios y aplicaciones a medida que mejoran la experiencia del usuario y la productividad.",
-    icon: Rocket,
+      "Agentes que atienden por WhatsApp y por la web, automatizaciones que eliminan la carga manual y reportes que se arman solos.",
+    icon: Bot,
+    href: "/servicios/ia",
+    tags: ["Agentes de IA", "n8n", "WhatsApp Business", "Reportes"],
   },
   {
-    title: "SEO & visibilidad",
-    body:
-      "Optimización para buscadores y contenido orientado a atraer tráfico orgánico de calidad.",
+    title: "Desarrollo web",
+    body: "Sitios y aplicaciones a medida, rápidos por diseño y pensados para convertir.",
+    icon: Rocket,
+    href: "/servicios/diseno-web",
+  },
+  {
+    title: "SEO & posicionamiento",
+    body: "Base técnica sana y contenido que responde lo que tus clientes escriben en Google.",
     icon: Search,
+    href: "/servicios/seo",
   },
   {
     title: "Publicidad digital",
-    body:
-      "Campañas en redes y Google Ads pensadas para conversiones y alcance eficiente.",
+    body: "Campañas en Google y Meta con conversiones medidas y costo por consulta bajo control.",
     icon: Megaphone,
+    href: "/servicios/publicidad-paga-en-redes",
   },
   {
-    title: "Fotografía profesional",
-    body:
-      "Imágenes que reflejan la esencia de tu marca y conectan con tu audiencia.",
-    icon: Camera,
-  },
-  {
-    title: "Gestión de redes sociales",
-    body:
-      "Estrategia y contenido para fortalecer tu presencia en Instagram, Facebook y más.",
+    title: "Redes y contenido",
+    body: "Calendario trimestral, producción por lotes y una voz de marca que se sostiene.",
     icon: Share2,
+    href: "/servicios/gestion-de-redes-sociales",
+  },
+  {
+    title: "Foto y video",
+    body: "Producción propia: producto, equipo, obra y piezas para campañas.",
+    icon: Camera,
+    href: "/servicios/foto-y-video",
   },
 ];
 
-const solutions = [
+const processSteps = [
   {
-    title: "SEO & posicionamiento",
-    body:
-      "Trabajamos la visibilidad en Google con base técnica y contenidos alineados a tu negocio.",
+    title: "Escuchamos",
+    body: "Una reunión para entender el negocio, no para mostrarte un portfolio.",
+    meta: "Semana 1",
   },
   {
-    title: "Social engagement",
-    body:
-      "Medimos el compromiso de tu audiencia y ajustamos estrategias para mejorar resultados.",
+    title: "Diagnosticamos",
+    body: "Revisamos web, redes y procesos, y te devolvemos por escrito qué falla y qué va primero.",
+    meta: "Semana 1 y 2",
   },
   {
-    title: "Content marketing",
-    body:
-      "Piezas y narrativas que conectan con tu público y refuerzan autoridad de marca.",
+    title: "Proponemos",
+    body: "Plan con alcance, plazos y precio cerrado. Sin horas que aparecen a mitad de camino.",
+    meta: "Semana 2",
+  },
+  {
+    title: "Ejecutamos",
+    body: "Entregas parciales para que veas avances y corrijas a tiempo.",
+    meta: "Según proyecto",
+  },
+  {
+    title: "Medimos",
+    body: "Consultas, costo por consulta y evolución. Si algo no rinde, se cambia.",
+    meta: "Mes a mes",
   },
 ];
 
@@ -102,30 +170,28 @@ const timeline = [
   {
     date: "Dic 2003",
     title: "I-media 86",
-    detail: "Inicios en diseño web y proyectos digitales.",
+    detail: "Los primeros sitios web, cuando en la provincia casi nadie veía internet como canal comercial.",
   },
   {
     date: "May 2005",
     title: "SW Diario",
-    detail: "Creación del medio y consolidación del equipo editorial y técnico.",
+    detail: "El medio digital propio: redacción, producción y tecnología. Ahí se formó el núcleo del equipo.",
   },
   {
     date: "Jul 2023",
     title: "Cosecha Creativa",
-    detail:
-      "Fundación en San Juan: estrategia, creatividad y tecnología bajo una misma marca.",
+    detail: "Estrategia, creatividad y tecnología bajo una misma marca y un mismo método.",
   },
   {
     date: "2024",
-    title: "Equipo & nuevas tecnologías",
-    detail:
-      "Equipo multidisciplinario ampliado; IA y herramientas actuales aplicadas al marketing digital.",
+    title: "Equipo y nuevas tecnologías",
+    detail: "Se suman diseño, fotografía y comunidad. La IA entra al día a día de los proyectos.",
   },
   {
     date: "2026",
-    title: "Más tecnología y equipo",
-    detail:
-      "Profundizamos en procesos digitales, automatización e IA aplicada; el equipo crece con nuevos perfiles para entregar proyectos más veloces y medibles.",
+    title: "Más tecnología, más equipo",
+    detail: "Agentes de IA en producción, automatizaciones con n8n e infraestructura propia.",
+    current: true,
   },
 ];
 
@@ -136,7 +202,7 @@ const team = [
     role: "Diseño web · Dirección",
     bio: "Fundador de I-media 86, SW Diario y Cosecha Creativa. Periodismo, comunicación política y fotografía.",
     initials: "AC",
-    image: "/ale-chavez.png",
+    image: "/_lite/ale-chavez.webp",
     link: "https://alechavez.cosechacreativa.com.ar/",
   },
   {
@@ -167,13 +233,6 @@ const team = [
     bio: "Piezas visuales y postproducción para web, redes y campañas con criterio editorial unificado.",
     initials: "NC",
   },
-  {
-    id: "emilia-fuentes",
-    name: "Emilia Fuentes",
-    role: "Diseño",
-    bio: "Identidad visual, interfaces y material gráfico alineado a la voz de cada marca.",
-    initials: "EF",
-  },
 ];
 
 export function NosotrosPageClient() {
@@ -197,119 +256,128 @@ export function NosotrosPageClient() {
       </div>
 
       <NosotrosHero />
-      <SectionDivider color="copper" />
 
-      <NosotrosPillarsSection pillars={pillars} />
-      <SectionDivider color="purple-rose" />
+      {/* Recorrido de color: rosa (hero) → plata (datos) → violeta → cian →
+          esmeralda → cobre → rosa (equipo). Cada divisor anuncia el color
+          de la sección que viene, para que el corte se lea al hacer scroll. */}
 
-      <NosotrosIaServicesSection services={iaServices} />
-      <SectionDivider color="cyan" />
+      {/* Cinta en movimiento: separa el bloque de apertura del cuerpo. */}
+      <NosotrosMarquee items={marqueeItems} />
 
-      <NosotrosSolutionsSection solutions={solutions} />
+      {/* Plata — datos duros, sin color de marca */}
+      <NosotrosStatsBand stats={stats} />
       <SectionDivider color="purple" />
 
-      {/* Results */}
-      <motion.section 
-        initial={reduce ? false : { opacity: 0, y: 30, filter: "blur(6px)" }}
-        whileInView={reduce ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.85, ease: easePremium }}
-        className="relative overflow-hidden py-16 md:py-24"
-      >
-        {/* Glow ambient background style */}
-        <div className="pointer-events-none absolute inset-0 bg-[#05030a]/45" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(161,0,242,0.12),transparent_70%)]" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.25] [background-image:linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:44px_44px]" aria-hidden />
-        
-        <div className="relative z-10 mx-auto max-w-[1200px] px-4 text-center sm:px-4 sm:px-6 lg:px-12">
-          <h2 className="font-display text-3xl font-semibold md:text-4xl">
-            Resultados en el tiempo correcto
-          </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-white/72 md:text-[17px]">
-            Entendemos que el tiempo cuenta. Trabajamos con estrategias claras para impulsar el
-            crecimiento de tu negocio en meses, no en promesas vacías.
-          </p>
-        </div>
-      </motion.section>
-      <SectionDivider color="purple-cyan" />
+      {/* Violeta + trama de puntos */}
+      <NosotrosPrinciplesSection principles={principles} />
+      <SectionDivider color="cyan" />
 
-      {/* Timeline */}
-      <motion.section 
-        initial={reduce ? false : { opacity: 0, y: 30, filter: "blur(6px)" }}
-        whileInView={reduce ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.85, ease: easePremium }}
-        className="relative overflow-hidden py-20 md:py-28"
-      >
-        {/* Glow ambient background style */}
-        <div className="pointer-events-none absolute inset-0 bg-[#05030a]/45" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(103,232,249,0.08),transparent_65%)]" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.25] [background-image:linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:44px_44px]" aria-hidden />
+      {/* Cian + rayas diagonales */}
+      <NosotrosIaServicesSection services={iaServices} />
+      <SectionDivider color="emerald" />
 
-        <div className="relative z-10 mx-auto max-w-[720px] px-4 sm:px-6 lg:px-12">
-          <p className="text-center font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-[#eca8d6]/85">
-            Nuestra línea de tiempo
-          </p>
-          <h2 className="mt-3 text-center font-display text-3xl font-semibold md:text-4xl">
-            Más de dos décadas evolucionando
-          </h2>
-          <div className="relative mt-14 border-l border-white/10 pl-8 md:pl-10">
-            {timeline.map((item, i) => (
-              <motion.div
-                key={item.title + item.date}
-                initial={reduce ? false : { opacity: 0, x: -8 }}
-                whileInView={reduce ? undefined : { opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.06 }}
-                className="relative pb-12 last:pb-0"
-              >
-                <span className="absolute -left-[21px] top-1.5 flex h-3 w-3 rounded-full border-2 border-[#eca8d6]/80 bg-[#050506] md:-left-[25px]" />
-                <p className="font-mono text-sm text-[#eca8d6]/90">{item.date}</p>
-                <h3 className="mt-1 font-display text-xl font-semibold">{item.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-white/65">{item.detail}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-      <SectionDivider color="rose" />
-
-      <NosotrosTeamKineticSection members={team} />
+      {/* Esmeralda + grilla técnica */}
+      <NosotrosProcessSection steps={processSteps} />
       <SectionDivider color="copper" />
 
-      {/* Usina Creativa: Motor interactivo 3D con forma de agencia */}
-      <NosotrosAgency3d />
+      {/* Cobre sepia + campo de estrellas */}
+      <NosotrosTimelineSection items={timeline} />
+      <SectionDivider color="rose" />
+
+      {/* Rosa + líneas horizontales */}
+      <NosotrosTeamKineticSection members={team} />
       <SectionDivider color="purple-rose" />
 
+      {/* Usina Creativa: motor interactivo 3D con forma de agencia */}
+      <NosotrosAgency3d />
+      <SectionDivider color="dark" />
+
       {/* CTA */}
-      <motion.section 
-        initial={reduce ? false : { opacity: 0, scale: 0.95 }}
-        whileInView={reduce ? undefined : { opacity: 1, scale: 1 }}
+      <motion.section
+        initial={reduce ? false : { opacity: 0, y: 24 }}
+        whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: easePremium }}
-        className="relative overflow-hidden py-20 md:py-28"
+        className="relative overflow-hidden py-16 md:py-24"
       >
-        {/* Glow ambient background style */}
-        <div className="pointer-events-none absolute inset-0 bg-[#05030a]/45" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(184,82,33,0.10),transparent_65%)]" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.2] [background-image:linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:44px_44px]" aria-hidden />
+        {/* Cierre: recoge los cinco colores del recorrido en un solo bloque. */}
+        <div className="pointer-events-none absolute inset-0 bg-[#08050f]/85" aria-hidden />
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_75%_at_50%_120%,rgba(236,168,214,0.30),transparent_60%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_50%_at_8%_-10%,rgba(184,82,33,0.20),transparent_60%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_50%_at_92%_-10%,rgba(139,92,246,0.20),transparent_60%)]"
+          aria-hidden
+        />
 
         <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12">
-          <div className="rounded-[1.75rem] border border-[#eca8d6]/25 bg-gradient-to-br from-[#eca8d6]/15 via-transparent to-violet-900/20 px-8 py-12 md:px-14 md:py-14">
-            <h2 className="font-display text-2xl font-semibold md:text-3xl">
-              ¿Tu marca en el siguiente nivel?
-            </h2>
-            <p className="mt-4 max-w-xl text-[15px] text-white/75">
-              Contanos tu proyecto: estrategia, web, redes o campañas. Respondemos con propuesta
-              clara.
-            </p>
-            <Link
-              href="/#contacto"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-base font-semibold text-gray-900 transition hover:bg-white/90"
-            >
-              Ir a contacto
-              <ArrowUpRight className="h-5 w-5" />
-            </Link>
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-[#eca8d6]/30 bg-gradient-to-br from-[#eca8d6]/18 via-[#0a0710]/70 to-violet-900/35 px-7 py-11 backdrop-blur-md md:px-14 md:py-14">
+            <div
+              className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#eca8d6]/25 blur-3xl"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-[#8b5cf6]/25 blur-3xl"
+              aria-hidden
+            />
+
+            <div className="relative z-10 grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-14">
+              <div className="lg:col-span-7">
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-[#eca8d6]">
+                  Siguiente paso
+                </p>
+                <h2 className="mt-5 font-display text-[2.6rem] font-semibold leading-[0.92] tracking-tight sm:text-5xl lg:text-[3.8rem]">
+                  Contanos qué
+                  <span className="italic text-[#eca8d6]"> querés resolver</span>
+                </h2>
+                <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-white/72 md:text-[17px]">
+                  La primera reunión y el diagnóstico no tienen costo: te decimos qué haríamos y
+                  cuánto sale, sin vueltas.
+                </p>
+
+                <div className="mt-9 flex flex-wrap gap-3">
+                  <Link
+                    href="/#contacto"
+                    className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-[15px] font-semibold text-gray-900 transition hover:bg-white/90"
+                  >
+                    Ir a contacto
+                    <ArrowUpRight className="h-5 w-5" aria-hidden />
+                  </Link>
+                  <a
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-[15px] font-semibold text-white transition hover:border-[#eca8d6]/45 hover:bg-white/10"
+                  >
+                    <MessageCircle className="h-5 w-5" aria-hidden />
+                    Escribir por WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5">
+                <ul className="divide-y divide-white/10 border-y border-white/10">
+                  {[
+                    { k: "Respuesta", v: "Menos de 24 h hábiles" },
+                    { k: "Diagnóstico inicial", v: "Sin costo" },
+                    { k: "Presupuesto", v: "Alcance y precio cerrado" },
+                    { k: "Dónde estamos", v: "San Juan, Argentina" },
+                  ].map((row) => (
+                    <li key={row.k} className="flex items-baseline justify-between gap-4 py-4">
+                      <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-white/40">
+                        {row.k}
+                      </span>
+                      <span className="text-right text-[14.5px] text-white/80">{row.v}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </motion.section>

@@ -221,6 +221,7 @@ export function EventGalleryModal({ open, onOpenChange, config }: EventGalleryMo
                 src={lightboxSrc}
                 alt=""
                 className="max-h-[82dvh] max-w-[min(96vw,100%)] object-contain shadow-2xl rounded-xl border border-white/10"
+                decoding="async"
                 onClick={(e) => e.stopPropagation()}
               />
             </div>

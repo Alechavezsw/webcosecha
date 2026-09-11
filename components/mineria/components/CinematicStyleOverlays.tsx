@@ -29,7 +29,7 @@ const CinematicStyleOverlays: React.FC = () => {
       />
       <div className="pointer-events-none absolute inset-0 bg-[#ffb800]/[0.06]" aria-hidden />
       <div
-        className="pointer-events-none absolute inset-0 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.09]"
+        className="pointer-events-none absolute inset-0 mix-blend-overlay bg-[url('/mineria/noise.svg')] opacity-[0.09]"
         aria-hidden
       />
     </>

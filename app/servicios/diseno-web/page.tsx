@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { DisenoWebClient } from "@/components/landing/servicios/diseno-web-client"
+import { DisenoWebJarvisClient } from "@/components/landing/servicios/diseno-web-jarvis-client"
 
 export const metadata: Metadata = {
   title: "Diseño Web en San Juan | Sitios premium y SEO — Cosecha Creativa",
@@ -14,5 +14,5 @@ export const metadata: Metadata = {
 }
 
 export default function DisenoWebPage() {
-  return <DisenoWebClient />
+  return <DisenoWebJarvisClient />
 }

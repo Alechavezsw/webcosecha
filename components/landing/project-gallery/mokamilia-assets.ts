@@ -1,5 +1,7 @@
 /** Rutas bajo `public/mokamilia/` — MOKAMILIA */
 
+import { opt } from "@/lib/optimized-images"
+
 const MOKAMILIA_ROOT = "/mokamilia"
 
 const RELATIVE_IMAGE_PATHS = [
@@ -12,7 +14,7 @@ const RELATIVE_IMAGE_PATHS = [
 ] as const
 
 function publicUrl(pathFromPublicRoot: string): string {
-  return encodeURI(pathFromPublicRoot)
+  return opt(pathFromPublicRoot)
 }
 
 /** Portada del slide (usando la imagen principal del set). */

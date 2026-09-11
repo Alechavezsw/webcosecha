@@ -1,8 +1,9 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { asset } from '../lib/asset';
+import { assetVideo, assetVideoPoster } from '../lib/asset';
 import IndustrialVideoHud from './IndustrialVideoHud';
+import SectionKicker from './SectionKicker';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,6 +17,36 @@ const VideoFrame: React.FC<VideoFrameProps> = ({ videoSectionRef, videoRef }) =>
   const stageRef = useRef<HTMLDivElement>(null);
   const scanRef = useRef<HTMLDivElement>(null);
   const bloomRef = useRef<HTMLDivElement>(null);
+  /**
+   * El `<source>` no se monta hasta que la sección se acerca a pantalla.
+   *
+   * `autoPlay` sin esto le pide al navegador el clip entero en la carga
+   * inicial, aunque el showreel esté a media página de distancia. Con el
+   * source diferido el video sigue arrancando solo — apenas se le asigna la
+   * fuente, `autoPlay` hace su trabajo — pero el 1,2 MB viaja recién cuando
+   * hace falta.
+   */
+  const [sourceMounted, setSourceMounted] = useState(false);
+
+  useEffect(() => {
+    const section = videoSectionRef.current;
+    if (!section || sourceMounted) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setSourceMounted(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setSourceMounted(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '700px 0px' },
+    );
+    io.observe(section);
+    return () => io.disconnect();
+  }, [videoSectionRef, sourceMounted]);
 
   useLayoutEffect(() => {
     const section = videoSectionRef.current;
@@ -30,6 +61,25 @@ const VideoFrame: React.FC<VideoFrameProps> = ({ videoSectionRef, videoRef }) =>
 
     let playSt: ScrollTrigger | undefined;
 
+    const startVideo = () => {
+      const rewind = () => {
+        try {
+          video.currentTime = 0;
+        } catch {
+          /* sin metadata todavía: arranca desde donde esté */
+        }
+      };
+      if (video.readyState >= 1) rewind();
+      else video.addEventListener('loadedmetadata', rewind, { once: true });
+
+      // Un rechazo acá casi siempre es una carga interrumpida, no una política
+      // de autoplay (el video va muteado). Un reintento alcanza.
+      void video.play().catch(() => {
+        video.load();
+        void video.play().catch(() => {});
+      });
+    };
+
     const ctx = gsap.context(() => {
       if (reduce) {
         gsap.set(stage, { clearProps: 'all' });
@@ -41,10 +91,7 @@ const VideoFrame: React.FC<VideoFrameProps> = ({ videoSectionRef, videoRef }) =>
           trigger: section,
           start: 'top 78%',
           once: true,
-          onEnter: () => {
-            video.currentTime = 0;
-            void video.play().catch(() => {});
-          },
+          onEnter: startVideo,
         });
         return;
       }
@@ -152,10 +199,7 @@ const VideoFrame: React.FC<VideoFrameProps> = ({ videoSectionRef, videoRef }) =>
         trigger: section,
         start: 'top 72%',
         once: true,
-        onEnter: () => {
-          video.currentTime = 0;
-          void video.play().catch(() => {});
-        },
+        onEnter: startVideo,
       });
     }, section);
 
@@ -192,7 +236,7 @@ const VideoFrame: React.FC<VideoFrameProps> = ({ videoSectionRef, videoRef }) =>
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 z-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.06]"
+        className="pointer-events-none absolute inset-0 z-0 bg-[url('/mineria/noise.svg')] opacity-[0.06]"
         aria-hidden
       />
 
@@ -222,12 +266,7 @@ const VideoFrame: React.FC<VideoFrameProps> = ({ videoSectionRef, videoRef }) =>
         style={{ transformStyle: 'preserve-3d' }}
       >
         <div className="mb-10 flex w-full max-w-6xl flex-col gap-5 sm:mb-12">
-          <div className="flex items-center gap-6">
-            <div className="h-0.5 w-20 shrink-0 bg-[#ffb800]" />
-            <span className="text-[12px] font-bold uppercase tracking-[0.45em] text-[#ffb800] sm:text-[13px] sm:tracking-[0.5em]">
-              Oportunidad de Comunicar
-            </span>
-          </div>
+          <SectionKicker>Oportunidad de Comunicar</SectionKicker>
           <p className="max-w-3xl text-lg leading-relaxed text-white/55 md:text-xl">
             Tu empresa puede trabajar muy bien… pero si no se comunica bien, pierde oportunidades. Muchos proveedores
             mineros tienen experiencia, capacidad técnica y trayectoria, pero no siempre cuentan con una presencia
@@ -242,14 +281,17 @@ const VideoFrame: React.FC<VideoFrameProps> = ({ videoSectionRef, videoRef }) =>
           >
             <video
               ref={videoRef}
-              poster="https://images.unsplash.com/photo-1578307336416-0c97e827c953?auto=format&fit=crop&q=60&w=1600"
+              poster={assetVideoPoster('clip_1_202603281304.webm')}
               className="h-full w-full object-cover opacity-90 will-change-transform"
+              autoPlay
               muted
               playsInline
-              loop={false}
-              preload="auto"
+              loop
+              preload="metadata"
             >
-              <source src={asset('clip_1_202603281304.webm')} type="video/webm" />
+              {sourceMounted && (
+                <source src={assetVideo('clip_1_202603281304.webm')} type="video/webm" />
+              )}
             </video>
 
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/80" />

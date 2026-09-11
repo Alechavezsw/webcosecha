@@ -100,6 +100,7 @@ export function ProjectGallerySlider() {
       <div
         ref={sliderRef}
         className="relative flex h-full w-full cursor-grab touch-pan-x items-center active:cursor-grabbing"
+        data-cursor="Arrastrá"
         onMouseDown={handleDragStart}
         onMouseMove={handleDragMove}
         onMouseUp={handleDragEnd}

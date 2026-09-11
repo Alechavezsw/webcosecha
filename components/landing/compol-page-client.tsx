@@ -28,7 +28,6 @@ import {
   Palette,
   ShieldAlert,
   Share2,
-  Sparkles,
   Users,
   X as XIcon,
   type LucideIcon,
@@ -50,7 +49,7 @@ import { cn } from "@/lib/utils";
 const easePremium = [0.22, 1, 0.36, 1] as const;
 
 /** Copia sin espacios en `public/media/compol-hero.mp4` (evita 404 / rutas rotas). */
-const COMPOL_HERO_VIDEO_SRC = "/media/compol-hero.mp4";
+const COMPOL_HERO_VIDEO_SRC = "/_lite/compol-hero.mp4";
 
 const heroContainer: Variants = {
   hidden: {},
@@ -282,6 +281,25 @@ const politicaTechEjemplos = [
   },
 ] as const;
 
+const processSteps = [
+  {
+    step: "Diagnóstico",
+    body: "Sondeos, entrevistas y escucha en redes para saber de dónde partimos y qué mueve a cada público.",
+  },
+  {
+    step: "Estrategia",
+    body: "Matriz de mensajes y plan editorial: qué decir, cuándo, en qué canal y con qué idea fuerza.",
+  },
+  {
+    step: "Producción",
+    body: "Piezas, contenidos, cobertura fotográfica y desarrollo. El mensaje se vuelve visible.",
+  },
+  {
+    step: "Medición",
+    body: "Tableros e informes para corregir sobre datos y no sobre intuición, mientras la campaña corre.",
+  },
+] as const;
+
 const marqueeWords = [
   "Comunicación política",
   "Campañas",
@@ -307,11 +325,10 @@ function CompolAmbientOrbs({ reduce }: { reduce: boolean }) {
   if (reduce) {
     return (
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
-        <div className="absolute left-[5%] top-[8%] h-[min(48vw,440px)] w-[min(48vw,440px)] rounded-full bg-[#eca8d6]/12 blur-[110px]" />
-        <div className="absolute right-[2%] top-[18%] h-[min(42vw,400px)] w-[min(42vw,400px)] rounded-full bg-violet-600/18 blur-[100px]" />
-        <div className="absolute bottom-[10%] left-[30%] h-[min(36vw,320px)] w-[min(36vw,320px)] rounded-full bg-fuchsia-500/10 blur-[120px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_-8%,rgba(236,168,214,0.09),transparent_50%)]" />
-        <div className="absolute inset-0 opacity-[0.28] [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:64px_64px]" />
+        <div className="absolute left-[5%] top-[8%] h-[min(48vw,440px)] w-[min(48vw,440px)] rounded-full bg-[#eca8d6]/[0.06] blur-[110px]" />
+        <div className="absolute right-[2%] top-[18%] h-[min(42vw,400px)] w-[min(42vw,400px)] rounded-full bg-violet-600/[0.09] blur-[100px]" />
+        <div className="absolute bottom-[10%] left-[30%] h-[min(36vw,320px)] w-[min(36vw,320px)] rounded-full bg-fuchsia-500/[0.05] blur-[120px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_-8%,rgba(236,168,214,0.05),transparent_50%)]" />
       </div>
     );
   }
@@ -320,18 +337,17 @@ function CompolAmbientOrbs({ reduce }: { reduce: boolean }) {
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
       <motion.div
         style={{ y: s1, rotate: sr }}
-        className="absolute -left-[18%] top-[6%] h-[min(58vw,540px)] w-[min(58vw,540px)] rounded-full bg-[#eca8d6]/[0.14] blur-[110px]"
+        className="absolute -left-[18%] top-[6%] h-[min(58vw,540px)] w-[min(58vw,540px)] rounded-full bg-[#eca8d6]/[0.07] blur-[110px]"
       />
       <motion.div
         style={{ y: s2 }}
-        className="absolute -right-[12%] top-[22%] h-[min(50vw,460px)] w-[min(50vw,460px)] rounded-full bg-violet-600/22 blur-[100px]"
+        className="absolute -right-[12%] top-[22%] h-[min(50vw,460px)] w-[min(50vw,460px)] rounded-full bg-violet-600/[0.11] blur-[100px]"
       />
       <motion.div
         style={{ y: s3 }}
-        className="absolute bottom-[6%] left-[28%] h-[min(44vw,400px)] w-[min(44vw,400px)] rounded-full bg-cyan-500/12 blur-[120px]"
+        className="absolute bottom-[6%] left-[28%] h-[min(44vw,400px)] w-[min(44vw,400px)] rounded-full bg-cyan-500/[0.06] blur-[120px]"
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-10%,rgba(236,168,214,0.11),transparent_52%)]" />
-      <div className="absolute inset-0 opacity-[0.32] [background-image:linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:64px_64px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-10%,rgba(236,168,214,0.06),transparent_52%)]" />
     </div>
   );
 }
@@ -383,7 +399,6 @@ function ServicesAnimatedBackdrop({ reduce }: { reduce: boolean }) {
         <div className="absolute -left-[20%] top-[-30%] h-[min(100vw,560px)] w-[min(100vw,560px)] rounded-full bg-[#eca8d6]/10 blur-[100px]" />
         <div className="absolute -right-[15%] bottom-[-25%] h-[min(90vw,480px)] w-[min(90vw,480px)] rounded-full bg-violet-600/14 blur-[110px]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_60%_at_50%_30%,rgba(236,168,214,0.08),transparent_55%)]" />
-        <div className="absolute inset-0 opacity-[0.22] [background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:56px_56px]" />
       </div>
     );
   }
@@ -421,7 +436,154 @@ function ServicesAnimatedBackdrop({ reduce }: { reduce: boolean }) {
         animate={{ opacity: [0.55, 0.95, 0.55] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
       />
-      <div className="absolute inset-0 opacity-[0.26] [background-image:linear-gradient(rgba(255,255,255,0.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.028)_1px,transparent_1px)] [background-size:56px_56px]" />
+    </div>
+  );
+}
+
+/**
+ * Fondos de sección.
+ *
+ * Antes la página tenía una sola textura repetida: `CompolAmbientOrbs` (fija,
+ * de fondo global) y `ServicesAnimatedBackdrop` eran la misma idea dos veces
+ * —orbes borrosos más una grilla de líneas de 56/64px— y el resto de las
+ * secciones no tenía fondo propio. Todo el scroll se sentía como una única
+ * superficie.
+ *
+ * Acá cada variante es una textura de otra naturaleza, no otro tono del mismo
+ * degradado, y cada sección usa una sola. La grilla de líneas quedó reservada
+ * para `blueprint`, donde significa algo (la sección de software).
+ */
+type GroundVariant =
+  | "spotlight"
+  | "spotlight-light"
+  | "dots"
+  | "film"
+  | "blueprint"
+  | "strata"
+  | "strata-light"
+  | "radar";
+
+function SectionGround({ variant, reduce }: { variant: GroundVariant; reduce: boolean }) {
+  if (variant === "spotlight-light") {
+    // Equipo en claro: la luz cenital ahora se dibuja con sombra en los
+    // bordes. Sobre claro se resta luz, no se suma.
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_50%_-8%,rgba(255,255,255,0.95),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_45%_40%_at_15%_92%,rgba(168,49,127,0.07),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(23,19,31,0.07)_100%)]" />
+      </div>
+    );
+  }
+
+  if (variant === "strata-light") {
+    // Proceso en claro: mismas franjas de avance, en gris azulado.
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-90 [background-image:repeating-linear-gradient(90deg,rgba(79,70,229,0.14)_0px,rgba(79,70,229,0.14)_1px,transparent_1px,transparent_25%)]"
+          style={{
+            maskImage: "linear-gradient(180deg, transparent, black 22%, black 78%, transparent)",
+            WebkitMaskImage: "linear-gradient(180deg, transparent, black 22%, black 78%, transparent)",
+          }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_50%_at_50%_105%,rgba(79,70,229,0.10),transparent_66%)]" />
+      </div>
+    );
+  }
+
+  if (variant === "spotlight") {
+    // Equipo: un cono de luz desde arriba. Es la sección de las personas, así
+    // que la textura es luz, no trama.
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#f5c98a]/45 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_50%_at_50%_-5%,rgba(245,201,138,0.16),transparent_62%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_35%_at_18%_85%,rgba(236,168,214,0.08),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(4,3,9,0.75)_100%)]" />
+      </div>
+    );
+  }
+
+  if (variant === "dots") {
+    // Galería: trama de puntos tipo hoja de contactos, difuminada en los
+    // bordes para que no compita con las fotos.
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-70 [background-image:radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)] [background-size:22px_22px]"
+          style={{
+            maskImage: "radial-gradient(ellipse 80% 70% at 50% 50%, black 25%, transparent 78%)",
+            WebkitMaskImage: "radial-gradient(ellipse 80% 70% at 50% 50%, black 25%, transparent 78%)",
+          }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(45,212,191,0.11),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_88%_12%,rgba(56,189,248,0.07),transparent_62%)]" />
+      </div>
+    );
+  }
+
+  if (variant === "film") {
+    // Coberturas: líneas de barrido y una fuga de luz diagonal. Es la sección
+    // de fotografía, así que la textura sale del oficio.
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_25%_20%,rgba(251,146,60,0.12),transparent_65%)]" />
+        <div className="absolute inset-0 opacity-60 [background-image:repeating-linear-gradient(180deg,rgba(255,255,255,0.032)_0px,rgba(255,255,255,0.032)_1px,transparent_1px,transparent_5px)]" />
+        <motion.div
+          className="absolute -inset-y-1/2 -left-1/3 w-1/2 rotate-[18deg] bg-[linear-gradient(90deg,transparent,rgba(255,196,120,0.13),transparent)] blur-2xl"
+          animate={reduce ? undefined : { x: ["0%", "260%"] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", repeatDelay: 4 }}
+        />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent" />
+      </div>
+    );
+  }
+
+  if (variant === "blueprint") {
+    // Tecnología: la única grilla de la página. Acá el plano técnico dice algo.
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-50 [background-image:linear-gradient(rgba(125,211,252,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.07)_1px,transparent_1px),linear-gradient(rgba(125,211,252,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.12)_1px,transparent_1px)] [background-size:40px_40px,40px_40px,200px_200px,200px_200px]"
+          style={{
+            maskImage: "radial-gradient(ellipse 90% 75% at 50% 40%, black 20%, transparent 82%)",
+            WebkitMaskImage: "radial-gradient(ellipse 90% 75% at 50% 40%, black 20%, transparent 82%)",
+          }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_80%_10%,rgba(56,189,248,0.09),transparent_60%)]" />
+      </div>
+    );
+  }
+
+  if (variant === "strata") {
+    // Proceso: franjas verticales de luz índigo, una por etapa. Marcan el
+    // avance de izquierda a derecha, que es lo que cuenta la sección.
+    return (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-80 [background-image:repeating-linear-gradient(90deg,rgba(129,140,248,0.09)_0px,rgba(129,140,248,0.09)_1px,transparent_1px,transparent_25%)]"
+          style={{
+            maskImage: "linear-gradient(180deg, transparent, black 25%, black 75%, transparent)",
+            WebkitMaskImage: "linear-gradient(180deg, transparent, black 25%, black 75%, transparent)",
+          }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_45%_at_50%_100%,rgba(99,102,241,0.16),transparent_65%)]" />
+      </div>
+    );
+  }
+
+  // radar — CTA: anillos concéntricos que salen del pie de la sección.
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div
+        className="absolute inset-0 [background-image:repeating-radial-gradient(circle_at_50%_112%,rgba(236,168,214,0.075)_0px,rgba(236,168,214,0.075)_1px,transparent_1px,transparent_86px)]"
+        style={{
+          maskImage: "radial-gradient(ellipse 90% 100% at 50% 112%, black 10%, transparent 72%)",
+          WebkitMaskImage: "radial-gradient(ellipse 90% 100% at 50% 112%, black 10%, transparent 72%)",
+        }}
+      />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#eca8d6]/35 to-transparent" />
     </div>
   );
 }
@@ -431,12 +593,20 @@ function SectionTitle({
   title,
   subtitle,
   reduce,
+  tone = "dark",
+  index,
 }: {
   kicker?: string;
   title: string;
-  subtitle?: string;
+  /** Acepta JSX: varias secciones le pasan un enlace dentro del texto. */
+  subtitle?: React.ReactNode;
   reduce: boolean;
+  /** "light" para las secciones de fondo claro (Equipo y Proceso). */
+  tone?: "dark" | "light";
+  /** Número de folio. Ordena la lectura como las secciones de un diario. */
+  index?: number;
 }) {
+  const light = tone === "light";
   return (
     <motion.div
       initial={reduce ? false : "hidden"}
@@ -448,22 +618,42 @@ function SectionTitle({
       {kicker ? (
         <motion.p
           variants={staggerItem}
-          className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.35em] text-[#eca8d6]/90"
+          className={cn(
+            "flex items-center gap-4 font-mono text-[11px] font-semibold uppercase tracking-[0.35em]",
+            light ? "text-[#a8317f]" : "text-[#eca8d6]/90",
+          )}
         >
-          <Sparkles className="h-3.5 w-3.5 text-[#eca8d6]" aria-hidden />
+          {index ? <span className="tabular-nums opacity-60">{String(index).padStart(2, "0")}</span> : null}
+          <span
+            aria-hidden
+            className={cn("h-px w-10 shrink-0", light ? "bg-[#a8317f]/35" : "bg-[#eca8d6]/35")}
+          />
           {kicker}
         </motion.p>
       ) : null}
       <motion.h2
         variants={staggerItem}
-        className="mt-3 font-display text-3xl font-semibold tracking-tight text-white md:text-4xl lg:text-[2.65rem]"
+        className={cn(
+          "mt-5 font-display text-[clamp(2.1rem,5.2vw,3.9rem)] font-semibold leading-[1.02] tracking-[-0.03em]",
+          light ? "text-[#17131f]" : "text-white",
+        )}
       >
-        <span className="bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent">
-          {title}
-        </span>
+        {light ? (
+          title
+        ) : (
+          <span className="bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent">
+            {title}
+          </span>
+        )}
       </motion.h2>
       {subtitle ? (
-        <motion.p variants={staggerItem} className="mt-4 text-sm leading-relaxed text-white/55 md:text-base">
+        <motion.p
+          variants={staggerItem}
+          className={cn(
+            "mt-4 text-sm leading-relaxed md:text-base",
+            light ? "text-[#4b4358]" : "text-white/55",
+          )}
+        >
           {subtitle}
         </motion.p>
       ) : null}
@@ -474,7 +664,7 @@ function SectionTitle({
 const COMPOL_GALLERY_IMAGES = [
   "/media/compol-gallery/compol-1.jpg",
   "/media/compol-gallery/compol-2.jpg",
-  "/media/compol-gallery/compol-3.jpg",
+  "/_lite/compol-3.webp",
   "/media/compol-gallery/compol-4.jpg",
 ] as const;
 
@@ -720,26 +910,24 @@ export function CompolPageClient() {
               animate={reduce ? undefined : "show"}
               className="relative"
             >
-              <motion.div variants={heroLine} className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full border border-[#eca8d6]/25 bg-[#eca8d6]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#eca8d6]">
-                  Compol
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/50">
-                  San Juan · Argentina
-                </span>
+              <motion.div
+                variants={heroLine}
+                className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-white/15 pb-4 font-mono text-[11px] uppercase tracking-[0.32em]"
+              >
+                <span className="font-semibold text-[#eca8d6]">Compol</span>
+                <span aria-hidden className="h-3 w-px bg-white/20" />
+                <span className="text-white/45">San Juan · Argentina</span>
+                <span aria-hidden className="h-3 w-px bg-white/20" />
+                <span className="text-white/45">Comunicación política</span>
               </motion.div>
 
               <motion.h1
                 variants={heroLine}
-                className="mt-8 max-w-4xl font-display text-[clamp(2.5rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-tight"
+                className="mt-10 max-w-4xl font-display text-[clamp(2.9rem,7.4vw,5.6rem)] font-semibold leading-[0.98] tracking-[-0.035em] text-white"
               >
-                <span className="bg-gradient-to-br from-white via-white to-white/55 bg-clip-text text-transparent">
-                  Comunicación política
-                </span>
+                Comunicación política
                 <br />
-                <span className="bg-gradient-to-r from-[#eca8d6] via-[#f5cce6] to-violet-300/90 bg-clip-text text-transparent">
-                  que se siente y se ve
-                </span>
+                <span className="text-[#eca8d6]">que se siente y se ve</span>
               </motion.h1>
 
               <motion.p
@@ -756,7 +944,7 @@ export function CompolPageClient() {
               >
                 <Button
                   asChild
-                  className="h-auto min-h-12 rounded-full border-0 bg-gradient-to-r from-[#eca8d6] to-[#e89bcb] px-8 py-4 text-base font-semibold text-gray-900 shadow-[0_24px_70px_-28px_rgba(236,168,214,0.55)] transition hover:scale-[1.02] hover:shadow-[0_28px_80px_-24px_rgba(236,168,214,0.65)] active:scale-[0.99]"
+                  className="group h-auto min-h-12 rounded-sm border-0 bg-[#eca8d6] px-9 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-[#14101c] shadow-[0_20px_60px_-30px_rgba(236,168,214,0.6)] transition-colors duration-300 hover:bg-white active:bg-white"
                 >
                   <a href="#contacto-compol">
                     Coordinar una reunión
@@ -767,16 +955,23 @@ export function CompolPageClient() {
 
               <motion.div
                 variants={heroLine}
-                className="mt-14 grid max-w-xl grid-cols-3 gap-3 border-t border-white/10 pt-10 sm:max-w-2xl sm:gap-6"
+                className="mt-16 grid max-w-xl grid-cols-3 border-t border-white/15 pt-8 sm:max-w-2xl"
               >
                 {[
                   { n: "8+", l: "líneas de servicio" },
                   { n: "360°", l: "comunicación" },
                   { n: "24/7", l: "enfoque campaña" },
-                ].map((stat) => (
-                  <div key={stat.l} className="text-left">
-                    <p className="font-display text-2xl font-semibold text-white md:text-3xl">{stat.n}</p>
-                    <p className="mt-1 text-xs text-white/45 md:text-sm">{stat.l}</p>
+                ].map((stat, i) => (
+                  <div
+                    key={stat.l}
+                    className={cn("text-left", i > 0 && "border-l border-white/12 pl-5 sm:pl-7")}
+                  >
+                    <p className="font-display text-3xl font-semibold tracking-tight text-white md:text-[2.6rem]">
+                      {stat.n}
+                    </p>
+                    <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-white/40 md:text-[11px]">
+                      {stat.l}
+                    </p>
                   </div>
                 ))}
               </motion.div>
@@ -805,10 +1000,16 @@ export function CompolPageClient() {
         <MarqueeStrip reduce={Boolean(reduce)} />
 
         {/* Equipo */}
-        <section id="equipo" className="scroll-mt-28 border-t border-white/10 bg-[#06040d]/75 px-6 py-20 md:py-28 lg:px-12">
-          <div className="mx-auto max-w-[1100px]">
+        <section
+          id="equipo"
+          className="relative scroll-mt-28 overflow-hidden border-y border-black/10 bg-[#f4f2f7] px-6 py-20 md:py-28 lg:px-12"
+        >
+          <SectionGround variant="spotlight-light" reduce={Boolean(reduce)} />
+          <div className="relative z-10 mx-auto max-w-[1100px]">
             <SectionTitle
               reduce={Boolean(reduce)}
+              tone="light"
+              index={1}
               kicker="Equipo"
               title="Tenemos equipo"
               subtitle="Especialistas en comunicación política, gubernamental y de campaña."
@@ -818,14 +1019,14 @@ export function CompolPageClient() {
               whileInView={reduce ? undefined : "show"}
               viewport={{ once: true, margin: "-80px" }}
               variants={sectionReveal}
-              className="relative mt-12 overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-white/[0.06] to-transparent p-8 shadow-[0_40px_100px_-50px_rgba(236,168,214,0.35)] backdrop-blur-xl md:p-12"
+              className="relative mt-12 overflow-hidden rounded-[1.75rem] border border-black/[0.07] bg-white p-8 shadow-[0_30px_70px_-45px_rgba(23,19,31,0.35)] md:p-12"
             >
-              <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#eca8d6]/15 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-violet-600/20 blur-3xl" />
-              <p className="relative max-w-3xl text-[15px] leading-relaxed text-white/80 md:text-[17px] md:leading-[1.68]">
-                En <strong className="font-semibold text-white">Cosecha Creativa</strong> contamos con un
+              <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#a8317f]/[0.07] blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-indigo-500/[0.07] blur-3xl" />
+              <p className="relative max-w-3xl text-[15px] leading-relaxed text-[#3b3448] md:text-[17px] md:leading-[1.68]">
+                En <strong className="font-semibold text-[#17131f]">Cosecha Creativa</strong> contamos con un
                 equipo especializado en comunicación política, gubernamental y de campaña, comprometido en
-                ofrecer <strong className="font-semibold text-[#eca8d6]">soluciones efectivas</strong> para
+                ofrecer <strong className="font-semibold text-[#a8317f]">soluciones efectivas</strong> para
                 alcanzar tus objetivos estratégicos. Desde fortalecer tu presencia política hasta desarrollar
                 campañas exitosas, estamos contigo en cada paso del camino.
               </p>
@@ -836,9 +1037,10 @@ export function CompolPageClient() {
         {/* Galería */}
         <section
           id="galeria"
-          className="scroll-mt-28 border-t border-white/10 px-6 py-20 md:py-28 lg:px-12"
+          className="relative scroll-mt-28 overflow-hidden border-t border-white/10 px-6 py-20 md:py-28 lg:px-12"
         >
-          <div className="mx-auto max-w-[1100px]">
+          <SectionGround variant="dots" reduce={Boolean(reduce)} />
+          <div className="relative z-10 mx-auto max-w-[1100px]">
             <motion.div
               initial={reduce ? false : "hidden"}
               whileInView={reduce ? undefined : "show"}
@@ -860,6 +1062,7 @@ export function CompolPageClient() {
           <div className="relative z-10 mx-auto max-w-[1100px]">
             <SectionTitle
               reduce={Boolean(reduce)}
+              index={2}
               kicker="Servicios"
               title="Todo lo que tu mensaje necesita"
               subtitle={
@@ -878,61 +1081,110 @@ export function CompolPageClient() {
               }
             />
 
-            <motion.div
+            <motion.ul
               initial={reduce ? false : "hidden"}
               whileInView={reduce ? undefined : "show"}
               viewport={{ once: true, margin: "-60px" }}
               variants={staggerParent}
-              className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+              className="mt-14 grid border-t border-white/10 lg:grid-cols-2 lg:gap-x-14"
             >
-              {services.map((item) => (
-                <motion.article
-                  key={item.id}
-                  variants={staggerItem}
-                  whileHover={
-                    reduce
-                      ? undefined
-                      : {
-                          y: -10,
-                          transition: { type: "spring", stiffness: 420, damping: 22 },
-                        }
-                  }
-                  className={cn(
-                    "group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-6",
-                    "shadow-[0_28px_90px_-52px_rgba(236,168,214,0.28)] backdrop-blur-md",
-                  )}
-                >
+              {services.map((item, i) => (
+                <motion.li key={item.id} variants={staggerItem} className="border-b border-white/10">
                   <button
                     type="button"
                     onClick={() => openServiceModal(item)}
                     aria-label={`Ver detalle de ${item.title}`}
-                    className="absolute inset-0 z-[3] cursor-pointer rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#eca8d6]/60"
-                  />
-                  <div className="pointer-events-none absolute inset-0 translate-x-[-120%] bg-gradient-to-r from-transparent via-white/[0.07] to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[120%]" />
-
-                  <motion.div
-                    whileHover={reduce ? undefined : { scale: 1.08, rotate: [0, -4, 4, 0] }}
-                    transition={{ type: "spring", stiffness: 400, damping: 18 }}
-                    className="relative mb-4 inline-flex rounded-xl border border-white/10 bg-gradient-to-br from-white/10 to-white/[0.02] p-3.5 text-[#eca8d6] shadow-inner"
+                    className="group relative flex w-full items-start gap-5 py-6 text-left outline-none focus-visible:ring-2 focus-visible:ring-[#eca8d6]/60"
                   >
-                    <item.icon className="h-5 w-5" aria-hidden />
-                  </motion.div>
-                  <h3 className="relative font-display text-lg font-semibold text-white">{item.title}</h3>
-                  <p className="relative mt-3 text-sm leading-relaxed text-white/65">{item.body}</p>
-                  <div className="relative mt-5 flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#eca8d6]/80 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    Ver en detalle <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-                  </div>
-                </motion.article>
+                    {/* Lavado que entra desde la izquierda al pasar el mouse:
+                        reemplaza al borde de la tarjeta como señal de foco. */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-y-0 -left-4 -right-4 origin-left scale-x-0 rounded-lg bg-gradient-to-r from-[#eca8d6]/[0.09] to-transparent transition-transform duration-500 ease-out group-hover:scale-x-100"
+                    />
+                    <span className="relative pt-0.5 font-mono text-[11px] tabular-nums tracking-widest text-[#eca8d6]/45 transition-colors group-hover:text-[#eca8d6]">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <item.icon
+                      className="relative mt-0.5 h-[18px] w-[18px] shrink-0 text-[#eca8d6]/70 transition-colors group-hover:text-[#eca8d6]"
+                      aria-hidden
+                    />
+                    <span className="relative flex-1">
+                      <span className="block font-display text-[17px] font-semibold leading-snug text-white transition-colors group-hover:text-[#eca8d6]">
+                        {item.title}
+                      </span>
+                      <span className="mt-1.5 block text-sm leading-relaxed text-white/55">{item.body}</span>
+                    </span>
+                    <ArrowUpRight
+                      className="relative mt-1 h-4 w-4 shrink-0 -translate-x-1 text-[#eca8d6] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                      aria-hidden
+                    />
+                  </button>
+                </motion.li>
               ))}
-            </motion.div>
+            </motion.ul>
+          </div>
+        </section>
+
+        {/* Proceso */}
+        {/* Línea de tiempo horizontal: es el único bloque de la página que
+            cuenta un orden, y responde lo que ninguna otra sección contestaba
+            —en qué secuencia pasan las cosas—. Ni tarjetas ni lista: el riel
+            con nodos es un cuarto tipo de bloque. */}
+        <section
+          id="proceso"
+          className="relative scroll-mt-28 overflow-hidden border-y border-black/10 bg-[#f7f6fa] px-6 py-20 md:py-28 lg:px-12"
+        >
+          <SectionGround variant="strata-light" reduce={Boolean(reduce)} />
+          <div className="relative z-10 mx-auto max-w-[1100px]">
+            <SectionTitle
+              reduce={Boolean(reduce)}
+              tone="light"
+              index={3}
+              kicker="Proceso"
+              title="Cómo trabajamos"
+              subtitle="Cuatro etapas encadenadas: cada una entrega lo que la siguiente necesita para empezar."
+            />
+
+            <motion.ol
+              initial={reduce ? false : "hidden"}
+              whileInView={reduce ? undefined : "show"}
+              viewport={{ once: true, margin: "-60px" }}
+              variants={staggerParent}
+              className="relative mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"
+            >
+              {/* Riel que une los nodos. Sólo en lg, que es donde las cuatro
+                  etapas quedan en una fila y la línea significa avance. */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute left-0 right-0 top-[7px] hidden h-px bg-gradient-to-r from-transparent via-indigo-500/45 to-transparent lg:block"
+              />
+              {processSteps.map((item, i) => (
+                <motion.li key={item.step} variants={staggerItem} className="group relative">
+                  <span
+                    aria-hidden
+                    className="relative z-10 block h-[15px] w-[15px] rotate-45 border border-indigo-500/60 bg-[#f7f6fa] transition-colors duration-300 group-hover:bg-indigo-500"
+                  />
+                  <p className="mt-6 font-mono text-[11px] tabular-nums tracking-[0.35em] text-indigo-600/70">
+                    {String(i + 1).padStart(2, "0")}
+                  </p>
+                  <h3 className="mt-2 font-display text-xl font-semibold text-[#17131f] transition-colors group-hover:text-indigo-700">
+                    {item.step}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-[#4b4358]">{item.body}</p>
+                </motion.li>
+              ))}
+            </motion.ol>
           </div>
         </section>
 
         {/* Coberturas */}
-        <section id="coberturas" className="scroll-mt-28 border-t border-white/10 px-6 py-20 md:py-28 lg:px-12">
-          <div className="mx-auto max-w-[1100px]">
+        <section id="coberturas" className="relative scroll-mt-28 overflow-hidden border-t border-white/10 px-6 py-20 md:py-28 lg:px-12">
+          <SectionGround variant="film" reduce={Boolean(reduce)} />
+          <div className="relative z-10 mx-auto max-w-[1100px]">
             <SectionTitle
               reduce={Boolean(reduce)}
+              index={4}
               kicker="Coberturas"
               title="Una imagen vale más que mil palabras"
               subtitle="Cobertura fotográfica profesional para el ámbito político y organizacional."
@@ -949,30 +1201,26 @@ export function CompolPageClient() {
               la mejor calidad visual, con un enfoque que refuerza tu narrativa.
             </motion.p>
 
-            <div className="mt-12 space-y-4">
-              {coverageBullets.map((item, i) => (
+            <motion.dl
+              initial={reduce ? false : "hidden"}
+              whileInView={reduce ? undefined : "show"}
+              viewport={{ once: true, margin: "-40px" }}
+              variants={staggerParent}
+              className="mt-12 border-t border-white/10"
+            >
+              {coverageBullets.map((item) => (
                 <motion.div
                   key={item.title}
-                  initial={reduce ? false : "hidden"}
-                  whileInView={reduce ? undefined : "show"}
-                  viewport={{ once: true, margin: "-30px" }}
-                  variants={sectionReveal}
-                  transition={{ delay: i * 0.06 }}
-                  whileHover={reduce ? undefined : { x: 8, transition: { type: "spring", stiffness: 300, damping: 22 } }}
-                  className="group relative flex gap-5 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent px-5 py-5 backdrop-blur-sm transition-colors hover:border-[#eca8d6]/25 md:gap-8 md:px-8 md:py-6"
+                  variants={staggerItem}
+                  className="group grid gap-2 border-b border-white/10 py-5 md:grid-cols-[minmax(0,15rem)_1fr] md:gap-10 md:py-6"
                 >
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#eca8d6]/25 bg-[#eca8d6]/10 font-display text-sm font-bold text-[#eca8d6] transition group-hover:scale-110 group-hover:bg-[#eca8d6]/20 md:h-12 md:w-12 md:text-base">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div>
-                    <h3 className="font-display text-lg font-semibold text-white transition group-hover:text-[#eca8d6]">
-                      {item.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-white/65 md:text-[15px]">{item.body}</p>
-                  </div>
+                  <dt className="font-display text-[15px] font-semibold leading-snug text-white transition-colors group-hover:text-[#eca8d6] md:text-base">
+                    {item.title}
+                  </dt>
+                  <dd className="text-sm leading-relaxed text-white/60 md:text-[15px]">{item.body}</dd>
                 </motion.div>
               ))}
-            </div>
+            </motion.dl>
 
             <motion.div
               initial={reduce ? false : "hidden"}
@@ -993,38 +1241,44 @@ export function CompolPageClient() {
         {/* Tecnología / software político */}
         <section
           id="tecnologia-politica"
-          className="scroll-mt-28 border-t border-white/10 bg-[#06040d]/70 px-6 py-20 md:py-28 lg:px-12"
+          className="relative scroll-mt-28 overflow-hidden border-t border-white/10 bg-[#04070d]/80 px-6 py-20 md:py-28 lg:px-12"
         >
-          <div className="mx-auto max-w-[1100px]">
+          <SectionGround variant="blueprint" reduce={Boolean(reduce)} />
+          <div className="relative z-10 mx-auto max-w-[1100px]">
             <SectionTitle
               reduce={Boolean(reduce)}
+              index={5}
               kicker="Tecnología"
               title="Software para la política"
               subtitle="Encuestas, webs, focus groups y tableros con métricas: diseñamos y desarrollamos productos digitales para medir, comunicar y decidir con datos."
             />
 
-            <motion.div
+            <motion.ul
               initial={reduce ? false : "hidden"}
               whileInView={reduce ? undefined : "show"}
               viewport={{ once: true, margin: "-50px" }}
               variants={staggerParent}
-              className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              className="mt-12 grid gap-x-14 border-t border-white/10 sm:grid-cols-2"
             >
               {politicaTechCapabilities.map((item) => (
-                <motion.div
+                <motion.li
                   key={item.title}
                   variants={staggerItem}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/35 p-5 backdrop-blur-md md:p-6"
+                  className="group flex items-start gap-4 border-b border-white/10 py-5"
                 >
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-violet-600/[0.06] via-transparent to-[#eca8d6]/[0.08] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                  <div className="relative mb-3 inline-flex rounded-xl border border-white/10 bg-gradient-to-br from-white/10 to-white/[0.02] p-3 text-[#eca8d6] shadow-inner">
-                    <item.icon className="h-5 w-5" aria-hidden />
+                  <item.icon
+                    className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#eca8d6]/70 transition-colors group-hover:text-[#eca8d6]"
+                    aria-hidden
+                  />
+                  <div>
+                    <h3 className="font-display text-[15px] font-semibold leading-snug text-white md:text-base">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-white/58">{item.body}</p>
                   </div>
-                  <h3 className="relative font-display text-base font-semibold text-white md:text-lg">{item.title}</h3>
-                  <p className="relative mt-2 text-sm leading-relaxed text-white/62">{item.body}</p>
-                </motion.div>
+                </motion.li>
               ))}
-            </motion.div>
+            </motion.ul>
 
             <motion.div
               initial={reduce ? false : "hidden"}
@@ -1068,9 +1322,10 @@ export function CompolPageClient() {
         {/* CTA */}
         <section
           id="contacto-compol"
-          className="relative scroll-mt-28 border-t border-white/10 px-6 py-24 md:py-32 lg:px-12"
+          className="relative scroll-mt-28 overflow-hidden border-t border-white/10 px-6 py-24 md:py-32 lg:px-12"
         >
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#06040d] via-black to-black" />
+          <SectionGround variant="radar" reduce={Boolean(reduce)} />
           <motion.div
             aria-hidden
             className="pointer-events-none absolute left-1/2 top-1/2 h-[min(90vw,520px)] w-[min(90vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#eca8d6]/[0.12] blur-[120px]"

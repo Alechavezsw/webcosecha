@@ -1,8 +1,9 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
+import dynamic from "next/dynamic"
 import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import {
   ArrowLeft,
   Check,
@@ -18,6 +19,12 @@ import { WhatsAppMark } from "@/components/icons/whatsapp-mark"
 import { getWhatsAppHref } from "@/lib/whatsapp"
 import { cn } from "@/lib/utils"
 import { PortfolioGallery, type PortfolioGalleryImage } from "@/components/ui/portfolio-gallery"
+
+/** La escena es WebGL: fuera del bundle inicial y sin render en servidor. */
+const EventosHall3D = dynamic(
+  () => import("@/components/landing/servicios/eventos-hall-3d").then((m) => m.EventosHall3D),
+  { ssr: false },
+)
 
 const EVENTOS_APPS_GALLERY_IMAGES: PortfolioGalleryImage[] = [
   { src: "/games/eventos-gallery-4/150_1x_shots_so.png", alt: "Interfaz de app para eventos" },
@@ -96,11 +103,9 @@ const SERVICES = {
 
 type TabKey = keyof typeof SERVICES
 
-// Helper type definition remains intact
-type TabKey = keyof typeof SERVICES
-
 export function EventosPageClient() {
   const [activeTab, setActiveTab] = useState<TabKey>("trivias")
+  const prefersReducedMotion = useReducedMotion()
   const currentService = SERVICES[activeTab]
   const ServiceIcon = currentService.icon
 
@@ -125,23 +130,18 @@ export function EventosPageClient() {
         }
       `}</style>
 
-      {/* ── VISOR 3D DETRÁS DE TODO (fixed fullscreen) ────────────────────── */}
-      <div className="absolute inset-0 w-full h-full z-0 bg-[#050505] pointer-events-auto">
-        <iframe
-          id="sketchfab-iframe"
-          src="https://sketchfab.com/models/f3b2e77703644c13ba4d839323ee8788/embed?autostart=1&ui_infos=0&ui_watermark=0&ui_hint=0&ui_theme=dark"
-          title="Recorrido Virtual 3D — Salón de Eventos"
-          className="w-full h-full border-none outline-none block opacity-85"
-          allow="autoplay; fullscreen; xr-spatial-tracking"
-          allowFullScreen
-          loading="eager"
-        />
+      {/* ── ESCENA 3D DETRÁS DE TODO ──────────────────────────────────────
+          Salón propio en three.js. Antes acá vivía un iframe de Sketchfab con
+          un modelo genérico de otra marca; ahora la pantalla LED de la escena
+          muestra el módulo que el visitante tiene seleccionado abajo. */}
+      <div className="absolute inset-0 w-full h-full z-0 bg-[#0a0410]" aria-hidden>
+        <EventosHall3D stage={activeTab} reducedMotion={!!prefersReducedMotion} />
       </div>
 
       {/* Progressive vignette overlay to blend 3D with the HUD */}
       <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_120%_90%_at_25%_50%,rgba(0,0,0,0.7)_0%,transparent_60%,rgba(0,0,0,0.85)_100%)]" />
       <div className="pointer-events-none absolute top-0 left-0 right-0 h-40 z-[1] bg-gradient-to-b from-black/90 via-black/40 to-transparent" />
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 z-[1] bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 z-[1] bg-gradient-to-t from-black/72 via-black/25 to-transparent" />
 
       {/* ── HEADER HUD ────────────────────────────────────────────────────── */}
       <header className="fixed top-6 left-6 right-6 z-30 flex items-center justify-between pointer-events-none">
@@ -289,23 +289,23 @@ export function EventosPageClient() {
       <section className="fixed right-6 top-24 z-20 w-80 rounded-2xl border border-white/10 bg-black/45 p-6 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.6)] hidden lg:block select-text hover:border-white/20 transition-all">
         <div className="flex items-center gap-2 mb-3">
           <Compass className="size-4 text-[#eca8d6] animate-spin" style={{ animationDuration: "12s" }} />
-          <span className="text-[10px] font-mono tracking-widest text-[#eca8d6] uppercase">Controles del Entorno 3D</span>
+          <span className="text-[10px] font-mono tracking-widest text-[#eca8d6] uppercase">Sobre la escena</span>
         </div>
         <p className="text-[11px] leading-relaxed text-white/60">
-          Este salón virtual 3D es completamente interactivo. Podés interactuar directamente con el fondo de la pantalla:
+          El salón de atrás no es un video: se dibuja en vivo y está conectado al panel de la izquierda.
         </p>
         <ul className="mt-3.5 space-y-2 text-[11px] text-white/80">
           <li className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-            Click y arrastrá para orbitar el salón.
+            <span className="w-1.5 h-1.5 rounded-full bg-[#eca8d6]" />
+            La pantalla LED muestra el módulo que elegiste.
           </li>
           <li className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-            Click derecho y arrastrá para paneo.
+            Cambiá de módulo y mirá la ola en el público.
           </li>
           <li className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-            Usá la rueda del mouse para hacer zoom.
+            Movés el mouse y la cámara acompaña.
           </li>
         </ul>
         <div className="mt-5 pt-4 border-t border-white/8">

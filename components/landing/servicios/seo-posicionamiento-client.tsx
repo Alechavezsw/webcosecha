@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button"
 import { WhatsAppMark } from "@/components/icons/whatsapp-mark"
 import { getWhatsAppHref } from "@/lib/whatsapp"
 
-const VIDEO_POSTER = "/images/bridge.png"
+const VIDEO_POSTER = "/_lite/bridge.webp"
 const HERO_BG_VIDEO_BASE = "continue_with_a_lot_of_202605020801"
 const HERO_BG_VIDEO_SOURCES = [
   `/videos/${HERO_BG_VIDEO_BASE}.mp4`,
@@ -38,7 +38,7 @@ const HERO_BG_VIDEO_SOURCES = [
   `/${HERO_BG_VIDEO_BASE}.webm`,
 ] as const
 
-const MID_BG_SRC = "/Gemini_Generated_Image_hodiophodiophodi.jpg"
+const MID_BG_SRC = "/images/redes-incluye-bg.webp"
 
 const easePremium = [0.22, 1, 0.36, 1] as const
 

@@ -1,5 +1,7 @@
 /** Rutas bajo `public/` del pack Gloria y Honor 2 · Luna Park (archivos reales en disco). */
 
+import { opt } from "@/lib/optimized-images"
+
 const EVENTO_GYH_ROOT =
   "/deportes/EVENTO DEPORTIVO _ GLORIA Y HONOR 2 _ LUNA PARK-20260503T153451Z-3-001/EVENTO DEPORTIVO _ GLORIA Y HONOR 2 _ LUNA PARK"
 
@@ -48,7 +50,7 @@ const RELATIVE_IMAGE_PATHS = [
 ] as const
 
 function publicUrl(pathFromPublicRoot: string): string {
-  return encodeURI(pathFromPublicRoot)
+  return opt(pathFromPublicRoot)
 }
 
 /** Portada del slide en el carrusel principal (gráfica general del evento). */

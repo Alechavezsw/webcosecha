@@ -17,8 +17,8 @@ interface LayeredTextProps {
   reducedMotion?: boolean
 }
 
-const gradientSpan =
-  "bg-gradient-to-r from-[#67e8f9] via-[#a78bfa] to-[#eca8d6] bg-clip-text text-transparent"
+/** Acento único de /servicios/apps, el único consumidor de este componente. */
+const gradientSpan = "text-[#C8FF00]"
 
 const hoverEase = [0.22, 1, 0.36, 1] as const
 

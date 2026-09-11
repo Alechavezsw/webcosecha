@@ -1,11 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useRef, useEffect, useMemo } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, useReducedMotion, useScroll, useSpring, AnimatePresence } from "framer-motion"
 import {
   ArrowLeft,
-  ArrowUpRight,
   Camera,
   Clapperboard,
   Film,
@@ -20,126 +19,65 @@ import {
   MousePointerClick,
   Sparkles,
   ChevronDown,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  ZoomIn,
 } from "lucide-react"
 import { Navigation } from "@/components/landing/navigation"
 import { FooterSection } from "@/components/landing/footer-section"
 import { Button } from "@/components/ui/button"
 import { WhatsAppMark } from "@/components/icons/whatsapp-mark"
 import { getWhatsAppHref } from "@/lib/whatsapp"
-import InfiniteGallery from "@/components/ui/infinite-gallery"
 import { TechConstellation } from "@/components/landing/servicios/tech-constellation"
 
 const easePremium = [0.22, 1, 0.36, 1] as const
 
-// Servicios organizados con hincapié en Cobertura de Eventos, Política, Fotoproducto y Edición.
+/**
+ * Derivado liviano de cada foto: `public/fotografia/lite/<nombre>.webp` (1100 px).
+ * Los originales de `public/fotografia/` llegan a 17 MB por archivo y no se sirven nunca.
+ */
+function lite(src: string): string {
+  const name = src.replace("/fotografia/", "").replace(/\.(jpe?g|png)$/i, "")
+  return `/fotografia/lite/${name}.webp`
+}
+
+/** Seis frentes de producción, una línea cada uno, ilustrados con trabajo real. */
 const offerings = [
   {
-    title: "Cobertura de Eventos",
-    body: "Registro profesional y ágil de congresos corporativos, lanzamientos de marca, ferias y encuentros sociales en San Juan. Entrega express de resúmenes audiovisuales de alta calidad listos para redes.",
+    title: "Cobertura de eventos",
+    body: "Congresos, lanzamientos y ferias, con resumen listo para redes.",
     icon: Camera,
-    badge: "Especialidad Destacada",
-    highlight: true,
+    image: "/fotografia/cobertura-1.jpg",
   },
   {
-    title: "Campaña & Comunicación Política",
-    body: "Spots publicitarios de alto impacto persuasivo, cobertura audiovisual de recorridos de campaña, discursos y contenidos optimizados para candidatos e instituciones gubernamentales.",
+    title: "Comunicación política",
+    body: "Spots, recorridos de campaña y discursos para candidatos e instituciones.",
     icon: Clapperboard,
-    badge: "Campañas Electorales",
-    highlight: true,
+    image: "/fotografia/PSX_20230503_214250.jpg",
   },
   {
-    title: "Fotoproducto & E-commerce",
-    body: "Fotografía publicitaria de producto, marcas y gastronomía local. Iluminación y dirección de arte meticulosas orientadas a resaltar detalles, texturas y potenciar tus ventas online.",
+    title: "Fotoproducto",
+    body: "Producto, marca y gastronomía con luz y dirección de arte propias.",
     icon: ImageIcon,
-    badge: "Fotografía de Producto",
-    highlight: true,
+    image: "/fotografia/484462772_3891899754458257_4815808110930233921_n.jpg",
   },
   {
-    title: "Edición Avanzada & Post-producción",
-    body: "Montaje con ritmo cinematográfico, corrección de color (color grading), diseño sonoro envolvente, motion graphics y adaptación fluida a todos los formatos digitales actuales.",
+    title: "Post-producción",
+    body: "Montaje, color grading, sonido y motion graphics para cada formato.",
     icon: Megaphone,
-    badge: "Post-producción & VFX",
-    highlight: true,
+    image: "/fotografia/PSX_20251018_083548.jpg",
   },
   {
-    title: "Video Corporativo",
-    body: "Spots de marca, documentales institucionales y video explicativo de procesos y servicios diseñado para consolidar tu posicionamiento y confiabilidad corporativa.",
+    title: "Video corporativo",
+    body: "Spots de marca, institucionales y video explicativo de procesos.",
     icon: Film,
-    badge: "Cine Publicitario",
-    highlight: false,
+    image: "/fotografia/cobertura-2.jpg",
   },
   {
-    title: "Reels & Contenido Vertical",
-    body: "Contenido de ritmo ágil, transiciones magnéticas y guiones pensados para retener la atención desde el segundo cero en Reels, TikTok y YouTube Shorts.",
+    title: "Reels y vertical",
+    body: "Ritmo ágil y guion pensado para retener desde el segundo cero.",
     icon: Sparkles,
-    badge: "Social Media",
-    highlight: false,
+    image: "/fotografia/DSC0026-1024x683.jpg",
   },
 ] as const
 
-// Colección completa de todas las 53 fotos categorizadas para el Portfolio Tradicional y el 3D
-const galleryImages = [
-  // Curated initial visual mix (first 20 images for maximum 3D and grid appeal)
-  { src: "/fotografia/PSX_20230503_214434.jpg", alt: "Fotografía de moda y lifestyle en viñedos locales", category: "retrato" },
-  { src: "/fotografia/PSX_20251018_083548.jpg", alt: "Discurso en panel empresarial", category: "eventos" },
-  { src: "/fotografia/20250813_214643.jpg", alt: "Fotografía publicitaria de marca y producto gastronómico", category: "fotoproducto" },
-  { src: "/fotografia/PSX_20240405_212950.jpg", alt: "Cobertura de prensa y autoridades gubernamentales", category: "politica" },
-  { src: "/fotografia/DSC0026-1024x683.jpg", alt: "Retrato lifestyle al aire libre", category: "retrato" },
-  { src: "/fotografia/cobertura-1.jpg", alt: "Cobertura corporativa Cosecha Creativa", category: "eventos" },
-  { src: "/fotografia/484462772_3891899754458257_4815808110930233921_n.jpg", alt: "Fotografía de producto gourmet de exportación", category: "fotoproducto" },
-  { src: "/fotografia/481503600_8905832596211180_3987812619903922815_n.jpg", alt: "Cobertura institucional y prensa oficial", category: "politica" },
-  { src: "/fotografia/DSC0028-1024x683.jpg", alt: "Retrato artístico en luz natural", category: "retrato" },
-  { src: "/fotografia/cobertura-2.jpg", alt: "Fotografía de eventos y oratoria profesional", category: "eventos" },
-  { src: "/fotografia/484804592_3891899657791600_1948284077339391040_n.jpg", alt: "Composición fotográfica gastronómica premium", category: "fotoproducto" },
-  { src: "/fotografia/PSX_20230503_214250.jpg", alt: "Campaña de cercanía y escucha vecinal - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/PSX_20230726_190136.jpg", alt: "Sesión fotográfica artística y retrato de estudio", category: "retrato" },
-  { src: "/fotografia/PSX_20251018_083653.jpg", alt: "Público en evento corporativo", category: "eventos" },
-  { src: "/fotografia/169ab5cefb6c89ea84509af222e52191_L.jpg", alt: "Dirección de arte en composición publicitaria y comercial", category: "fotoproducto" },
-  { src: "/fotografia/481787531_8905832752877831_4501663938026490346_n.jpg", alt: "Discurso institucional e inauguraciones públicas", category: "politica" },
-  { src: "/fotografia/DSC0039-1024x683.jpg", alt: "Sesión fotográfica de moda en exteriores", category: "retrato" },
-  { src: "/fotografia/PSX_20251018_083745.jpg", alt: "Evento de Cosecha Creativa San Juan", category: "eventos" },
-  { src: "/fotografia/DSC0117-1024x683.jpg", alt: "Fotografía publicitaria de producto y branding", category: "fotoproducto" },
-  { src: "/fotografia/PSX_20251018_084451.jpg", alt: "Fotografía de prensa institucional y gobernación", category: "politica" },
-
-  // Remaining visual items beautifully distributed
-  { src: "/fotografia/DSC0071-683x1024.jpg", alt: "Retrato de estudio con iluminación suave", category: "retrato" },
-  { src: "/fotografia/PSX_20251018_083852.jpg", alt: "Exposición en escenario con luces", category: "eventos" },
-  { src: "/fotografia/DSC0132-1024x683.jpg", alt: "Detalle y textura en fotografía de producto", category: "fotoproducto" },
-  { src: "/fotografia/PSX_20251018_084551.jpg", alt: "Panelistas en debate y mesa redonda comercial", category: "politica" },
-  { src: "/fotografia/DSC0078-683x1024.jpg", alt: "Sesión conceptual de retrato y moda", category: "retrato" },
-  { src: "/fotografia/PSX_20251018_083933.jpg", alt: "Conferencia y paneles de debate", category: "eventos" },
-  { src: "/fotografia/PSX_20251018_084645.jpg", alt: "Registro oficial de conferencistas y autoridades", category: "politica" },
-  { src: "/fotografia/484449896_3891899711124928_5801498566980876160_n.jpg", alt: "Dirección de arte y retrato conceptual en estudio", category: "retrato" },
-  { src: "/fotografia/PSX_20251018_084018.jpg", alt: "Registro de networking empresarial", category: "eventos" },
-  { src: "/fotografia/PSX_20251018_085001.jpg", alt: "Inauguración oficial y corte de cinta", category: "politica" },
-  { src: "/fotografia/PSX_20251018_084108.jpg", alt: "Disertantes y oradores destacados", category: "eventos" },
-  { src: "/fotografia/PSX_20251018_085209.jpg", alt: "Reunión institucional con directivos y gabinete", category: "politica" },
-  { src: "/fotografia/PSX_20251018_084326.jpg", alt: "Público en seminario de negocios", category: "eventos" },
-  { src: "/fotografia/PSX_20251018_085458.jpg", alt: "Cobertura de prensa oficial y comunicación de gobierno", category: "politica" },
-  { src: "/fotografia/PSX_20251018_084735.jpg", alt: "Evento y catering corporativo", category: "eventos" },
-  { src: "/fotografia/PSX_20230503_214333.jpg", alt: "Caminata y diálogo con vecinos en San Juan - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/PSX_20251018_085316.jpg", alt: "Presentación de marca y branding corporativo", category: "eventos" },
-  { src: "/fotografia/PSX_20230503_215028.jpg", alt: "Encuentro y cercanía con la comunidad - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/PSX_20251018_085606.jpg", alt: "Cierre de convención y networking", category: "eventos" },
-  { src: "/fotografia/PSX_20230504_201801.jpg", alt: "Cobertura de prensa institucional y congreso", category: "politica" },
-  { src: "/fotografia/cobertura-3.jpg", alt: "Encuentro de innovación y networking", category: "eventos" },
-  { src: "/fotografia/PSX_20230505_204217.jpg", alt: "Recorrido electoral y contacto directo - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/cobertura-4.jpg", alt: "Catering y ambientación en eventos", category: "eventos" },
-  { src: "/fotografia/PSX_20230505_215057.jpg", alt: "Presentación de propuestas en San Juan - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/DSC0763-1024x683.jpg", alt: "Cobertura de evento social y corporativo", category: "eventos" },
-  { src: "/fotografia/PSX_20230505_215352.jpg", alt: "Oratoria y discurso de campaña - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/DSC0772-1024x683.jpg", alt: "Detalle y ambientación de eventos en San Juan", category: "eventos" },
-  { src: "/fotografia/PSX_20230525_125743.jpg", alt: "Diálogo institucional y apoyo vecinal - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/DSC0806-1024x683.jpg", alt: "Registro espontáneo y emociones en eventos", category: "eventos" },
-  { src: "/fotografia/PSX_20230608_172804.jpg", alt: "Recorrido y escucha activa en San Juan - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/FB_IMG_1679691535741.jpg", alt: "Evento institucional Cosecha Creativa en San Juan", category: "eventos" },
-  { src: "/fotografia/PSX_20230709_153506.jpg", alt: "Charla con comerciantes y pymes locales - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/PSX_20251018_084216.jpg", alt: "Saludo institucional y diplomático de autoridades en el estrado", category: "politica" },
-]
 
 function CustomVideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -332,22 +270,71 @@ function CustomVideoPlayer() {
   )
 }
 
-// Colección de imágenes altamente optimizadas en resolución y peso (< 450 KB) exclusivas para la Galería 3D.
-// Previene sobrecargas de VRAM en la GPU y caídas de contexto WebGL, asegurando renderizado instantáneo.
-const optimized3DImages = [
-  { src: "/fotografia/DSC0026-1024x683.jpg", alt: "Retrato lifestyle al aire libre", category: "retrato" },
-  { src: "/fotografia/cobertura-1.jpg", alt: "Cobertura corporativa Cosecha Creativa", category: "eventos" },
-  { src: "/fotografia/484462772_3891899754458257_4815808110930233921_n.jpg", alt: "Fotografía de producto gourmet de exportación", category: "fotoproducto" },
-  { src: "/fotografia/PSX_20230503_214250.jpg", alt: "Campaña de cercanía y escucha vecinal - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/DSC0028-1024x683.jpg", alt: "Retrato artístico en luz natural", category: "retrato" },
-  { src: "/fotografia/cobertura-2.jpg", alt: "Fotografía de eventos y oratoria profesional", category: "eventos" },
-  { src: "/fotografia/484804592_3891899657791600_1948284077339391040_n.jpg", alt: "Composición fotográfica gastronómica premium", category: "fotoproducto" },
-  { src: "/fotografia/PSX_20230505_215057.jpg", alt: "Presentación de propuestas en San Juan - Marcelo Orrego", category: "politica" },
-  { src: "/fotografia/DSC0039-1024x683.jpg", alt: "Sesión fotográfica de moda en exteriores", category: "retrato" },
-  { src: "/fotografia/cobertura-4.jpg", alt: "Catering y ambientación en eventos", category: "eventos" },
-  { src: "/fotografia/DSC0117-1024x683.jpg", alt: "Fotografía publicitaria de producto y branding", category: "fotoproducto" },
-  { src: "/fotografia/PSX_20230505_215352.jpg", alt: "Oratoria y discurso de campaña - Marcelo Orrego", category: "politica" }
-];
+/** Se muestran junto al hero para dar contexto sin texto largo. */
+const HERO_TAGS = ["Eventos", "Política", "Fotoproducto", "Retrato", "Reels"] as const
+
+/** Tres columnas de fotos reales para el mosaico del hero, mezclando categorías. */
+const HERO_MOSAIC: string[][] = [
+  [
+    "/fotografia/cobertura-1.jpg",
+    "/fotografia/484462772_3891899754458257_4815808110930233921_n.jpg",
+    "/fotografia/DSC0071-683x1024.jpg",
+    "/fotografia/PSX_20251018_084108.jpg",
+    "/fotografia/DSC0132-1024x683.jpg",
+  ],
+  [
+    "/fotografia/PSX_20230503_214250.jpg",
+    "/fotografia/DSC0026-1024x683.jpg",
+    "/fotografia/PSX_20251018_085001.jpg",
+    "/fotografia/484804592_3891899657791600_1948284077339391040_n.jpg",
+    "/fotografia/DSC0078-683x1024.jpg",
+  ],
+  [
+    "/fotografia/PSX_20251018_083548.jpg",
+    "/fotografia/DSC0039-1024x683.jpg",
+    "/fotografia/cobertura-4.jpg",
+    "/fotografia/DSC0117-1024x683.jpg",
+    "/fotografia/PSX_20230503_214434.jpg",
+  ],
+].map((col) => col.map(lite))
+
+/** Columna del mosaico: se desplaza sola y se duplica para que el loop no corte. */
+function MosaicColumn({
+  images,
+  direction,
+  duration,
+  reduce,
+}: {
+  images: string[]
+  direction: "up" | "down"
+  duration: number
+  reduce: boolean | null
+}) {
+  const loop = [...images, ...images]
+
+  return (
+    <motion.div
+      className="flex flex-col gap-3"
+      animate={reduce ? undefined : { y: direction === "up" ? ["0%", "-50%"] : ["-50%", "0%"] }}
+      transition={{ duration, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+    >
+      {loop.map((src, i) => (
+        <div
+          key={`${src}-${i}`}
+          className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]"
+        >
+          <img
+            src={src}
+            alt=""
+            loading={i < 3 ? "eager" : "lazy"}
+            decoding="async"
+            className="block w-full object-cover opacity-85"
+          />
+        </div>
+      ))}
+    </motion.div>
+  )
+}
 
 export function FotoYVideoClient() {
   const reduce = useReducedMotion()
@@ -358,71 +345,6 @@ export function FotoYVideoClient() {
 
   const waHref = getWhatsAppHref("Producción de Foto y Video")
   const WaContenidoHref = getWhatsAppHref("Servicios Audiovisuales y Fotográficos")
-
-  // Filtros de la Galería Tradicional
-  const [activeFilter, setActiveFilter] = useState<"todos" | "eventos" | "politica" | "fotoproducto" | "retrato">("todos")
-  
-  // Estado para el visualizador Lightbox
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
-
-  // Cantidad de imágenes iniciales a mostrar (Load More)
-  const [visibleImagesCount, setVisibleImagesCount] = useState(12)
-
-  // Resetear la cantidad de imágenes cuando cambia el filtro
-  useEffect(() => {
-    setVisibleImagesCount(12)
-  }, [activeFilter])
-
-  // Filtrado de las imágenes en base a la categoría activa
-  const filteredImages = useMemo(() => {
-    if (activeFilter === "todos") return galleryImages
-    return galleryImages.filter((img) => img.category === activeFilter)
-  }, [activeFilter])
-
-  // Subconjunto de imágenes actualmente visibles
-  const visibleImages = useMemo(() => {
-    return filteredImages.slice(0, visibleImagesCount)
-  }, [filteredImages, visibleImagesCount])
-
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index)
-  }
-
-  const closeLightbox = () => {
-    setLightboxIndex(null)
-  }
-
-  const showPrevImage = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation()
-    if (lightboxIndex !== null) {
-      setLightboxIndex((prev) => {
-        if (prev === null) return null
-        return prev === 0 ? filteredImages.length - 1 : prev - 1
-      })
-    }
-  }
-
-  const showNextImage = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation()
-    if (lightboxIndex !== null) {
-      setLightboxIndex((prev) => {
-        if (prev === null) return null
-        return prev === filteredImages.length - 1 ? 0 : prev + 1
-      })
-    }
-  }
-
-  // Manejo de teclas para navegación de lightbox
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (lightboxIndex === null) return
-      if (e.key === "Escape") closeLightbox()
-      if (e.key === "ArrowLeft") showPrevImage()
-      if (e.key === "ArrowRight") showNextImage()
-    }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [lightboxIndex, filteredImages])
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-black text-white selection:bg-[#eca8d6]/30 selection:text-white">
@@ -449,13 +371,21 @@ export function FotoYVideoClient() {
       {/* PRIMER PLIEGUE: GALERÍA INTERACTIVA 3D A PANTALLA COMPLETA */}
       <section className="relative w-full h-screen overflow-hidden bg-black">
         
-        {/* Canvas de la galería interactiva en 3D con todas las fotos */}
-        <div className="absolute inset-0 z-0">
-          <InfiniteGallery
-            images={optimized3DImages}
-            speed={1.2}
-            visibleCount={12}
-            className="w-full h-full"
+        {/* Mosaico de fotos reales: tres columnas que se desplazan solas */}
+        <div
+          className="absolute inset-y-0 right-0 z-0 w-full overflow-hidden lg:w-[58%] [mask-image:linear-gradient(to_right,transparent_0%,black_26%,black_100%)]"
+          aria-hidden
+        >
+          <div className="grid h-full grid-cols-3 gap-3 px-3">
+            <MosaicColumn images={HERO_MOSAIC[0]} direction="up" duration={54} reduce={reduce} />
+            <div className="-mt-16">
+              <MosaicColumn images={HERO_MOSAIC[1]} direction="down" duration={64} reduce={reduce} />
+            </div>
+            <MosaicColumn images={HERO_MOSAIC[2]} direction="up" duration={46} reduce={reduce} />
+          </div>
+          <div
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(4,2,8,0.9)_0%,transparent_18%,transparent_82%,rgba(4,2,8,0.95)_100%)]"
+            aria-hidden
           />
         </div>
 
@@ -478,117 +408,150 @@ export function FotoYVideoClient() {
               </Link>
             </motion.div>
 
-            <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[9px] tracking-widest text-[#eca8d6] bg-[#eca8d6]/10 px-3 py-1 rounded-full uppercase border border-[#eca8d6]/10">
-              <Sparkles className="size-2.5 animate-pulse" />
-              {galleryImages.length} Obras en Portfolio
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#eca8d6]/10 bg-[#eca8d6]/10 px-3 py-1 font-mono text-[9px] uppercase tracking-widest text-[#eca8d6]">
+              <Sparkles className="size-2.5" />
+              Equipo propio en San Juan
             </span>
           </div>
 
-          {/* Rótulo Central en mix-blend-exclusion */}
-          <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center text-center px-4 mix-blend-exclusion">
+          {/* Bloque principal: legible sobre el 3D gracias a un scrim propio */}
+          <div className="absolute inset-0 z-10 flex items-center px-6 lg:px-12 pointer-events-none">
+            <div
+              className="pointer-events-none absolute inset-y-0 left-0 w-full bg-[linear-gradient(90deg,rgba(4,2,8,0.96)_0%,rgba(4,2,8,0.9)_30%,rgba(4,2,8,0.35)_48%,transparent_66%)] lg:w-[62%]"
+              aria-hidden
+            />
             <motion.div
-              initial={reduce ? false : { opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, ease: easePremium }}
-              className="flex flex-col items-center select-none"
+              initial={reduce ? false : { opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, ease: easePremium }}
+              className="relative mx-auto flex w-full max-w-[1400px] flex-col items-start pointer-events-auto lg:max-w-[1400px]"
             >
-              <h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8.5xl tracking-tight leading-none text-white select-none">
-                <span className="font-light italic text-[#eca8d6]">cosechamos</span> <span className="font-extralight uppercase tracking-tighter">miradas</span>
+              <span className="mb-5 inline-flex items-center gap-3 font-mono text-xs uppercase tracking-[0.24em] text-[#eca8d6]/90 sm:text-sm">
+                <span className="h-px w-12 bg-gradient-to-r from-transparent to-[#eca8d6]/60" />
+                Foto y video · San Juan
+              </span>
+
+              <h1 className="font-display text-[clamp(2.75rem,7.5vw,5.5rem)] leading-[0.92] tracking-tight text-white">
+                Cosechamos
+                <span className="mt-1 block bg-gradient-to-r from-[#eca8d6] via-[#f7b8d8] to-[#ffd2a8] bg-clip-text text-transparent">
+                  miradas
+                </span>
               </h1>
-              <p className="mt-4 font-mono text-[9px] sm:text-xs tracking-[0.35em] text-white/50 uppercase">
-                Estilo 3D & Producción Visual
+
+              <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/70 md:text-xl">
+                Fotografía y producción audiovisual para marcas, eventos e instituciones. Del registro
+                a la entrega, listo para publicar.
               </p>
+
+              <div className="mt-7 flex flex-wrap gap-2">
+                {HERO_TAGS.map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-full border border-white/12 bg-black/45 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-white/60 backdrop-blur-sm transition-colors hover:border-[#eca8d6]/40 hover:text-white sm:text-[11px]"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Button
+                  asChild
+                  size="sm"
+                  className="h-11 gap-2 rounded-full bg-[#eca8d6] px-6 text-[13px] font-semibold text-black transition-all duration-300 hover:bg-[#f2c4e2] hover:shadow-[0_14px_36px_-14px_rgba(236,168,214,0.7)]"
+                >
+                  <a href={waHref} target="_blank" rel="noopener noreferrer">
+                    <WhatsAppMark className="size-[17px] shrink-0 text-black" />
+                    Pedir presupuesto
+                  </a>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="group h-11 gap-2 rounded-full border-white/25 bg-transparent px-6 text-[13px] font-medium text-white/85 backdrop-blur-sm transition-all hover:border-white/50 hover:bg-white/[0.06] hover:text-white"
+                >
+                  <a href="#servicios">
+                    Ver qué producimos
+                    <ChevronDown className="size-3.5 shrink-0 opacity-70 transition-transform duration-300 group-hover:translate-y-0.5" />
+                  </a>
+                </Button>
+              </div>
             </motion.div>
           </div>
 
-          {/* Inferior / Instrucciones y CTAs */}
-          <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4 pt-6 border-t border-white/5 pointer-events-auto">
-            <div className="flex items-center gap-2 font-mono text-[9px] sm:text-[10px] text-zinc-400 uppercase tracking-widest">
-              <MousePointerClick className="size-3.5 text-[#eca8d6] animate-pulse" />
-              <span>Arrastrá o usá scroll para navegar en 3D</span>
+          {/* Inferior / Pista de interacción con el 3D */}
+          <div className="relative z-20 flex w-full items-center justify-between gap-4 border-t border-white/5 pt-6 pointer-events-auto">
+            <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest text-zinc-400 sm:text-[10px]">
+              <MousePointerClick className="size-3.5 text-[#eca8d6]" />
+              <span>Trabajos reales del estudio en San Juan</span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <Button asChild size="sm" className="bg-[#eca8d6] text-black hover:bg-[#f0b8e0] rounded-full px-5 py-1 text-xs">
-                <a href={waHref} target="_blank" rel="noopener noreferrer">
-                  <WhatsAppMark className="h-4 w-4 mr-1.5" />
-                  Hablemos
-                </a>
-              </Button>
-              <a href="#servicios" className="inline-flex items-center gap-1 font-mono text-[9px] text-zinc-500 hover:text-white transition-colors uppercase tracking-widest animate-pulse">
-                <span>Ver servicios</span>
-                <ChevronDown className="size-3" />
-              </a>
-            </div>
+            <a
+              href="#servicios"
+              className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-zinc-500 transition-colors hover:text-white"
+            >
+              <span>Ver servicios</span>
+              <ChevronDown className="size-3" />
+            </a>
           </div>
         </div>
       </section>
 
       {/* SEGUNDO PLIEGUE: NUESTRO CATÁLOGO DE SERVICIOS EN PEQUEÑAS TARJETITAS */}
-      <section id="servicios" className="relative py-24 md:py-32 bg-zinc-950/45">
+      <section id="servicios" className="relative bg-zinc-950/45 py-16 md:py-20 lg:py-24">
         <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
-          
-          <div className="max-w-2xl mb-16">
-            <span className="font-mono text-xs tracking-widest text-[#eca8d6] uppercase">SERVICIOS DE PRODUCCIÓN</span>
+          <div className="mb-12 max-w-2xl">
+            <span className="font-mono text-xs uppercase tracking-widest text-[#eca8d6]">
+              Servicios de producción
+            </span>
             <h2 className="mt-2 font-display text-3xl tracking-tight sm:text-4xl md:text-5xl">
-              Nuestras Especialidades
+              Qué producimos
             </h2>
-            <p className="mt-4 text-zinc-400 text-base">
-              Diseñamos soluciones audiovisuales y fotográficas a medida en San Juan. Hacemos especial foco en coberturas de eventos, spots políticos, fotografía de producto gourmet y post-producción avanzada.
+            <p className="mt-4 text-base text-zinc-400">
+              Seis frentes de trabajo, todos con equipo propio y entrega lista para publicar.
             </p>
           </div>
 
-          {/* Grilla de Pequeñas Tarjetitas de Servicio */}
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Cada especialidad con una foto real del estudio detrás */}
+          <div className="grid gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3">
             {offerings.map((item, idx) => (
               <motion.article
                 key={item.title}
-                initial={reduce ? false : { opacity: 0, y: 15 }}
+                initial={reduce ? false : { opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.45, delay: idx * 0.05, ease: easePremium }}
-                className={`group relative rounded-xl border p-6 transition-all duration-300 backdrop-blur-sm overflow-hidden flex flex-col justify-between ${
-                  item.highlight
-                    ? "border-[#eca8d6]/30 bg-zinc-900/60 shadow-[0_4px_30px_rgba(236,168,214,0.03)]"
-                    : "border-white/5 bg-zinc-900/20"
-                } hover:border-[#eca8d6]/60 hover:bg-zinc-900/80`}
+                transition={{ duration: 0.5, delay: idx * 0.05, ease: easePremium }}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/40 transition-colors duration-500 hover:border-[#eca8d6]/45"
               >
-                {/* Glow decorativo de fondo en tarjetas destacadas */}
-                {item.highlight && (
-                  <div className="absolute top-0 right-0 size-20 bg-[#eca8d6]/5 rounded-bl-full filter blur-lg transition-all group-hover:bg-[#eca8d6]/10" />
-                )}
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={lite(item.image)}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="size-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#07040a] via-[#07040a]/45 to-transparent"
+                    aria-hidden
+                  />
+                  <span className="absolute left-4 top-4 flex size-10 items-center justify-center rounded-xl border border-[#eca8d6]/40 bg-[#eca8d6]/15 backdrop-blur-md">
+                    <item.icon className="size-[18px] text-[#eca8d6]" strokeWidth={1.5} aria-hidden />
+                  </span>
+                </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`p-2.5 rounded-lg border transition-all duration-300 ${
-                      item.highlight
-                        ? "bg-[#eca8d6]/10 border-[#eca8d6]/20 text-[#eca8d6] group-hover:bg-[#eca8d6] group-hover:text-black"
-                        : "bg-white/5 border-white/10 text-zinc-400 group-hover:text-white"
-                    }`}>
-                      <item.icon className="h-5 w-5" aria-hidden />
-                    </div>
-                    <span className={`font-mono text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                      item.highlight
-                        ? "text-[#eca8d6] bg-[#eca8d6]/10 border border-[#eca8d6]/20"
-                        : "text-zinc-500 bg-white/5"
-                    }`}>
-                      {item.badge}
-                    </span>
-                  </div>
-
-                  <h3 className="mb-2 font-display text-lg tracking-tight text-white group-hover:text-[#eca8d6] transition-colors">
+                <div className="relative -mt-8 p-5 sm:p-6">
+                  <h3 className="font-display text-xl tracking-tight text-white transition-colors group-hover:text-[#eca8d6] sm:text-2xl">
                     {item.title}
                   </h3>
-                  
-                  <p className="text-xs leading-relaxed text-zinc-400">
-                    {item.body}
-                  </p>
+                  <p className="mt-2 text-[0.9rem] leading-relaxed text-zinc-400">{item.body}</p>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-zinc-500 group-hover:text-white transition-colors">
-                  <span>Consultar por WhatsApp</span>
-                  <ArrowUpRight className="h-3.5 w-3.5 opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                </div>
+                <span
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-[#eca8d6] via-[#ffd2a8] to-transparent transition-transform duration-700 group-hover:scale-x-100"
+                  aria-hidden
+                />
               </motion.article>
             ))}
           </div>
@@ -596,114 +559,69 @@ export function FotoYVideoClient() {
       </section>
 
       {/* TERCER PLIEGUE: SHOWCASE AUDIOVISUAL PREMIUM (Video institucional generado) */}
-      <section className="relative py-24 md:py-32 bg-black/45">
-        <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
-          
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="mt-3 font-display text-3xl tracking-tight sm:text-4xl md:text-5xl">
-              Producción de Reels
+      <section className="relative overflow-hidden bg-black/45 py-16 md:py-20 lg:py-24">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_75%_45%,rgba(236,168,214,0.1)_0%,transparent_62%)]"
+          aria-hidden
+        />
+        <div className="relative z-10 mx-auto grid max-w-[1400px] items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16 lg:px-12">
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, ease: easePremium }}
+          >
+            <span className="font-mono text-xs uppercase tracking-widest text-[#eca8d6]">
+              Contenido vertical
+            </span>
+            <h2 className="mt-2 font-display text-3xl tracking-tight sm:text-4xl md:text-5xl">
+              Producción de reels
             </h2>
-          </div>
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg">
+              Guion, rodaje y montaje pensados para el formato vertical. Gancho en los primeros
+              segundos y cierre con una acción clara.
+            </p>
 
-          <div className="max-w-5xl mx-auto">
-            <CustomVideoPlayer />
-          </div>
-        </div>
-      </section>
-
-      {/* CUARTO PLIEGUE: PORTFOLIO TRADICIONAL Y CATEGORIZADO (NO SOLO 3D) */}
-      <section id="portfolio-galeria" className="relative py-24 md:py-32 bg-zinc-950/45">
-        <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-            <div>
-              <span className="font-mono text-xs tracking-widest text-[#eca8d6] uppercase">PORTFOLIO DE TRABAJOS</span>
-              <h2 className="mt-2 font-display text-3xl tracking-tight sm:text-4xl md:text-5xl">
-                Galería de Proyectos
-              </h2>
-              <p className="mt-4 text-zinc-400 max-w-xl text-sm sm:text-base">
-                Explorá en detalle cada una de nuestras fotografías reales. Hacé clic sobre cualquier imagen para ampliarla en alta definición.
-              </p>
-            </div>
-
-            {/* Pestañas de Filtro (Categorías) */}
-            <div className="flex flex-wrap gap-2 font-mono text-xs border-b border-white/5 pb-2 md:pb-0 md:border-b-0">
+            <ul className="mt-8 space-y-3">
               {[
-                { id: "todos", label: "Todos" },
-                { id: "eventos", label: "Eventos" },
-                { id: "politica", label: "Política" },
-                { id: "fotoproducto", label: "Fotoproducto" },
-                { id: "retrato", label: "Retratos & Moda" }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveFilter(tab.id as any)}
-                  className={`px-4 py-2 rounded-full border transition-all duration-300 ${
-                    activeFilter === tab.id
-                      ? "bg-[#eca8d6] text-black border-[#eca8d6]"
-                      : "bg-transparent border-white/10 text-zinc-400 hover:text-white hover:border-white/30"
-                  }`}
-                >
-                  {tab.label}
-                </button>
+                "Guion y storyboard antes de filmar",
+                "Rodaje con equipo e iluminación propios",
+                "Montaje, color y sonido en post",
+                "Entrega en 9:16, 1:1 y 16:9",
+              ].map((linea) => (
+                <li key={linea} className="flex items-start gap-3 text-[0.95rem] text-zinc-300">
+                  <span className="mt-[0.45rem] size-1.5 shrink-0 rounded-full bg-[#eca8d6]" aria-hidden />
+                  {linea}
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
 
-          {/* Grilla Asimétrica de Portfolio (Masonry Grid) */}
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-            <AnimatePresence mode="popLayout">
-              {visibleImages.map((img) => (
-                <motion.div
-                  key={img.src}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, ease: easePremium }}
-                  className="break-inside-avoid relative group overflow-hidden rounded-2xl border border-white/5 bg-zinc-900 cursor-pointer"
-                  onClick={() => openLightbox(filteredImages.indexOf(img))}
-                >
-                  <img
-                    src={img.src}
-                    alt={img.alt}
-                    className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  
-                  {/* Overlay en hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                    <div className="flex items-center gap-1.5 font-mono text-[9px] text-[#eca8d6] uppercase tracking-widest mb-1.5">
-                      <ZoomIn className="size-3" />
-                      <span>Ampliar Imagen</span>
-                    </div>
-                    <p className="text-xs text-white leading-tight font-medium drop-shadow-md">
-                      {img.alt}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+            <Button
+              asChild
+              size="sm"
+              className="mt-9 h-11 gap-2 rounded-full bg-[#eca8d6] px-6 text-[13px] font-semibold text-black transition-all duration-300 hover:bg-[#f2c4e2]"
+            >
+              <a href={WaContenidoHref} target="_blank" rel="noopener noreferrer">
+                <WhatsAppMark className="size-[17px] shrink-0 text-black" />
+                Quiero mis reels
+              </a>
+            </Button>
+          </motion.div>
 
-          {/* Botón de Cargar Más (Load More) */}
-          {filteredImages.length > visibleImagesCount && (
-            <div className="mt-12 flex justify-center">
-              <Button
-                onClick={() => setVisibleImagesCount((prev) => prev + 12)}
-                variant="outline"
-                className="border-white/10 hover:border-white/30 bg-white/5 hover:bg-white/10 rounded-full px-8 py-5 text-sm font-mono tracking-widest uppercase transition-all duration-300"
-              >
-                Cargar más proyectos
-              </Button>
-            </div>
-          )}
-
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.75, delay: 0.08, ease: easePremium }}
+            className="mx-auto w-full max-w-[420px] lg:max-w-none"
+          >
+            <CustomVideoPlayer />
+          </motion.div>
         </div>
       </section>
 
       {/* QUINTO PLIEGUE: CTA LLAMADA A LA ACCIÓN COMERCIAL */}
-      <section className="relative bg-zinc-950/45 py-24 md:py-32 overflow-hidden">
+      <section className="relative overflow-hidden bg-zinc-950/45 py-16 md:py-20 lg:py-24">
         <div className="absolute inset-0 pointer-events-none" aria-hidden>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[500px] rounded-full bg-[#eca8d6]/5 blur-3xl filter animate-pulse" />
         </div>
@@ -721,7 +639,7 @@ export function FotoYVideoClient() {
               ¿Tenés un proyecto para tu marca?
             </h2>
             <p className="mt-4 text-zinc-400 text-sm sm:text-base">
-              Contanos qué necesitás filmar o fotografiar. Te asesoramos en la planificación creativa, locación y armamos una propuesta adaptada a tus plazos y objetivos.
+              Contanos qué necesitás filmar o fotografiar y armamos una propuesta a medida.
             </p>
             
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
@@ -740,69 +658,6 @@ export function FotoYVideoClient() {
           </motion.div>
         </div>
       </section>
-
-      {/* LIGHTBOX MODAL EN ALTA RESOLUCIÓN */}
-      <AnimatePresence>
-        {lightboxIndex !== null && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4"
-            onClick={closeLightbox}
-          >
-            {/* Botón de cerrar */}
-            <button
-              onClick={closeLightbox}
-              className="absolute top-6 right-6 p-2 rounded-full bg-white/5 text-white hover:bg-white/15 transition-colors z-50 pointer-events-auto"
-            >
-              <X className="size-6" />
-            </button>
-
-            {/* Botón previo */}
-            <button
-              onClick={showPrevImage}
-              className="absolute left-4 p-3 rounded-full bg-white/5 text-white hover:bg-white/15 transition-colors z-50 pointer-events-auto"
-            >
-              <ChevronLeft className="size-6" />
-            </button>
-
-            {/* Contenido de la Imagen */}
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative max-w-4xl max-h-[80vh] flex flex-col items-center pointer-events-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={filteredImages[lightboxIndex].src}
-                alt={filteredImages[lightboxIndex].alt}
-                className="max-w-full max-h-[72vh] object-contain rounded-xl border border-white/10 shadow-2xl"
-              />
-              
-              {/* Pie de foto en Lightbox */}
-              <div className="mt-4 text-center px-4 max-w-lg">
-                <p className="text-sm font-medium text-white">
-                  {filteredImages[lightboxIndex].alt}
-                </p>
-                <span className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest text-[#eca8d6]">
-                  Categoría: {filteredImages[lightboxIndex].category} ({lightboxIndex + 1} / {filteredImages.length})
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Botón siguiente */}
-            <button
-              onClick={showNextImage}
-              className="absolute right-4 p-3 rounded-full bg-white/5 text-white hover:bg-white/15 transition-colors z-50 pointer-events-auto"
-            >
-              <ChevronRight className="size-6" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Footer corporativo */}
       <FooterSection />

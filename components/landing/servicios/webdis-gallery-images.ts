@@ -6,7 +6,7 @@
 export const WEBDIS_IMAGE_FALLBACK = "/lumi2.png" as const
 
 /** Pantalla del MacBook — misma referencia que antes del cambio a webdis */
-export const PORTFOLIO_MACBOOK_SCREENSHOT = "/images/bridge.png" as const
+export const PORTFOLIO_MACBOOK_SCREENSHOT = "/_lite/bridge.webp" as const
 
 export const WEBDIS_GALLERY_IMAGES = [
   "/webdis/53shots_so.png",

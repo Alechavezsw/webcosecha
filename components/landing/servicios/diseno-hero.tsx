@@ -1,264 +1,193 @@
 "use client"
 
+import { motion, useReducedMotion } from "framer-motion"
+import { ArrowDown, ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
-import gsap from "gsap"
+import { Button } from "@/components/ui/button"
+import { WhatsAppMark } from "@/components/icons/whatsapp-mark"
 import { getWhatsAppHref } from "@/lib/whatsapp"
 
-const VIDEO_SRC =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_080827_a9e5ad52-b6ee-4e79-b393-d936f179cfd7.mp4"
+const easePremium = [0.22, 1, 0.36, 1] as const
 
-export function DisenoHero() {
-  const [mounted, setMounted] = useState(false)
-  const [framesReady, setFramesReady] = useState(false)
-  const [reduceMotion, setReduceMotion] = useState(false)
-  const [heroInView, setHeroInView] = useState(true)
+/** Páginas del logofolio real, derivadas livianas en `public/diseno-portfolio/lite/`. */
+const LOGO_WALL = [
+  "0003",
+  "0004",
+  "0005",
+  "0006",
+  "0007",
+  "0008",
+  "0009",
+  "0010",
+  "0011",
+  "0012",
+  "0013",
+  "0014",
+].map((p) => `/diseno-portfolio/lite/${p}.webp`)
 
-  const sectionRef = useRef<HTMLElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const videoBgRef = useRef<HTMLDivElement>(null)
-  const displayCanvasRef = useRef<HTMLCanvasElement>(null)
-  const framesRef = useRef<HTMLCanvasElement[]>([])
+const DISCIPLINAS = ["Identidad", "Redes", "Publicidad", "Editorial", "Merchandising"] as const
 
-  const waHref = getWhatsAppHref("Diseño Gráfico")
+const heroItem = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: easePremium } },
+} as const
 
-  useEffect(() => {
-    setMounted(true)
-    setReduceMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-  }, [])
-
-  useEffect(() => {
-    const section = sectionRef.current
-    if (!section) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setHeroInView(entry.isIntersecting),
-      { threshold: 0, rootMargin: "0px 0px 0px 0px" },
-    )
-
-    observer.observe(section)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (reduceMotion) return
-
-    const video = videoRef.current
-    if (!video) return
-
-    let capturing = true
-    let lastTime = -1
-    const MAX_WIDTH = 960
-    const frames: HTMLCanvasElement[] = []
-    let rafId = 0
-
-    const captureFrame = () => {
-      if (!capturing || video.readyState < 2 || video.currentTime === lastTime) return
-      lastTime = video.currentTime
-      const scale = Math.min(1, MAX_WIDTH / video.videoWidth)
-      const w = Math.floor(video.videoWidth * scale)
-      const h = Math.floor(video.videoHeight * scale)
-      const canvas = document.createElement("canvas")
-      canvas.width = w
-      canvas.height = h
-      const ctx = canvas.getContext("2d")
-      if (!ctx) return
-      ctx.drawImage(video, 0, 0, w, h)
-      frames.push(canvas)
-    }
-
-    const loop = () => {
-      captureFrame()
-      if (capturing) {
-        if ("requestVideoFrameCallback" in video) {
-          video.requestVideoFrameCallback(() => {
-            rafId = requestAnimationFrame(loop)
-          })
-        } else {
-          rafId = requestAnimationFrame(loop)
-        }
-      }
-    }
-
-    const onLoaded = () => {
-      void video.play().catch(() => {})
-      loop()
-    }
-
-    const onEnded = () => {
-      capturing = false
-      cancelAnimationFrame(rafId)
-      if (frames.length > 0) {
-        framesRef.current = frames
-        setFramesReady(true)
-      }
-    }
-
-    video.addEventListener("loadedmetadata", onLoaded)
-    video.addEventListener("ended", onEnded)
-    if (video.readyState >= 1) onLoaded()
-
-    return () => {
-      capturing = false
-      cancelAnimationFrame(rafId)
-      video.removeEventListener("loadedmetadata", onLoaded)
-      video.removeEventListener("ended", onEnded)
-    }
-  }, [reduceMotion])
-
-  useEffect(() => {
-    if (!framesReady || reduceMotion || !heroInView) return
-
-    const canvas = displayCanvasRef.current
-    const frames = framesRef.current
-    if (!canvas || frames.length === 0) return
-
-    canvas.width = frames[0].width
-    canvas.height = frames[0].height
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    let index = 0
-    let direction = 1
-    let last = performance.now()
-    const interval = 1000 / 30
-    let animId = 0
-
-    const render = (now: number) => {
-      if (now - last >= interval) {
-        ctx.drawImage(frames[index], 0, 0)
-        index += direction
-        if (index >= frames.length - 1) {
-          index = frames.length - 1
-          direction = -1
-        } else if (index <= 0) {
-          index = 0
-          direction = 1
-        }
-        last = now
-      }
-      animId = requestAnimationFrame(render)
-    }
-
-    animId = requestAnimationFrame(render)
-    return () => cancelAnimationFrame(animId)
-  }, [framesReady, reduceMotion, heroInView])
-
-  useEffect(() => {
-    if (reduceMotion || !heroInView) {
-      if (videoBgRef.current) gsap.set(videoBgRef.current, { x: 0, y: 0 })
-      return
-    }
-
-    const strength = 20
-    let targetX = 0
-    let targetY = 0
-    let currentX = 0
-    let currentY = 0
-    let animId = 0
-
-    const onMove = (e: MouseEvent) => {
-      const cx = window.innerWidth / 2
-      const cy = window.innerHeight / 2
-      targetX = ((e.clientX - cx) / cx) * strength
-      targetY = ((e.clientY - cy) / cy) * strength
-    }
-
-    const tick = () => {
-      currentX += (targetX - currentX) * 0.06
-      currentY += (targetY - currentY) * 0.06
-      if (videoBgRef.current) {
-        gsap.set(videoBgRef.current, { x: currentX, y: currentY })
-      }
-      animId = requestAnimationFrame(tick)
-    }
-
-    window.addEventListener("mousemove", onMove)
-    animId = requestAnimationFrame(tick)
-
-    return () => {
-      window.removeEventListener("mousemove", onMove)
-      cancelAnimationFrame(animId)
-    }
-  }, [reduceMotion, heroInView])
+/** Columna de piezas que se desplaza sola; duplicada para que el loop no corte. */
+function WallColumn({
+  images,
+  direction,
+  duration,
+  reduce,
+}: {
+  images: string[]
+  direction: "up" | "down"
+  duration: number
+  reduce: boolean | null
+}) {
+  const loop = [...images, ...images]
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative isolate z-[1] h-screen min-h-[640px] w-full overflow-hidden bg-[#030308] text-white"
+    <motion.div
+      className="flex flex-col gap-4"
+      animate={reduce ? undefined : { y: direction === "up" ? ["0%", "-50%"] : ["-50%", "0%"] }}
+      transition={{ duration, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
     >
+      {loop.map((src, i) => (
+        <figure
+          key={`${src}-${i}`}
+          className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] shadow-[0_18px_46px_-24px_rgba(0,0,0,0.9)]"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="block w-full opacity-90 transition-opacity duration-500 group-hover:opacity-100"
+          />
+          <div
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(150deg,rgba(236,168,214,0.16),transparent_45%,rgba(167,139,250,0.14))] mix-blend-overlay"
+            aria-hidden
+          />
+        </figure>
+      ))}
+    </motion.div>
+  )
+}
+
+export function DisenoHero() {
+  const reduce = useReducedMotion()
+  const waHref = getWhatsAppHref("Diseño Gráfico")
+
+  const colA = LOGO_WALL.slice(0, 6)
+  const colB = LOGO_WALL.slice(6)
+
+  return (
+    <section className="relative overflow-hidden px-6 pb-16 pt-28 lg:px-12 lg:pb-24 lg:pt-32">
+      {/* Resplandor superior propio de la página */}
       <div
-        ref={videoBgRef}
-        className={`pointer-events-none absolute inset-0 z-0 origin-center scale-[1.08] transition-opacity duration-500 ease-out motion-reduce:transition-none ${
-          heroInView ? "opacity-100" : "opacity-0"
-        }`}
+        className="pointer-events-none absolute inset-x-0 top-0 h-[min(60vh,520px)] bg-[radial-gradient(ellipse_80%_70%_at_50%_0%,rgba(236,168,214,0.16)_0%,transparent_70%)]"
         aria-hidden
-      >
-        <video
-          ref={videoRef}
-          src={VIDEO_SRC}
-          muted
-          playsInline
-          preload="auto"
-          crossOrigin="anonymous"
-          className="h-full w-full object-cover"
-          style={{ display: framesReady && !reduceMotion ? "none" : "block" }}
-        />
-        <canvas
-          ref={displayCanvasRef}
-          className="h-full w-full object-cover"
-          style={{ display: framesReady && !reduceMotion ? "block" : "none" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-[#030308]/95" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_20%,rgba(236,168,214,0.12)_0%,transparent_55%)]" />
-        <div
-          className="absolute inset-x-0 bottom-0 z-[1] h-[min(42vh,320px)] bg-gradient-to-b from-transparent via-[#030308]/40 to-[#030308]"
-          aria-hidden
-        />
-      </div>
+      />
 
-      <div
-        className={`pointer-events-none absolute left-0 right-0 z-20 w-full px-4 transition-all duration-500 ${
-          mounted && heroInView ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-        }`}
-        style={{ top: "126px" }}
+      <motion.div
+        initial={reduce ? false : "hidden"}
+        animate={reduce ? undefined : "show"}
+        variants={{ show: { transition: { staggerChildren: 0.09 } } }}
+        className="relative z-10 mx-auto grid max-w-[1400px] items-center gap-14 lg:grid-cols-12 lg:gap-16"
       >
-        <h1 className="cc-hero-title select-none text-center text-white">Diseño</h1>
-      </div>
+        {/* Texto */}
+        <div className="lg:col-span-7">
+          <motion.div variants={heroItem}>
+            <Link
+              href="/#soluciones"
+              className="mb-9 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 text-[13px] text-white/70 backdrop-blur-sm transition-all hover:border-[#eca8d6]/40 hover:text-white"
+            >
+              <ArrowLeft className="size-3.5" aria-hidden />
+              Volver a soluciones
+            </Link>
+          </motion.div>
 
-      <div
-        className={`pointer-events-none absolute bottom-12 left-0 right-0 z-30 flex items-end justify-between px-6 transition-all duration-500 md:px-10 ${
-          mounted && heroInView ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-        }`}
-      >
-        <p className="hidden max-w-[220px] text-sm font-light leading-relaxed text-white/75 md:block">
-          Diseño gráfico y digital con mirada estratégica: piezas que comunican, venden y destacan tu
-          marca.
-        </p>
-
-        <div className="pointer-events-auto absolute bottom-0 left-1/2 flex -translate-x-1/2 items-center gap-3">
-          <a
-            href={waHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative overflow-hidden rounded-full bg-white px-6 py-3 text-sm font-medium text-black shadow-[0_0_0_0_rgba(255,255,255,0)] transition-all duration-200 hover:scale-[1.03] hover:shadow-[0_0_24px_4px_rgba(255,255,255,0.25)] active:scale-[0.97]"
+          <motion.span
+            variants={heroItem}
+            className="mb-5 inline-flex items-center gap-3 font-mono text-sm uppercase tracking-[0.24em] text-[#eca8d6]/90"
           >
-            <span className="relative z-10">Pedir presupuesto</span>
-            <span className="absolute inset-0 bg-gradient-to-b from-white to-white/85 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-          </a>
-          <Link
-            href="#que-hacemos"
-            scroll
-            className="liquid-glass group relative z-[1] rounded-full px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.03] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_0_20px_2px_rgba(255,255,255,0.07)] active:scale-[0.97]"
+            <span className="h-px w-12 bg-gradient-to-r from-transparent to-[#eca8d6]/60" />
+            Diseño gráfico · San Juan
+          </motion.span>
+
+          <motion.h1
+            variants={heroItem}
+            className="font-display text-[clamp(2.75rem,7.5vw,5.5rem)] leading-[0.92] tracking-tight text-white"
           >
-            Ver servicios
-          </Link>
+            Diseño que hace
+            <span className="mt-1 block bg-gradient-to-r from-[#eca8d6] via-[#e879f9] to-[#a78bfa] bg-clip-text text-transparent">
+              que te elijan
+            </span>
+          </motion.h1>
+
+          <motion.p
+            variants={heroItem}
+            className="mt-7 max-w-xl text-lg leading-relaxed text-white/65 md:text-xl"
+          >
+            Identidad, piezas para redes, campañas y material comercial. Coherente en todos lados,
+            desde el logo hasta el roll-up.
+          </motion.p>
+
+          <motion.div variants={heroItem} className="mt-7 flex flex-wrap gap-2">
+            {DISCIPLINAS.map((d) => (
+              <span
+                key={d}
+                className="rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-white/55 backdrop-blur-sm transition-colors hover:border-[#eca8d6]/40 hover:text-white sm:text-[11px]"
+              >
+                {d}
+              </span>
+            ))}
+          </motion.div>
+
+          <motion.div variants={heroItem} className="mt-9 flex flex-wrap gap-3">
+            <Button
+              asChild
+              size="sm"
+              className="group h-11 gap-2 rounded-full bg-[#eca8d6] px-6 text-[13px] font-semibold text-black transition-all duration-300 hover:bg-[#f2bee2] hover:shadow-[0_14px_36px_-14px_rgba(236,168,214,0.7)]"
+            >
+              <a href={waHref} target="_blank" rel="noopener noreferrer">
+                <WhatsAppMark className="size-[17px] shrink-0 text-black" />
+                Pedir presupuesto
+              </a>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="group h-11 gap-2 rounded-full border-white/25 bg-transparent px-6 text-[13px] font-medium text-white/85 backdrop-blur-sm transition-all hover:border-white/50 hover:bg-white/[0.06] hover:text-white"
+            >
+              <a href="#portfolio">
+                Ver trabajos
+                <ArrowDown className="size-3.5 shrink-0 opacity-70 transition-transform duration-300 group-hover:translate-y-0.5" />
+              </a>
+            </Button>
+          </motion.div>
         </div>
 
-        <p className="hidden max-w-[220px] text-right text-sm font-light leading-relaxed text-white/75 md:block">
-          Identidad coherente para redes, ads, web, eventos y materiales comerciales.
-        </p>
-      </div>
+        {/* Muro de piezas reales */}
+        <motion.div variants={heroItem} className="lg:col-span-5">
+          <div
+            className="relative h-[420px] overflow-hidden sm:h-[520px] lg:h-[620px] [mask-image:linear-gradient(to_bottom,transparent_0%,black_14%,black_86%,transparent_100%)]"
+            aria-hidden
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <WallColumn images={colA} direction="up" duration={42} reduce={reduce} />
+              <div className="pt-10">
+                <WallColumn images={colB} direction="down" duration={50} reduce={reduce} />
+              </div>
+            </div>
+          </div>
+          <p className="mt-4 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-white/30">
+            Logofolio Cosecha Creativa
+          </p>
+        </motion.div>
+      </motion.div>
     </section>
   )
 }

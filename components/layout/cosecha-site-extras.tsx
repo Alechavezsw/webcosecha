@@ -1,6 +1,7 @@
 "use client"
 
-import { CosechaCrmChatWidget } from "@/components/chat/cosecha-crm-chat"
+import { CursorFollower } from "@/components/layout/cursor-follower"
+import { WhatsAppFab } from "@/components/layout/whatsapp-fab"
 import { usePathname } from "next/navigation"
 import { SmoothScroll } from "@/components/layout/smooth-scroll"
 import { FilmGrainOverlay } from "@/components/layout/film-grain-overlay"
@@ -26,7 +27,10 @@ export function CosechaSiteExtras() {
       <RouteTransition />
       <IntroPreloader />
       {!noGrain && <FilmGrainOverlay />}
-      <CosechaCrmChatWidget />
+      {/* El chat flotante se reemplazó por contacto directo por WhatsApp.
+          El widget sigue en components/chat/cosecha-crm-chat.tsx por si vuelve. */}
+      <CursorFollower />
+      <WhatsAppFab />
     </>
   )
 }

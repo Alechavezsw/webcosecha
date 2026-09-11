@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { WhatsAppMark } from "@/components/icons/whatsapp-mark";
 import { getWhatsAppHref } from "@/lib/whatsapp";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useImmersiveParallax } from "@/lib/use-immersive-parallax";
 import { Hero3DLayer } from "@/components/landing/hero-3d";
@@ -113,6 +113,32 @@ function BlurWord({ word, trigger }: { word: string; trigger: number }) {
   );
 }
 
+/**
+ * Accesos rápidos del hero. Antes eran una fila ancha anclada al pie del hero,
+ * donde quedaban cortadas en pantallas bajas; ahora son chips compactos que
+ * cierran la columna de texto.
+ */
+const HERO_SHORTCUTS = [
+  {
+    value: "Estrategia",
+    label: "Marketing 360°",
+    href: "/servicios/gestion-de-redes-sociales",
+    accent: "from-[#eca8d6] via-[#d48ee0] to-[#a100f2]",
+  },
+  {
+    value: "Desarrollo",
+    label: "Web y Tiendas",
+    href: "/servicios/diseno-web",
+    accent: "from-cyan-400 via-[#67e8f9] to-[#a100f2]",
+  },
+  {
+    value: "Automatización",
+    label: "Sistemas IA y n8n",
+    href: "/servicios/ia",
+    accent: "from-[#a100f2] via-[#eca8d6] to-emerald-400",
+  },
+] as const;
+
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
@@ -159,7 +185,7 @@ export function HeroSection() {
       <Hero3DLayer />
 
       <div
-        className={`relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-4 pb-16 pt-28 will-change-transform sm:px-6 sm:py-24 lg:px-12 lg:py-28 ${
+        className={`relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-end px-4 pb-[clamp(2rem,6vh,5rem)] pt-[clamp(5rem,11vh,7rem)] will-change-transform sm:px-6 lg:px-12 ${
           isVisible ? "opacity-100" : "opacity-0"
         } transition-opacity duration-700`}
         style={{ transform: `translate3d(0, ${parallaxY * -0.22}px, 0)` }}
@@ -258,87 +284,48 @@ export function HeroSection() {
           </Button>
           </Magnetic>
         </div>
-        </div>
-      </div>
-      
-      {/* Stats — ancladas al bloque inferior del hero */}
-      <div
-        className={`relative z-10 shrink-0 px-4 pb-6 pt-2 transition-all duration-700 delay-500 will-change-transform sm:px-6 sm:pb-8 lg:px-12 lg:pb-10 ${
-          isVisible ? "opacity-100" : "opacity-0"
-        }`}
-        style={{ transform: `translate3d(0, ${parallaxY * -0.45}px, 0)` }}
-      >
-        <div className="mx-auto flex max-w-[1400px] flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:gap-8 lg:gap-12">
-          {[
-            {
-              value: "Estrategia",
-              label: "Marketing 360°",
-              href: "/servicios/gestion-de-redes-sociales",
-              accent: "from-[#eca8d6] via-[#d48ee0] to-[#a100f2]",
-            },
-            {
-              value: "Desarrollo",
-              label: "Web y Tiendas",
-              href: "/servicios/diseno-web",
-              accent: "from-cyan-400 via-[#67e8f9] to-[#a100f2]",
-            },
-            {
-              value: "Automatización",
-              label: "Sistemas IA y n8n",
-              href: "/servicios/ia",
-              accent: "from-[#a100f2] via-[#eca8d6] to-emerald-400",
-            },
-          ].map((stat, i) => (
+
+        {/* Accesos rápidos — cierran la columna, alineados con el resto del texto */}
+        <div className="mt-8 flex flex-col items-stretch gap-2 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-3">
+          {HERO_SHORTCUTS.map((stat, i) => (
             <Link
               key={stat.label}
               href={stat.href}
-              className={`cc-hero-stat group relative flex min-w-0 flex-1 flex-col gap-1 overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:hover:transform-none sm:min-w-[10rem] sm:px-5 sm:py-3.5 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-              } hover:-translate-y-1 hover:border-[#eca8d6]/35 hover:bg-white/[0.07] hover:shadow-[0_0_0_1px_rgba(236,168,214,0.25),0_20px_50px_-18px_rgba(236,168,214,0.55),0_8px_32px_-12px_rgba(161,0,242,0.35)] sm:hover:-translate-y-2 md:hover:-translate-y-2.5`}
-              style={{ transitionDelay: `${520 + i * 110}ms` }}
+              className={`cc-hero-stat group relative flex min-w-0 flex-1 items-center gap-2.5 overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.03] px-3.5 py-2.5 backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:hover:transform-none sm:min-w-[8.5rem] ${
+                isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+              } hover:-translate-y-0.5 hover:border-[#eca8d6]/35 hover:bg-white/[0.07] hover:shadow-[0_10px_30px_-14px_rgba(236,168,214,0.6)]`}
+              style={{ transitionDelay: `${640 + i * 90}ms` }}
             >
-              {/* Glow de fondo */}
-              <span
-                className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-[#eca8d6]/25 via-[#a100f2]/15 to-cyan-500/10 opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100"
-                aria-hidden
-              />
-              {/* Barrido de luz */}
-              <span
-                className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/[0.14] to-transparent opacity-0 transition-[transform,opacity] duration-700 group-hover:translate-x-full group-hover:opacity-100"
-                aria-hidden
-              />
               {/* Borde superior animado */}
               <span
                 className={`pointer-events-none absolute inset-x-0 top-0 h-[2px] scale-x-0 bg-gradient-to-r ${stat.accent} opacity-0 transition-all duration-500 group-hover:scale-x-100 group-hover:opacity-100`}
                 aria-hidden
               />
-              {/* Acento lateral */}
+              {/* Barrido de luz */}
               <span
-                className="pointer-events-none absolute bottom-3 left-0 top-3 w-[3px] scale-y-0 rounded-full bg-gradient-to-b from-[#eca8d6] to-[#a100f2] transition-transform duration-500 group-hover:scale-y-100"
+                className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/[0.12] to-transparent opacity-0 transition-[transform,opacity] duration-700 group-hover:translate-x-full group-hover:opacity-100"
                 aria-hidden
               />
 
-              <span className="relative flex items-center gap-2">
-                <Sparkles
-                  className="size-3.5 shrink-0 scale-75 opacity-0 transition-all duration-500 group-hover:scale-100 group-hover:opacity-100 group-hover:text-[#eca8d6] group-hover:drop-shadow-[0_0_10px_rgba(236,168,214,0.85)]"
-                  aria-hidden
-                />
-                <span className="font-display text-base text-white transition-all duration-500 group-hover:bg-gradient-to-r group-hover:from-white group-hover:via-[#f5d4ea] group-hover:to-[#eca8d6] group-hover:bg-clip-text group-hover:text-transparent sm:text-lg md:text-xl">
+              <span className="relative flex min-w-0 flex-col">
+                <span className="font-display text-[15px] leading-tight text-white transition-colors duration-500 group-hover:text-[#f5d4ea] sm:text-base">
                   {stat.value}
                 </span>
-                <ArrowRight
-                  className="size-3.5 shrink-0 -translate-x-1 opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:opacity-90 group-hover:text-[#eca8d6]"
-                  aria-hidden
-                />
+                <span className="text-[10px] leading-snug tracking-wide text-white/45 transition-colors duration-500 group-hover:text-white/80">
+                  {stat.label}
+                </span>
               </span>
-              <span className="relative max-w-[11rem] pl-5 text-[10px] leading-snug tracking-wide text-white/45 transition-all duration-500 group-hover:translate-x-0.5 group-hover:text-white/85 sm:text-[11px] md:max-w-none">
-                {stat.label}
-              </span>
+
+              <ArrowRight
+                className="relative ml-auto size-3.5 shrink-0 -translate-x-1 opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:text-[#eca8d6] group-hover:opacity-90"
+                aria-hidden
+              />
             </Link>
           ))}
         </div>
+        </div>
       </div>
-
+      
       {/* Transición inmersiva hacia #about */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-32 sm:h-40 lg:h-48"

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WhatsAppMark } from "@/components/icons/whatsapp-mark";
+import { KineticHeading } from "@/components/landing/kinetic-heading";
 import { getWhatsAppHref } from "@/lib/whatsapp";
 import { Magnetic } from "@/components/layout/magnetic";
 import { Mail } from "lucide-react";
@@ -31,10 +32,8 @@ export function CtaSection() {
       ref={sectionRef}
       id="contacto"
       aria-labelledby="contacto-heading"
-      className="cc-aura cc-aura-center relative overflow-hidden py-28 sm:py-32 lg:py-40"
+      className="relative overflow-hidden py-28 sm:py-32 lg:py-40"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#eca8d6]/40 to-transparent" aria-hidden />
-
       <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-4 text-center sm:px-6 lg:px-8">
         <span
           className={`cc-eyebrow mb-6 transition-all duration-700 ${
@@ -46,17 +45,19 @@ export function CtaSection() {
           <span className="cc-eyebrow-line w-8" />
         </span>
 
-        <h2
+        <KineticHeading
           id="contacto-heading"
-          className={`cc-section-title leading-[0.98] text-white transition-[opacity,transform,filter] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:blur-none md:text-6xl lg:text-7xl ${
-            isVisible ? "translate-y-0 opacity-100 blur-0" : "translate-y-8 opacity-0 blur-[6px]"
-          }`}
-        >
-          <span className="block">Sembremos hoy.</span>
-          <span className="block bg-gradient-to-r from-[#eca8d6] via-[#c77dff] to-[#a78bfa] bg-clip-text text-transparent">
-            Cosechá resultados.
-          </span>
-        </h2>
+          className="cc-section-title leading-[0.98] text-white md:text-6xl lg:text-7xl"
+          lines={[
+            { text: "Sembremos hoy." },
+            {
+              text: "Cosechá resultados.",
+              mode: "line",
+              className:
+                "bg-gradient-to-r from-[#eca8d6] via-[#c77dff] to-[#a78bfa] bg-clip-text text-transparent",
+            },
+          ]}
+        />
 
         <p
           className={`mt-6 max-w-md text-sm leading-relaxed text-white/55 transition-all duration-1000 delay-150 sm:text-[15px] ${

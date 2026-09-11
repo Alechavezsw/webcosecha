@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Rotate3d, Compass, Cpu } from 'lucide-react';
-import { asset } from '../lib/asset';
+import { Radio, Compass, Cpu } from 'lucide-react';
+import { assetOpt } from '../lib/asset';
+import SectionKicker from './SectionKicker';
 
 interface Stat {
   label: string;
@@ -110,7 +111,7 @@ function AnimatedStatValue({
   return (
     <div
       ref={ref}
-      className="stat-value relative z-10 text-6xl sm:text-7xl lg:text-[85px] xl:text-[95px] font-display text-white/70 group-hover:text-[#ffb800] transition-colors duration-500 leading-none mb-3 tabular-nums select-none drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] group-hover:drop-shadow-[0_0_20px_rgba(255,184,0,0.35)] font-bold"
+      className="stat-value relative z-10 mb-3 select-none bg-gradient-to-b from-white via-[#ffd977] to-[#ffb800] bg-clip-text font-display text-6xl font-bold leading-none tabular-nums text-transparent drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] transition-[filter] duration-500 group-hover:drop-shadow-[0_0_22px_rgba(255,184,0,0.45)] sm:text-7xl lg:text-[85px] xl:text-[95px]"
       aria-live="polite"
     >
       {display}
@@ -118,33 +119,170 @@ function AnimatedStatValue({
   );
 }
 
+/** UID del modelo en Sketchfab (camión de acarreo minero). */
+const SKETCHFAB_UID = 'dcf8bedc3b4848bfa0ff4fcaf2c697de';
+const SKETCHFAB_API_SRC = 'https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js';
+
+/** Tono de roca de la foto de fondo, en 0-1, para que el visor no corte en gris. */
+const TRUCK_BG_COLOR = [0.15, 0.132, 0.112];
+
+/** Carga única del script del visor; las siguientes llamadas reusan la promesa. */
+let sketchfabApiPromise: Promise<void> | null = null;
+function loadSketchfabApi(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (sketchfabApiPromise) return sketchfabApiPromise;
+  sketchfabApiPromise = new Promise<void>((resolve, reject) => {
+    if ((window as unknown as { Sketchfab?: unknown }).Sketchfab) return resolve();
+    const script = document.createElement('script');
+    script.src = SKETCHFAB_API_SRC;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('sketchfab-api'));
+    document.head.appendChild(script);
+  });
+  return sketchfabApiPromise;
+}
+
 const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
-  const sketchfabUrl = "https://sketchfab.com/models/dcf8bedc3b4848bfa0ff4fcaf2c697de/embed?autostart=1&transparent=1&ui_animations=0&ui_infos=0&ui_stop=0&ui_inspector=0&ui_watermark_link=0&ui_watermark=0&ui_hint=0&ui_help=0&ui_settings=0&ui_vr=0&ui_fullscreen=0&ui_annotations=0&ui_controls=0&dnt=1";
+  const modelSlotRef = useRef<HTMLDivElement>(null);
+  const modelFrameRef = useRef<HTMLIFrameElement>(null);
+  const [modelVisible, setModelVisible] = useState(false);
+
+  useEffect(() => {
+    const slot = modelSlotRef.current;
+    if (!slot || modelVisible) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setModelVisible(true);
+      return;
+    }
+    // 400px de margen: llega montado justo antes de que el usuario lo vea.
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setModelVisible(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '400px 0px' },
+    );
+    io.observe(slot);
+    return () => io.disconnect();
+  }, [modelVisible]);
+
+  /**
+   * El embed por querystring ignora `transparent=1`: este modelo trae su propio
+   * fondo gris de escena y tapaba la foto minera. La API del visor sí lo puede
+   * apagar (`setBackground({ transparent: true })`), y así el camión queda
+   * sólido y recortado sobre la foto.
+   */
+  useEffect(() => {
+    if (!modelVisible) return;
+    const iframe = modelFrameRef.current;
+    if (!iframe) return;
+    let cancelled = false;
+
+    loadSketchfabApi()
+      .then(() => {
+        if (cancelled) return;
+        const Sketchfab = (window as unknown as { Sketchfab?: new (v: string, el: HTMLIFrameElement) => { init: (uid: string, opts: Record<string, unknown>) => void } }).Sketchfab;
+        if (!Sketchfab) return;
+
+        new Sketchfab('1.12.1', iframe).init(SKETCHFAB_UID, {
+          autostart: 1,
+          autospin: 0.2,
+          scrollwheel: 0,
+          preload: 0,
+          transparent: 1,
+          dnt: 1,
+          ui_animations: 0,
+          ui_infos: 0,
+          ui_stop: 0,
+          ui_inspector: 0,
+          ui_watermark_link: 0,
+          ui_watermark: 0,
+          ui_hint: 0,
+          ui_help: 0,
+          ui_settings: 0,
+          ui_vr: 0,
+          ui_fullscreen: 0,
+          ui_annotations: 0,
+          ui_controls: 0,
+          success: (api: {
+            start: () => void;
+            addEventListener: (ev: string, cb: () => void) => void;
+            setBackground: (opts: Record<string, unknown>) => void;
+          }) => {
+            api.start();
+            // El gris claro viene con la escena del modelo: `transparent=1` por
+            // querystring no lo saca. Desde la API sí se puede pisar, así que le
+            // ponemos el tono de la roca de la foto de fondo y el recuadro deja
+            // de leerse como una caja blanca.
+            const clearBg = () => {
+              try {
+                api.setBackground({ transparent: true });
+                api.setBackground({ color: TRUCK_BG_COLOR });
+              } catch {
+                /* el visor todavía no aceptó la llamada */
+              }
+            };
+            api.addEventListener('viewerready', () => {
+              clearBg();
+              [200, 800, 2000].forEach((ms) => window.setTimeout(clearBg, ms));
+            });
+          },
+          error: () => {},
+        });
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [modelVisible]);
+
+  /**
+   * Las opciones del visor viajan por la API (ver el efecto de arriba), no por
+   * querystring. De ahí que `scrollwheel=0` (no robar la rueda del mouse),
+   * `autospin` (gira solo) y `preload=0` vivan en ese `init`.
+   */
+
+  /** Atributos que React no tipa (políticas de permisos del embed). */
+  const embedPolicyAttrs = {
+    'xr-spatial-tracking': 'true',
+    'execution-while-out-of-viewport': 'true',
+    'execution-while-not-rendered': 'true',
+    'web-share': 'true',
+  } as unknown as React.IframeHTMLAttributes<HTMLIFrameElement>;
 
   return (
-    <section className="reveal-section stats-container min-h-[950px] xl:min-h-[1050px] flex flex-col justify-between pt-24 pb-12 bg-[#050607] border-y border-[#ffb800]/10 relative overflow-hidden">
+    <section className="reveal-section stats-container relative flex min-h-[950px] flex-col justify-between overflow-hidden border-y border-[#ffb800]/10 bg-[#050607] py-20 md:py-28 xl:min-h-[1050px]">
       
       {/* 3D Model background container with user's exact sand/dust gradient background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none bg-gradient-to-b from-[#8a7d6d] to-[#5c4a3d]">
         
         {/* Custom High-Fidelity Mining backdrop loaded from the Min/fondo assets (zero people) */}
         <img
-          src={asset('Gemini_Generated_Image_yu2miiyu2miiyu2m.png')}
+          src={assetOpt('Gemini_Generated_Image_yu2miiyu2miiyu2m.png')}
           alt="Operación Minera Especial de Fondo"
-          className="w-full h-full object-cover opacity-80"
+          className="w-full h-full object-cover"
+          width={1600}
+          height={900}
+          loading="lazy"
+          decoding="async"
         />
 
-        {/* MUCHO OVERLAY: Capa oscura súper potente para que el fondo sea muy sutil y elegante */}
-        <div className="absolute inset-0 bg-[#050607]/80 z-[1] pointer-events-none" />
+        {/* Velo suave: la foto tiene que leerse, porque ahora es el fondo real
+            del camión 3D (antes quedaba tapada y el visor mostraba su gris). */}
+        <div className="absolute inset-0 bg-[#050607]/25 z-[1] pointer-events-none" />
 
-        {/* Ambient Overlays to smooth transitions into the dark sections above/below (Darker and taller) */}
-        <div className="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#050607] via-[#050607]/85 to-transparent z-[2] pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#050607] via-[#050607]/85 to-transparent z-[2] pointer-events-none" />
-        <div className="absolute inset-y-0 left-0 w-44 bg-gradient-to-r from-[#050607] via-[#050607]/85 to-transparent z-[2] pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-44 bg-gradient-to-l from-[#050607] via-[#050607]/85 to-transparent z-[2] pointer-events-none" />
+        {/* Degradés de borde para empalmar con las secciones oscuras de arriba y abajo */}
+        <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-[#050607] via-[#050607]/55 to-transparent z-[2] pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#050607] via-[#050607]/55 to-transparent z-[2] pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-36 bg-gradient-to-r from-[#050607] via-[#050607]/55 to-transparent z-[2] pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-36 bg-gradient-to-l from-[#050607] via-[#050607]/55 to-transparent z-[2] pointer-events-none" />
 
-        {/* Stronger Inset Shadow exactly from the user's snippet for high-end cinematic frame */}
-        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_160px_rgba(0,0,0,0.85)] z-[3]" />
+        {/* Viñeta cinematográfica, más suave que antes para no apagar la foto */}
+        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_160px_rgba(0,0,0,0.45)] z-[1]" />
 
         {/* Blueprint HUD Overlay Background Circles & Radar */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.025] z-[1]">
@@ -152,34 +290,42 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
           <div className="w-[800px] h-[800px] rounded-full border border-dashed border-[#ffb800]/40 absolute animate-[spin_120s_linear_infinite_reverse]" />
         </div>
 
-        {/* The 3D Model Iframe in the FOREGROUND, SOLID & OPAQUE, on top of the dark mine background */}
-        {/* On desktop, we shift the truck to the right side (calc(47% - 40px)) to perfectly balance the text on the left */}
-        <div 
-          className="absolute pointer-events-auto z-[2] left-[-40px] right-[-40px] w-[calc(100%+80px)] xl:left-[calc(47%-40px)] xl:w-[calc(53%+80px)]" 
+        {/* Halo ámbar detrás del camión: lo recorta del fondo y le da un piso
+            de luz, en vez de dejarlo flotando en negro. */}
+        <div
+          className="pointer-events-none absolute inset-0 z-[3] bg-[radial-gradient(ellipse_46%_38%_at_50%_58%,rgba(255,184,0,0.16),transparent_70%)] xl:bg-[radial-gradient(ellipse_30%_40%_at_74%_55%,rgba(255,184,0,0.2),transparent_70%)]"
+          aria-hidden
+        />
+
+        {/* Camión 3D sólido y recortado sobre la foto: el fondo del visor lo
+            apaga la API en `setBackground({ transparent: true })`.
+            Ocupa un recuadro acotado, centrado abajo en mobile y corrido a la
+            derecha en desktop para dejarle aire al texto de la izquierda. */}
+        <div
+          ref={modelSlotRef}
+          className="absolute bottom-[6%] left-1/2 z-[4] h-[46%] w-[86%] -translate-x-1/2 pointer-events-none md:h-[52%] md:w-[64%] xl:bottom-[10%] xl:left-auto xl:right-[2%] xl:h-[58%] xl:w-[46%] xl:translate-x-0"
           style={{
-            top: '-80px',      // Empuja el borde superior fuera de la vista
-            bottom: '-80px',   // Empuja el borde inferior (donde está el logo) fuera de la vista
-            height: 'calc(100% + 160px)',
-            opacity: 0.95,     // Ocupa el frente de forma sólida y definida
+            // Difumina el borde del visor para que el recuadro no se recorte
+            // contra la foto: el camión aparece dentro de la escena, no encima.
+            maskImage:
+              'radial-gradient(ellipse 78% 76% at 50% 52%, #000 58%, transparent 100%)',
+            WebkitMaskImage:
+              'radial-gradient(ellipse 78% 76% at 50% 52%, #000 58%, transparent 100%)',
           }}
         >
-          <iframe
-            title="Mining Haul Truck 3D Telemetry"
-            frameBorder="0"
-            allowFullScreen
-            mozallowfullscreen="true"
-            webkitallowfullscreen="true"
-            allow="autoplay; fullscreen; xr-spatial-tracking"
-            xr-spatial-tracking="true"
-            execution-while-out-of-viewport="true"
-            execution-while-not-rendered="true"
-            web-share="true"
-            src={sketchfabUrl}
-            className="w-full h-full object-cover"
-            style={{
-              pointerEvents: 'auto',
-            }}
-          />
+          {modelVisible && (
+            <iframe
+              ref={modelFrameRef}
+              title="Camión minero de acarreo en 3D"
+              frameBorder="0"
+              allow="autoplay; xr-spatial-tracking"
+              {...embedPolicyAttrs}
+              className="h-full w-full"
+              // Decorativo: sin puntero, la rueda y el touch nunca quedan
+              // atrapados en el visor.
+              style={{ pointerEvents: 'none' }}
+            />
+          )}
         </div>
       </div>
 
@@ -205,10 +351,13 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
         </div>
       </div>
 
-      {/* HUD 3D Control Prompt (Hint to interact with 3D model) */}
-      <div className="absolute right-10 top-24 hidden md:flex items-center gap-2 text-[#ffb800]/40 text-[9px] font-mono tracking-widest uppercase z-20 pointer-events-none bg-black/40 px-3 py-1.5 rounded border border-[#ffb800]/10 backdrop-blur-sm select-none">
-        <Rotate3d className="w-3.5 h-3.5 animate-pulse text-[#ffb800]/60" />
-        <span>Arrastra para rotar camión 3D</span>
+      {/* Chapa del modelo. Antes decía "arrastrá para rotar", pero el visor ya
+          no recibe puntero: giraba solo y capturaba la rueda del mouse. */}
+      <div className="absolute right-10 top-24 z-20 hidden select-none items-center gap-2.5 rounded border border-[#ffb800]/15 bg-black/45 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest text-[#ffb800]/50 backdrop-blur-sm md:flex pointer-events-none">
+        <Radio className="h-3.5 w-3.5 text-[#ffb800]/70" />
+        <span>Escaneo 3D · Camión de acarreo</span>
+        <span className="h-3 w-px bg-[#ffb800]/20" />
+        <span className="text-[#ffb800]/70">360°</span>
       </div>
 
       {/* Top Telemetry Header */}
@@ -225,10 +374,20 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
       </div>
 
       {/* Main Content Layout (Texts on the Left, 3D truck breathing room on the Right) */}
-      <div className="w-full max-w-[1850px] mx-auto px-6 sm:px-10 xl:px-16 relative z-10 flex flex-col xl:flex-row gap-16 xl:gap-24 items-center justify-between mt-8 mb-16 pointer-events-none">
-        
+      <div className="w-full max-w-[1850px] mx-auto px-6 sm:px-10 xl:px-16 relative z-10 flex flex-col xl:flex-row gap-16 xl:gap-24 items-start justify-between mt-8 mb-16 pointer-events-none">
+
+        <div className="flex w-full flex-col gap-8 xl:w-[54%]">
+
+        {/* Apertura de la sección: mismo compás que el resto de la página. */}
+        <div>
+          <SectionKicker className="mb-5">Cosecha Creativa</SectionKicker>
+          <h2 className="font-display text-[clamp(2.25rem,5vw,4rem)] uppercase italic leading-[0.95] tracking-tighter text-white">
+            ¿Qué hacemos por tu <span className="text-gradient-amber">empresa</span>?
+          </h2>
+        </div>
+
         {/* Descriptive Text Column from Mockup (styled as a highly defined framed dashboard console) */}
-        <div className="w-full xl:w-[54%] text-left relative z-20 flex flex-col gap-6 p-8 sm:p-10 xl:p-12 bg-[#050607]/85 rounded-xl border border-[#ffb800]/20 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_0_0_24px_rgba(255,184,0,0.03)] relative overflow-hidden group/panel hover:border-[#ffb800]/40 transition-all duration-500 pointer-events-auto">
+        <div className="w-full text-left relative z-20 flex flex-col gap-6 p-8 sm:p-10 xl:p-12 bg-[#050607]/85 rounded-xl border border-[#ffb800]/20 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_0_0_24px_rgba(255,184,0,0.03)] relative overflow-hidden group/panel hover:border-[#ffb800]/40 transition-all duration-500 pointer-events-auto">
           
           {/* Sci-fi Corner Brackets for the panel (Fully Opaque Yellow Glowing Brackets) */}
           <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-[#ffb800] shadow-[0_0_8px_rgba(255,184,0,0.6)] rounded-tl-sm z-30" />
@@ -246,18 +405,6 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
           />
 
           <div className="relative z-10 flex flex-col gap-6">
-            <div className="flex flex-col gap-2.5">
-              <span className="text-[10px] font-mono tracking-[0.45em] text-[#ffb800] uppercase font-bold">
-                COSECHA CREATIVA
-              </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-display uppercase italic tracking-tight text-white leading-none font-black">
-                ¿Qué hacemos por tu empresa?
-              </h2>
-            </div>
-
-            {/* Horizontal Divider Line */}
-            <div className="w-full h-px bg-white/10" />
-
             {/* Item 01 */}
             <div className="flex flex-col gap-3 group/item">
               <div className="flex gap-3 items-center text-[#ffb800] group-hover/item:text-[#ffb800] transition-colors duration-300">
@@ -301,15 +448,19 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
                     "Mayor claridad comercial",
                     "Presencia digital al nivel del sector"
                   ].map((bullet, bidx) => (
-                    <div key={bidx} className="flex gap-2.5 items-center text-[12px] text-white/75 leading-tight hover:text-white transition-colors">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#ffb800] shrink-0 shadow-[0_0_6px_rgba(255,184,0,0.85)] animate-pulse" />
-                      <span className="font-medium whitespace-nowrap">{bullet}</span>
+                    <div
+                      key={bidx}
+                      className="group/bullet flex items-center gap-2.5 border-l border-[#ffb800]/15 pl-3 text-[12px] leading-tight text-white/75 transition-all duration-300 hover:border-[#ffb800]/70 hover:text-white"
+                    >
+                      <span className="h-1.5 w-1.5 shrink-0 rotate-45 bg-[#ffb800]/70 shadow-[0_0_6px_rgba(255,184,0,0.55)] transition-transform duration-300 group-hover/bullet:rotate-0 group-hover/bullet:bg-[#ffb800]" />
+                      <span className="font-medium">{bullet}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
           </div>
+        </div>
         </div>
 
         {/* Empty Spacer on Large Screens so the 3D Truck on the right has full visibility */}
@@ -323,10 +474,16 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
           {stats.map((stat, idx) => (
             <div
               key={idx}
-              className="stat-card group relative z-10 rounded-xl p-5 sm:p-7 border border-white/[0.04] bg-[#050607]/45 backdrop-blur-md hover:border-[#ffb800]/25 hover:bg-white/[0.02] transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.5)] pointer-events-auto"
+              className="stat-card group pointer-events-auto relative z-10 overflow-hidden rounded-xl border border-white/[0.06] bg-[#050607]/55 p-5 shadow-[0_4px_30px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all duration-500 hover:-translate-y-1.5 hover:border-[#ffb800]/35 hover:bg-white/[0.03] hover:shadow-[0_18px_50px_-12px_rgba(255,184,0,0.25),0_4px_30px_rgba(0,0,0,0.6)] sm:p-7"
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
             >
+              {/* Filo superior: la tarjeta se "enciende" de izquierda a derecha. */}
+              <span
+                className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-transparent via-[#ffb800] to-transparent transition-transform duration-700 group-hover:scale-x-100"
+                aria-hidden
+              />
+
               {/* Sci-fi Corner Brackets */}
               <div className="absolute top-0 left-0 w-2.5 h-2.5 border-t border-l border-[#ffb800]/20 group-hover:border-[#ffb800] transition-colors duration-300 rounded-tl-sm" />
               <div className="absolute top-0 right-0 w-2.5 h-2.5 border-t border-r border-[#ffb800]/20 group-hover:border-[#ffb800] transition-colors duration-300 rounded-tr-sm" />
@@ -350,6 +507,16 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
               {/* Stat Label */}
               <div className="text-[9px] sm:text-[10px] xl:text-[11px] font-bold uppercase tracking-[0.35em] text-white/50 group-hover:text-white transition-colors duration-300 leading-relaxed select-none">
                 {stat.label}
+              </div>
+
+              {/* Riel de instrumento: cada tarjeta llena una fracción distinta,
+                  así la fila se lee como un tablero y no como cuatro cajas. */}
+              <div className="relative mt-5 h-[3px] w-full overflow-hidden rounded-full bg-white/[0.06]">
+                <span
+                  className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[#ffb800]/50 to-[#ffb800] shadow-[0_0_10px_rgba(255,184,0,0.5)]"
+                  style={{ width: `${58 + idx * 12}%` }}
+                  aria-hidden
+                />
               </div>
             </div>
           ))}

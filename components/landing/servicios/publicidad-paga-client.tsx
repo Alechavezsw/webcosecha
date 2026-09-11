@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { motion, useReducedMotion } from 'framer-motion';
 import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -10,12 +11,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { 
   ArrowLeft, 
   ArrowUpRight, 
-  Search, 
   Layers, 
-  Megaphone, 
-  Target, 
-  Sparkles, 
-  TrendingUp, 
   CheckCircle,
   Mail,
   ChevronDown,
@@ -26,10 +22,238 @@ import {
 import { WhatsAppMark } from "@/components/icons/whatsapp-mark";
 import { getWhatsAppHref } from "@/lib/whatsapp";
 
+const PLATFORMS = [
+  { name: "Meta Ads", dot: "#0866FF" },
+  { name: "Google Ads", dot: "#FBBC05" },
+  { name: "TikTok", dot: "#25F4EE" },
+  { name: "YouTube", dot: "#FF0033" },
+  { name: "LinkedIn", dot: "#0A66C2" },
+] as const;
+
+const HERO_STATS = [
+  { value: "ROAS 3x+", label: "objetivo" },
+  { value: "5 canales", label: "un solo ecosistema" },
+  { value: "Semanal", label: "test de creativos" },
+] as const;
+
+const STEP_PANELS = [
+  {
+    id: 1,
+    side: "left" as const,
+    icon: Crosshair,
+    accent: "#67e8f9",
+    kicker: "01 · Segmentación",
+    title: "Audiencias con intención real",
+    body: (
+      <>
+        Instalamos <strong className="font-semibold text-white">Píxel de Meta, CAPI y Google Tag Manager</strong> para no perder atribución. Remarketing, lookalikes y listas de compradores: tu presupuesto va a quien sí puede comprar.
+      </>
+    ),
+    stats: [
+      { k: "Tracking", v: "Píxel · CAPI · GTM" },
+      { k: "Audiencias", v: "Remarketing + Lookalikes" },
+    ],
+  },
+  {
+    id: 2,
+    side: "right" as const,
+    icon: Layers,
+    accent: "#a78bfa",
+    kicker: "02 · Canales",
+    title: "Un ecosistema, no avisos sueltos",
+    body: (
+      <>
+        Coordinamos <strong className="font-semibold text-white">Search, Shopping, Performance Max, catálogo de Meta y mensajes a WhatsApp</strong>. El usuario te ve en el momento justo del recorrido de compra.
+      </>
+    ),
+    stats: [
+      { k: "Plataformas", v: "Meta · Google · TikTok" },
+      { k: "Formatos", v: "Search, Shopping, PMax" },
+    ],
+  },
+  {
+    id: 3,
+    side: "left" as const,
+    icon: Zap,
+    accent: "#c084fc",
+    kicker: "03 · Creativos",
+    title: "Piezas que frenan el scroll",
+    body: (
+      <>
+        Estructura <strong className="font-semibold text-white">AIDA</strong> y formatos <strong className="font-semibold text-white">UGC</strong>: ganchos en 3 segundos, tests semanales de video, imagen y copy para que los anuncios no se quemen.
+      </>
+    ),
+    stats: [
+      { k: "Gancho", v: "3 segundos" },
+      { k: "Testeo", v: "Semanal · A/B" },
+    ],
+  },
+  {
+    id: 4,
+    side: "right" as const,
+    icon: BarChart3,
+    accent: "#eca8d6",
+    kicker: "04 · Optimización",
+    title: "ROAS que se puede defender",
+    body: (
+      <>
+        Redistribuimos presupuesto, controlamos frecuencia y leemos atribución con rigor. Objetivo: sostener un <strong className="font-semibold text-white">ROAS 3x+</strong> y bajar el costo de adquisición mes a mes.
+      </>
+    ),
+    stats: [
+      { k: "Objetivo", v: "ROAS 3x+" },
+      { k: "Control", v: "Frecuencia y CPA" },
+    ],
+  },
+];
+
+function StepPanel({
+  step,
+  reduce,
+  active,
+}: {
+  step: (typeof STEP_PANELS)[number]
+  reduce: boolean | null
+  active: boolean
+}) {
+  const Icon = step.icon
+  const isLeft = step.side === "left"
+  const accent = step.accent
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-x-0 flex h-screen w-full items-center px-5 sm:px-10 md:px-16 lg:px-24"
+      style={{ top: `${step.id * 100}vh` }}
+    >
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: 44, x: isLeft ? -28 : 28 }}
+        whileInView={reduce ? undefined : { opacity: 1, y: 0, x: 0 }}
+        viewport={{ once: true, amount: 0.35 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className={`pointer-events-auto group relative z-20 w-full max-w-[28rem] md:max-w-[31rem] ${
+          isLeft ? "mr-auto md:mr-0" : "ml-auto"
+        }`}
+      >
+        {/* Scrim para no mezclar texto con el 3D */}
+        <div
+          className="pointer-events-none absolute -inset-8 -z-20 rounded-[2.5rem] bg-[radial-gradient(ellipse_at_center,rgba(1,6,14,0.94)_0%,rgba(1,6,14,0.6)_55%,transparent_80%)] blur-sm"
+          aria-hidden
+        />
+        {/* Halo del paso activo */}
+        <div
+          className="pointer-events-none absolute -inset-4 -z-10 blur-2xl transition-opacity duration-700"
+          style={{
+            background: `radial-gradient(58% 58% at 50% 50%, ${accent}33 0%, transparent 72%)`,
+            opacity: active ? 1 : 0,
+          }}
+          aria-hidden
+        />
+        {/* Halo de hover */}
+        <div
+          className="pointer-events-none absolute -inset-4 -z-10 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-70"
+          style={{ background: `radial-gradient(58% 58% at 50% 50%, ${accent}33 0%, transparent 72%)` }}
+          aria-hidden
+        />
+
+        {/* Borde en degradé */}
+        <div
+          className="relative p-px shadow-[0_28px_90px_-30px_rgba(0,0,0,0.92)] transition-transform duration-500 group-hover:-translate-y-1"
+          style={{
+            background: `linear-gradient(${isLeft ? "135deg" : "225deg"}, ${accent}99 0%, rgba(255,255,255,0.10) 38%, rgba(255,255,255,0.03) 100%)`,
+          }}
+        >
+          <div className="relative overflow-hidden bg-[#04070d]/95 p-6 backdrop-blur-xl sm:p-8">
+            {/* Trama de datos */}
+            <div
+              className="pointer-events-none absolute inset-0 opacity-[0.045] [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.7)_1px,transparent_1px)] [background-size:26px_26px]"
+              aria-hidden
+            />
+            {/* Número fantasma */}
+            <span
+              className="pointer-events-none absolute -right-1 -top-7 select-none font-display text-[7rem] font-semibold leading-none tracking-tighter opacity-[0.08] sm:text-[8.5rem]"
+              style={{ color: accent }}
+              aria-hidden
+            >
+              {String(step.id).padStart(2, "0")}
+            </span>
+
+            <div className="relative">
+              <div className="mb-5 flex items-center gap-3">
+                <span
+                  className="flex size-11 items-center justify-center border"
+                  style={{
+                    borderColor: `${accent}59`,
+                    background: `${accent}1a`,
+                    boxShadow: `0 0 26px -6px ${accent}80`,
+                  }}
+                >
+                  <Icon className="size-[18px]" style={{ color: accent }} aria-hidden />
+                </span>
+                <span
+                  className="font-mono text-[11px] uppercase tracking-[0.26em]"
+                  style={{ color: `${accent}e6` }}
+                >
+                  {step.kicker}
+                </span>
+              </div>
+
+              <h2 className="font-display text-[1.75rem] font-semibold leading-[1.08] tracking-tight text-white sm:text-[2.15rem]">
+                {step.title}
+              </h2>
+
+              <motion.div
+                initial={reduce ? false : { scaleX: 0 }}
+                whileInView={reduce ? undefined : { scaleX: 1 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.9, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                className="mt-4 h-px w-32 origin-left"
+                style={{ background: `linear-gradient(90deg, ${accent}, transparent)` }}
+                aria-hidden
+              />
+
+              <p className="mt-4 text-[0.95rem] leading-relaxed text-white/70 sm:text-base">
+                {step.body}
+              </p>
+
+              <dl className="mt-6 grid grid-cols-2 gap-px overflow-hidden border border-white/10 bg-white/10">
+                {step.stats.map((s) => (
+                  <div key={s.k} className="bg-[#04070d] px-4 py-3">
+                    <dt className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">
+                      {s.k}
+                    </dt>
+                    <dd className="mt-1 text-[13px] font-medium leading-snug text-white/85">
+                      {s.v}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            {/* Esquinas tipo HUD */}
+            <span
+              className="pointer-events-none absolute left-0 top-0 size-3 border-l border-t"
+              style={{ borderColor: accent }}
+              aria-hidden
+            />
+            <span
+              className="pointer-events-none absolute bottom-0 right-0 size-3 border-b border-r"
+              style={{ borderColor: accent }}
+              aria-hidden
+            />
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 export function PublicidadPagaClient() {
   const mountRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useRef<number>(0);
   const [activeSection, setActiveSection] = useState<number>(0);
+  const [heroOpacity, setHeroOpacity] = useState(1);
+  const [progress, setProgress] = useState(0);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     // --- 1. CONFIGURACIÓN BÁSICA DE THREE.JS ---
@@ -477,217 +701,303 @@ export function PublicidadPagaClient() {
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
-    const maxScroll = target.scrollHeight - target.clientHeight;
+    const maxScroll = Math.max(1, target.scrollHeight - target.clientHeight);
     const currentProg = target.scrollTop / maxScroll;
     scrollProgress.current = currentProg;
+    setProgress(currentProg);
 
-    // Calcular sección activa
-    const sectionIndex = Math.min(5, Math.floor(currentProg * 6 + 0.15));
+    // Hero se apaga antes de que entre el primer paso (evita superposición)
+    setHeroOpacity(Math.max(0, 1 - currentProg * 7.5));
+
+    const sectionIndex = Math.min(5, Math.floor(currentProg * 6 + 0.12));
     setActiveSection(sectionIndex);
   };
 
   const sections = [
-    { id: 0, title: "Paid Ads & ROI" },
-    { id: 1, title: "1. Segmentación" },
-    { id: 2, title: "2. Canales Ads" },
-    { id: 3, title: "3. Creativos" },
-    { id: 4, title: "4. Optimización" },
-    { id: 5, title: "5. Escalamiento" }
+    { id: 0, title: "Inicio" },
+    { id: 1, title: "Segmentación" },
+    { id: 2, title: "Canales" },
+    { id: 3, title: "Creativos" },
+    { id: 4, title: "Optimización" },
+    { id: 5, title: "Escalar" },
   ];
 
   return (
-    <div className="w-full h-screen bg-[#010204] text-white overflow-hidden relative font-sans selection:bg-cyan-500/30">
+    <div className="relative h-screen w-full overflow-hidden bg-[#010204] font-sans text-white selection:bg-cyan-500/30">
       
       {/* CAPA DE FONDO: Entorno 3D */}
-      <div ref={mountRef} className="absolute inset-0 z-0 pointer-events-none"></div>
+      <div ref={mountRef} className="pointer-events-none absolute inset-0 z-0" />
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/35 via-transparent to-black/50"
+        aria-hidden
+      />
+      {/* Viñeta lateral: separa el texto del 3D sin tapar la escena */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_120%_90%_at_50%_50%,transparent_38%,rgba(1,2,4,0.55)_100%)]"
+        aria-hidden
+      />
 
-      {/* HEADER DE NAVEGACIÓN RETROILUMINADO */}
-      <div className="fixed top-6 left-6 z-50 pointer-events-auto flex items-center gap-4">
+      {/* BARRA DE PROGRESO */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[2px] bg-white/[0.06]" aria-hidden>
+        <div
+          className="h-full bg-gradient-to-r from-cyan-300 via-[#c084fc] to-[#eca8d6] shadow-[0_0_14px_rgba(236,168,214,0.65)]"
+          style={{ width: `${Math.min(100, Math.max(0, progress * 100))}%` }}
+        />
+      </div>
+
+      {/* HEADER */}
+      <div className="pointer-events-auto fixed left-4 top-5 z-50 flex items-center gap-3 sm:left-6 sm:top-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-black/70 px-4 py-2 text-[13px] text-cyan-200/90 backdrop-blur-md transition-all hover:border-cyan-500/60 hover:bg-cyan-950/40 hover:text-white"
+          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/55 px-4 py-2 text-[13px] text-white/80 backdrop-blur-md transition-all hover:border-[#eca8d6]/40 hover:bg-black/70 hover:text-white"
         >
-          <ArrowLeft className="size-4 text-cyan-400" />
+          <ArrowLeft className="size-4 text-[#eca8d6]" />
           Volver al inicio
         </Link>
       </div>
 
-      {/* INDICADORES LATERALES DE PROGRESO */}
-      <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 pointer-events-auto hidden md:flex flex-col gap-6 items-end">
-        <div className="text-[10px] font-mono tracking-[0.2em] text-cyan-400/50 uppercase mb-2">Performance Ads</div>
+      {/* INDICADORES LATERALES */}
+      <div className="pointer-events-auto fixed right-6 top-1/2 z-50 hidden -translate-y-1/2 flex-col items-end gap-5 md:flex lg:right-8">
+        <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.22em] text-white/35">
+          Paid Ads
+        </div>
         {sections.map((sec, idx) => (
           <button
             key={sec.id}
+            type="button"
             onClick={() => {
-              const scrollEl = document.querySelector('.overflow-y-auto');
+              const scrollEl = document.querySelector(".ads-scroll-layer");
               if (scrollEl) {
                 const height = scrollEl.scrollHeight - scrollEl.clientHeight;
                 scrollEl.scrollTo({
                   top: (idx / 5) * height,
-                  behavior: 'smooth'
+                  behavior: "smooth",
                 });
               }
             }}
             className="group flex items-center gap-3 focus:outline-none"
           >
-            <span className={`text-[11px] font-mono tracking-wider transition-all duration-300 ${
-              activeSection === idx ? 'text-cyan-400 opacity-100 translate-x-0' : 'text-cyan-200/40 opacity-0 translate-x-2 group-hover:opacity-60'
-            }`}>
+            <span
+              className={`font-mono text-[11px] tracking-wider transition-all duration-300 ${
+                activeSection === idx
+                  ? "translate-x-0 text-[#eca8d6] opacity-100"
+                  : "translate-x-2 text-white/35 opacity-0 group-hover:opacity-70"
+              }`}
+            >
               {sec.title}
             </span>
-            <div className={`h-2 rounded-full transition-all duration-500 ${
-              activeSection === idx 
-                ? 'w-8 bg-gradient-to-r from-cyan-400 to-blue-500 shadow-[0_0_10px_rgba(0,243,255,0.8)]' 
-                : 'w-2 bg-cyan-100/20 group-hover:bg-cyan-100/40'
-            }`} />
+            <div
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                activeSection === idx
+                  ? "w-7 bg-gradient-to-r from-[#eca8d6] to-cyan-400 shadow-[0_0_12px_rgba(236,168,214,0.55)]"
+                  : "w-1.5 bg-white/20 group-hover:bg-white/40"
+              }`}
+            />
           </button>
         ))}
       </div>
 
-      {/* CAPA FRONTAL: Scroll HTML Nativo */}
-      <div 
-        className="absolute inset-0 z-10 overflow-y-auto overflow-x-hidden scroll-smooth"
+      {/* SCROLL LAYER */}
+      <div
+        className="ads-scroll-layer absolute inset-0 z-10 overflow-x-hidden overflow-y-auto scroll-smooth"
         onScroll={handleScroll}
       >
-        {/* Expandido a 600vh para permitir 6 vistas de cámara distintas */}
-        <div style={{ height: '600vh' }} className="relative w-full">
+        <div style={{ height: "600vh" }} className="relative w-full">
           
-          {/* 1. Vista Inicial: Título General */}
-          <div className="h-screen w-full flex flex-col items-center justify-center relative sticky top-0 pointer-events-none px-4">
-            <div className="max-w-4xl text-center flex flex-col items-center justify-center">
-              <span className="mb-4 inline-flex items-center gap-3 font-mono text-xs md:text-sm text-cyan-400 tracking-[0.3em] uppercase">
-                <Sparkles className="size-4 animate-pulse text-cyan-400" />
-                Cosecha Creativa
-              </span>
-              <h1 className="cc-hero-title text-center uppercase italic leading-none text-transparent bg-clip-text bg-gradient-to-b from-cyan-100 via-cyan-300 to-blue-600 drop-shadow-[0_0_35px_rgba(0,243,255,0.4)] sm:text-6xl md:text-8xl">
-                Paid Media & Ads
+          {/* HERO — absolute (no sticky) para que no se monte sobre los pasos */}
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 z-[5] flex h-screen w-full flex-col items-center justify-center px-5"
+            style={{
+              opacity: heroOpacity,
+              visibility: heroOpacity < 0.04 ? "hidden" : "visible",
+              transition: "opacity 80ms linear",
+            }}
+            aria-hidden={heroOpacity < 0.2}
+          >
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 28 }}
+              animate={reduce ? undefined : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+              className={`relative flex max-w-3xl flex-col items-center text-center ${
+                heroOpacity > 0.28 ? "pointer-events-auto" : "pointer-events-none"
+              }`}
+            >
+              <div
+                className="pointer-events-none absolute -inset-x-10 -inset-y-8 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(5,8,15,0.88)_0%,rgba(5,8,15,0.45)_50%,transparent_75%)]"
+                aria-hidden
+              />
+              <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-[#eca8d6] sm:text-xs">
+                Cosecha Creativa · San Juan
+              </p>
+              <h1 className="font-display text-[clamp(2.5rem,8.5vw,5.25rem)] leading-[0.94] tracking-tight text-white">
+                Publicidad paga
+                <span className="mt-1 block bg-gradient-to-r from-cyan-200 via-[#eca8d6] to-cyan-300 bg-clip-text text-transparent">
+                  en redes
+                </span>
               </h1>
-              <p className="mt-6 text-base sm:text-lg md:text-2xl text-cyan-100/80 max-w-2xl text-center px-4 leading-relaxed font-light font-display">
-                Multiplicamos la visibilidad de tu marca y aceleramos tus ventas mediante campañas de alto rendimiento en Meta Ads (Instagram/Facebook), Google Ads, YouTube, TikTok y LinkedIn B2B.
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/68 sm:mt-6 sm:text-lg">
+                Inversión que se transforma en ventas medibles. Creativos que cortan el ruido
+                y reportes que se entienden.
               </p>
-            </div>
-            
-            <div className="absolute bottom-10 flex flex-col items-center animate-bounce text-cyan-400/80">
-              <span className="text-[10px] md:text-xs uppercase tracking-[0.3em] mb-2 font-semibold">Deslizá lentamente para ver la máquina</span>
-              <ChevronDown className="size-5 text-cyan-400" />
-            </div>
-          </div>
 
-          {/* 2. Suelo / Raíces: Segmentación Precisa */}
-          <div className="h-screen w-full flex items-center justify-start px-6 sm:px-16 md:px-32 absolute top-[100vh] pointer-events-none">
-            <div className="max-w-xl bg-[#01060e]/75 backdrop-blur-lg p-6 sm:p-10 rounded-3xl border border-cyan-900/40 pointer-events-auto shadow-[0_0_50px_rgba(0,243,255,0.12)] transition-all duration-500 hover:border-cyan-500/40">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-10 rounded-xl bg-cyan-950/50 border border-cyan-500/40 flex items-center justify-center">
-                  <Crosshair className="size-5 text-cyan-400" />
-                </div>
-                <span className="text-xs font-mono uppercase tracking-[0.25em] text-cyan-400 font-bold">Paso 01 · Las Raíces</span>
+              <div className="mt-7 flex max-w-2xl flex-wrap items-center justify-center gap-2">
+                {PLATFORMS.map((p, i) => (
+                  <motion.span
+                    key={p.name}
+                    initial={reduce ? false : { opacity: 0, y: 10 }}
+                    animate={reduce ? undefined : { opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.55 + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                    className="group/chip inline-flex items-center gap-2 border border-white/14 bg-black/45 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/65 backdrop-blur-sm transition-colors duration-300 hover:border-white/30 hover:text-white sm:text-[11px]"
+                  >
+                    <span
+                      className="size-1.5 rounded-full transition-shadow duration-300"
+                      style={{ background: p.dot, boxShadow: `0 0 8px ${p.dot}` }}
+                      aria-hidden
+                    />
+                    {p.name}
+                  </motion.span>
+                ))}
               </div>
-              <h2 className="font-display text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-[#67e8f9] mb-4 tracking-tight">
-                Segmentación Quirúrgica
-              </h2>
-              <p className="text-cyan-100/85 text-base sm:text-lg leading-relaxed">
-                Toda gran campaña nace con datos limpios. Implementamos el <strong className="font-semibold text-white">Píxel de Meta, la API de Conversiones (CAPI) y Google Tag Manager</strong> para trazar el recorrido exacto de tus usuarios sin perder atribución. Construimos audiencias personalizadas, remarketing dinámico y públicos similares basados en compradores reales, para que tus anuncios lleguen únicamente a quienes tienen intención real de compra.
-              </p>
-            </div>
-          </div>
 
-          {/* 3. Ascenso por el tronco: Red de Canales */}
-          <div className="h-screen w-full flex items-center justify-end px-6 sm:px-16 md:px-32 absolute top-[200vh] pointer-events-none">
-            <div className="max-w-xl bg-[#01060e]/75 backdrop-blur-lg p-6 sm:p-10 rounded-3xl border border-cyan-900/40 pointer-events-auto shadow-[0_0_50px_rgba(0,243,255,0.12)] transition-all duration-500 hover:border-cyan-500/40">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-10 rounded-xl bg-cyan-950/50 border border-cyan-500/40 flex items-center justify-center">
-                  <Layers className="size-5 text-cyan-400" />
-                </div>
-                <span className="text-xs font-mono uppercase tracking-[0.25em] text-cyan-400 font-bold">Paso 02 · El Tronco</span>
-              </div>
-              <h2 className="font-display text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-[#67e8f9] mb-4 tracking-tight">
-                Ecosistema Multicanal
-              </h2>
-              <p className="text-cyan-100/85 text-base sm:text-lg leading-relaxed">
-                El núcleo por donde fluye la inversión. Sincronizamos campañas inteligentes en <strong className="font-semibold text-white">Google Search, Google Shopping, Performance Max, anuncios de catálogo de Meta y campañas de mensajes directas a WhatsApp Business</strong>. Un ecosistema coordinado que acompaña al usuario en cada etapa de su decisión de compra.
-              </p>
-            </div>
-          </div>
+              <motion.dl
+                initial={reduce ? false : { opacity: 0, y: 14 }}
+                animate={reduce ? undefined : { opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
+                className="mt-7 hidden w-full max-w-lg grid-cols-3 gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid"
+              >
+                {HERO_STATS.map((s) => (
+                  <div key={s.label} className="bg-[#04070d]/85 px-3 py-3 text-center backdrop-blur-sm">
+                    <dt className="font-display text-[15px] font-semibold leading-none text-white">
+                      {s.value}
+                    </dt>
+                    <dd className="mt-1.5 font-mono text-[9px] uppercase leading-tight tracking-[0.16em] text-white/40">
+                      {s.label}
+                    </dd>
+                  </div>
+                ))}
+              </motion.dl>
 
-          {/* 4. Parte trasera: Creativos Magnéticos */}
-          <div className="h-screen w-full flex items-center justify-start px-6 sm:px-16 md:px-32 absolute top-[300vh] pointer-events-none">
-            <div className="max-w-xl bg-[#01060e]/75 backdrop-blur-lg p-6 sm:p-10 rounded-3xl border border-cyan-900/40 pointer-events-auto shadow-[0_0_50px_rgba(0,243,255,0.12)] transition-all duration-500 hover:border-cyan-500/40">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-10 rounded-xl bg-cyan-950/50 border border-cyan-500/40 flex items-center justify-center">
-                  <Zap className="size-5 text-cyan-400" />
-                </div>
-                <span className="text-xs font-mono uppercase tracking-[0.25em] text-cyan-400 font-bold">Paso 03 · Las Ramas</span>
-              </div>
-              <h2 className="font-display text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-[#67e8f9] mb-4 tracking-tight">
-                Creativos Imantados (UGC)
-              </h2>
-              <p className="text-cyan-100/85 text-base sm:text-lg leading-relaxed">
-                Detenemos el scroll de tu audiencia. Aplicamos la <strong className="font-semibold text-white">estructura AIDA</strong> (Atención, Interés, Deseo, Acción) y creamos contenidos con enfoque de creador — <strong className="font-semibold text-white">UGC</strong> — que rompen la barrera publicitaria convencional. Ganchos potentes en los primeros 3 segundos de cada reel y tests semanales de imágenes, videos y textos para que tus anuncios nunca se desgasten.
-              </p>
-            </div>
-          </div>
-
-          {/* 5. Inmersión en el follaje: Optimización y ROI */}
-          <div className="h-screen w-full flex items-center justify-end px-6 sm:px-16 md:px-32 absolute top-[400vh] pointer-events-none">
-            <div className="max-w-xl bg-[#01060e]/75 backdrop-blur-lg p-6 sm:p-10 rounded-3xl border border-cyan-900/40 pointer-events-auto shadow-[0_0_50px_rgba(0,243,255,0.12)] transition-all duration-500 hover:border-cyan-500/40">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-10 rounded-xl bg-cyan-950/50 border border-cyan-500/40 flex items-center justify-center">
-                  <BarChart3 className="size-5 text-cyan-400" />
-                </div>
-                <span className="text-xs font-mono uppercase tracking-[0.25em] text-cyan-400 font-bold">Paso 04 · El Follaje</span>
-              </div>
-              <h2 className="font-display text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-[#67e8f9] mb-4 tracking-tight">
-                Optimización y Retorno (ROAS)
-              </h2>
-              <p className="text-cyan-100/85 text-base sm:text-lg leading-relaxed">
-                Decisiones basadas en datos duros, no en suposiciones. Optimizamos la distribución del presupuesto entre campañas y conjuntos de anuncios, controlamos la frecuencia para no saturar a tu audiencia y analizamos la atribución en detalle. La meta: alcanzar y sostener un <strong className="font-semibold text-white">retorno publicitario (ROAS) superior a 3x</strong>, bajando mes a mes tu costo de adquisición.
-              </p>
-            </div>
-          </div>
-
-          {/* 6. Vista final mirando arriba: Escalamiento */}
-          <div className="h-screen w-full flex items-center justify-center absolute top-[500vh] pointer-events-none px-4">
-            <div className="text-center max-w-2xl bg-[#010204]/60 backdrop-blur-lg p-8 sm:p-12 rounded-3xl border border-cyan-900/20 shadow-[0_0_60px_rgba(0,243,255,0.08)] pointer-events-auto flex flex-col items-center">
-              <div className="size-16 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-center mb-6">
-                <CheckCircle className="size-8 text-cyan-400 shadow-sm animate-pulse" />
-              </div>
-              <h2 className="cc-section-title text-transparent bg-clip-text bg-gradient-to-t from-blue-600 via-cyan-300 to-cyan-100 leading-none md:text-6xl">
-                Escalamiento Controlado
-              </h2>
-              <p className="mt-4 text-cyan-100/80 text-lg leading-relaxed font-light">
-                Multiplicamos tus ventas de forma predecible y segura. Escalamos <strong className="font-semibold text-white">en vertical</strong> — aumentos controlados del presupuesto que no reinician el aprendizaje del algoritmo — y <strong className="font-semibold text-white">en horizontal</strong>: nuevas audiencias, nuevos mercados geográficos y nuevas ofertas de gancho.
-              </p>
-              
-              <div className="mt-8 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                <a 
-                  href={getWhatsAppHref("Publicidad paga en redes")}
-                  target="_blank" 
+              <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:mt-9 sm:w-auto sm:flex-row sm:items-center">
+                <a
+                  href={getWhatsAppHref("Publicidad paga en redes — quiero una campaña")}
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-cyan-500/30 bg-white hover:bg-cyan-100 text-black px-6 py-3 text-sm font-semibold tracking-wide shadow-[0_15px_30px_-8px_rgba(0,243,255,0.3)] transition-all hover:scale-105 duration-300"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black shadow-[0_16px_40px_-12px_rgba(37,211,102,0.45)] transition-transform hover:scale-[1.03] active:scale-[0.98]"
                 >
                   <WhatsAppMark className="size-[18px] text-[#25D366]" />
-                  Iniciar Campaña por WhatsApp
+                  Hablar por WhatsApp
                 </a>
-                
-                <a 
-                  href="mailto:contacto@cosechacreativa.com.ar?subject=Publicidad%20Paga%20en%20Redes"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-cyan-500/30 bg-black/60 px-6 py-3 text-sm font-semibold tracking-wide text-cyan-200/90 hover:text-white hover:border-cyan-500/60 backdrop-blur-sm transition-all hover:scale-105 duration-300"
+                <button
+                  type="button"
+                  onClick={() => {
+                    const scrollEl = document.querySelector(".ads-scroll-layer");
+                    if (scrollEl) {
+                      const height = scrollEl.scrollHeight - scrollEl.clientHeight;
+                      scrollEl.scrollTo({ top: height / 5, behavior: "smooth" });
+                    }
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-black/45 px-7 py-3.5 text-sm font-medium text-white/85 backdrop-blur-sm transition-all hover:border-[#eca8d6]/45 hover:text-white"
                 >
-                  <Mail className="size-4 text-cyan-400" />
-                  Escribinos por Email
+                  Ver el método
+                  <ChevronDown className="size-4 opacity-70" />
+                </button>
+              </div>
+            </motion.div>
+
+            <div
+              className="absolute bottom-8 flex flex-col items-center text-white/40"
+              style={{ opacity: Math.min(1, heroOpacity * 1.2) }}
+            >
+              <span className="mb-2 font-mono text-[10px] uppercase tracking-[0.28em]">
+                Deslizá para entrar
+              </span>
+              <ChevronDown className="size-5 animate-bounce text-cyan-300/70" />
+            </div>
+          </div>
+
+          {STEP_PANELS.map((step) => (
+            <StepPanel
+              key={step.id}
+              step={step}
+              reduce={reduce}
+              active={activeSection === step.id}
+            />
+          ))}
+
+          {/* CIERRE */}
+          <div
+            id="ads-escalar"
+            className="pointer-events-none absolute inset-x-0 top-[500vh] z-20 flex h-screen w-full items-center justify-center px-5"
+          >
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 40 }}
+              whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+              className="pointer-events-auto relative flex max-w-2xl flex-col items-center text-center"
+            >
+              <div
+                className="pointer-events-none absolute -inset-x-12 -inset-y-10 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(5,8,15,0.94)_0%,rgba(5,8,15,0.55)_55%,transparent_78%)]"
+                aria-hidden
+              />
+              <span className="mb-5 flex size-14 items-center justify-center border border-[#eca8d6]/40 bg-[#eca8d6]/12">
+                <CheckCircle className="size-7 text-[#eca8d6]" />
+              </span>
+              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-cyan-300/85">
+                05 · Escalamiento
+              </p>
+              <h2 className="mt-3 font-display text-[clamp(2rem,6vw,3.5rem)] leading-[1.02] tracking-tight text-white">
+                Crecer sin quemar el algoritmo
+              </h2>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/65 sm:text-lg">
+                Escalamos en vertical con aumentos controlados de presupuesto, y en horizontal con
+                nuevas audiencias, plazas y ofertas de gancho.
+              </p>
+
+              <dl className="mt-8 grid w-full max-w-lg grid-cols-3 gap-px overflow-hidden border border-white/10 bg-white/10">
+                {[
+                  { v: "ROAS 3x+", k: "meta sostenida" },
+                  { v: "CPA en baja", k: "mes a mes" },
+                  { v: "Reportes", k: "que se entienden" },
+                ].map((s) => (
+                  <div key={s.k} className="bg-[#04070d]/85 px-3 py-4 text-center backdrop-blur-sm">
+                    <dt className="font-display text-[15px] font-semibold leading-none text-white sm:text-base">
+                      {s.v}
+                    </dt>
+                    <dd className="mt-1.5 font-mono text-[9px] uppercase leading-tight tracking-[0.16em] text-white/40">
+                      {s.k}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              <div className="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+                <a
+                  href={getWhatsAppHref("Publicidad paga en redes")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition-transform hover:scale-[1.03]"
+                >
+                  <WhatsAppMark className="size-[18px] text-[#25D366]" />
+                  Iniciar campaña
+                </a>
+                <a
+                  href="mailto:contacto@cosechacreativa.com.ar?subject=Publicidad%20Paga%20en%20Redes"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-black/50 px-7 py-3.5 text-sm font-medium text-white/85 backdrop-blur-sm transition-colors hover:border-white/40 hover:text-white"
+                >
+                  <Mail className="size-4 text-[#eca8d6]" />
+                  Escribinos
                 </a>
               </div>
 
-              <div className="mt-6">
-                <Link 
-                  href="/servicios" 
-                  className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.2em] text-cyan-400/60 hover:text-cyan-400 transition-colors duration-300"
-                >
-                  Ver otros servicios
-                  <ArrowUpRight className="size-3.5" />
-                </Link>
-              </div>
-            </div>
+              <Link
+                href="/servicios"
+                className="mt-7 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.22em] text-white/40 transition-colors hover:text-[#eca8d6]"
+              >
+                Ver otros servicios
+                <ArrowUpRight className="size-3.5" />
+              </Link>
+            </motion.div>
           </div>
 
         </div>

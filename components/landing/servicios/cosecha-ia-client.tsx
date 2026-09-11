@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { useEffect, useRef, useState, type ComponentType, type MouseEvent } from "react"
-import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion"
+import dynamic from "next/dynamic"
+import { motion, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion"
 import {
   ArrowDown,
   ArrowLeft,
@@ -40,27 +40,32 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Spotlight } from "@/components/ui/spotlight"
-import { SparklesCore } from "@/components/ui/sparkles"
-import { SplineScene } from "@/components/ui/spline-scene"
-import { IaSplineRobot } from "@/components/landing/servicios/ia-spline-robot"
 import { TechConstellation } from "@/components/landing/servicios/tech-constellation"
+import { IaIntegrationsMarquee } from "@/components/landing/servicios/ia-integrations-marquee"
+import { IaAgentFlow } from "@/components/landing/servicios/ia-agent-flow"
 import AnimatedGradientBackground from "@/components/ui/animated-gradient-background"
-import { CardScanner } from "@/components/landing/servicios/card-scanner"
 import { CosechaIaAgentPlan } from "@/components/landing/servicios/cosecha-ia-agent-plan"
 import { CosechaIaChatMedida } from "@/components/landing/servicios/cosecha-ia-chat-medida"
 import { WhatsAppMark } from "@/components/icons/whatsapp-mark"
 import { getWhatsAppHref } from "@/lib/whatsapp"
 import { cn } from "@/lib/utils"
 
-const VIDEO_POSTER = "/images/bridge.png"
+const VIDEO_POSTER = "/_lite/bridge.webp"
 /** Video de fondo sección «El problema»: `public/ia/1/cinematic_202605032307.*` */
 const PROBLEMA_BG_VIDEO_SOURCES = [
   "/ia/1/cinematic_202605032307.mp4",
   "/ia/1/cinematic_202605032307.webm",
   "/ia/1/cinematic_202605032307.mov",
 ] as const
-/** Escena 3D (misma URL que en `public/LO9Dx1UhR8y`) */
+
+/** Escena 3D del asistente. Se carga en diferido: su runtime pesa ~1 MB. */
 const SPLINE_SCENE_URL = "https://prod.spline.design/UbM7F-HZcyTbZ4y3/scene.splinecode"
+
+/** Fuera del bundle inicial; solo baja cuando la sección de agentes se acerca. */
+const IaSplineRobot = dynamic(
+  () => import("@/components/landing/servicios/ia-spline-robot").then((m) => m.IaSplineRobot),
+  { ssr: false },
+)
 
 const CONTACT_EMAIL = "contacto@cosechacreativa.com.ar"
 
@@ -89,83 +94,89 @@ const methodology = [
   {
     step: "01",
     title: "Diagnóstico",
-    body: "Entendemos procesos, herramientas y dolores reales: qué automatizar primero y qué no tocar.",
+    body: "Qué automatizar primero y qué conviene no tocar.",
   },
   {
     step: "02",
     title: "Diseño de flujos",
-    body: "Definimos agentes, disparadores, datos sensibles y responsables humanos en cada paso.",
+    body: "Agentes, disparadores y quién decide en cada paso.",
   },
   {
     step: "03",
     title: "Implementación",
-    body: "Construimos, conectamos y probamos con tu equipo hasta que el flujo sea confiable.",
+    body: "Construimos y probamos con tu equipo hasta que sea confiable.",
   },
   {
     step: "04",
     title: "Medición",
-    body: "Seguimos métricas simples: tiempo ahorrado, leads atendidos, errores evitados — y ajustamos.",
+    body: "Tiempo ahorrado, leads atendidos, errores evitados.",
   },
 ] as const
 
+/**
+ * Paleta única de la página: cian → violeta. Las tarjetas se diferencian por
+ * posición dentro de esa rampa, nunca por colores sueltos — antes cada grilla
+ * usaba su propio arcoíris y la página se leía como cinco páginas distintas.
+ */
 const METHODOLOGY_CARD_ACCENTS = [
   {
-    border: "border-violet-400/18 hover:border-violet-400/35",
-    mesh: "bg-[radial-gradient(ellipse_130%_90%_at_15%_-10%,rgba(167,139,250,0.35),transparent_58%)]",
-    stepClass: "bg-gradient-to-br from-violet-100 via-fuchsia-200 to-violet-400 bg-clip-text text-transparent",
-    hoverGlow: "hover:shadow-[0_28px_56px_-26px_rgba(139,92,246,0.48)]",
+    border: "border-cyan-400/18 hover:border-cyan-400/40",
+    mesh: "bg-[radial-gradient(ellipse_130%_90%_at_15%_-10%,rgba(34,211,238,0.3),transparent_58%)]",
+    stepClass: "bg-gradient-to-br from-cyan-100 via-cyan-200 to-cyan-500 bg-clip-text text-transparent",
+    hoverGlow: "hover:shadow-[0_28px_56px_-26px_rgba(34,211,238,0.45)]",
   },
   {
-    border: "border-cyan-400/18 hover:border-cyan-400/35",
-    mesh: "bg-[radial-gradient(ellipse_130%_90%_at_85%_0%,rgba(34,211,238,0.28),transparent_55%)]",
-    stepClass: "bg-gradient-to-br from-cyan-100 via-teal-200 to-cyan-500 bg-clip-text text-transparent",
-    hoverGlow: "hover:shadow-[0_28px_56px_-26px_rgba(34,211,238,0.4)]",
+    border: "border-sky-400/18 hover:border-sky-400/40",
+    mesh: "bg-[radial-gradient(ellipse_130%_90%_at_85%_0%,rgba(56,189,248,0.28),transparent_55%)]",
+    stepClass: "bg-gradient-to-br from-sky-100 via-sky-200 to-sky-500 bg-clip-text text-transparent",
+    hoverGlow: "hover:shadow-[0_28px_56px_-26px_rgba(56,189,248,0.42)]",
   },
   {
-    border: "border-amber-400/18 hover:border-amber-400/32",
-    mesh: "bg-[radial-gradient(ellipse_120%_100%_at_50%_110%,rgba(251,191,36,0.22),transparent_50%)]",
-    stepClass: "bg-gradient-to-br from-amber-100 via-orange-200 to-amber-500 bg-clip-text text-transparent",
-    hoverGlow: "hover:shadow-[0_28px_56px_-26px_rgba(245,158,11,0.38)]",
+    border: "border-violet-400/18 hover:border-violet-400/40",
+    mesh: "bg-[radial-gradient(ellipse_120%_100%_at_50%_110%,rgba(167,139,250,0.28),transparent_50%)]",
+    stepClass: "bg-gradient-to-br from-violet-100 via-violet-200 to-violet-500 bg-clip-text text-transparent",
+    hoverGlow: "hover:shadow-[0_28px_56px_-26px_rgba(139,92,246,0.45)]",
   },
   {
-    border: "border-emerald-400/18 hover:border-emerald-400/32",
-    mesh: "bg-[radial-gradient(ellipse_110%_90%_at_10%_90%,rgba(52,211,153,0.26),transparent_52%)]",
-    stepClass: "bg-gradient-to-br from-emerald-100 via-teal-200 to-emerald-500 bg-clip-text text-transparent",
-    hoverGlow: "hover:shadow-[0_28px_56px_-26px_rgba(16,185,129,0.4)]",
+    border: "border-fuchsia-400/18 hover:border-fuchsia-400/38",
+    mesh: "bg-[radial-gradient(ellipse_110%_90%_at_10%_90%,rgba(232,121,249,0.24),transparent_52%)]",
+    stepClass: "bg-gradient-to-br from-fuchsia-100 via-fuchsia-200 to-fuchsia-500 bg-clip-text text-transparent",
+    hoverGlow: "hover:shadow-[0_28px_56px_-26px_rgba(217,70,239,0.42)]",
   },
 ] as const
 
 const useCases = [
   {
     title: "Comercios y marcas locales",
-    body: "Consultas repetidas, stock, turnos y campañas: menos pérdida de mensajes en horas pico.",
+    body: "Consultas, stock y turnos sin perder mensajes en horas pico.",
     icon: Store,
   },
   {
     title: "Profesionales y estudios",
-    body: "Seguimiento de clientes, recordatorios y documentación sin vivir en la bandeja de entrada.",
+    body: "Seguimiento y recordatorios sin vivir en la bandeja de entrada.",
     icon: Building2,
   },
   {
     title: "Instituciones",
-    body: "Centralizar consultas, canalizar pedidos y mantener trazabilidad sin saturar al equipo.",
+    body: "Consultas centralizadas y trazables, sin saturar al equipo.",
     icon: Layers,
   },
   {
     title: "Equipos en crecimiento",
-    body: "Escalar atención y reporting cuando contratar más no alcanza o no cierra por números.",
+    body: "Escalar atención y reportes cuando contratar más no cierra.",
     icon: Gauge,
   },
 ] as const
 
+/** Misma rampa cian → violeta que el resto de la página. */
 const USE_CASE_CARD_ACCENTS = [
   {
-    mesh: "bg-[radial-gradient(ellipse_110%_85%_at_12%_-5%,rgba(244,114,182,0.22),transparent_58%)]",
-    iconWrap: "border-rose-400/30 bg-rose-500/[0.12] text-rose-50 shadow-[0_0_28px_-8px_rgba(244,114,182,0.45)]",
-    chip: "text-rose-200/85",
+    mesh: "bg-[radial-gradient(ellipse_110%_85%_at_12%_-5%,rgba(103,232,249,0.2),transparent_58%)]",
+    iconWrap: "border-cyan-400/30 bg-cyan-500/[0.12] text-cyan-50 shadow-[0_0_28px_-8px_rgba(103,232,249,0.45)]",
+    chip: "text-cyan-200/85",
   },
   {
-    mesh: "bg-[radial-gradient(ellipse_110%_85%_at_92%_8%,rgba(56,189,248,0.2),transparent_56%)]",
+    mesh: "bg-[radial-gradient(ellipse_110%_85%_at_92%_8%,rgba(56,189,248,0.19),transparent_56%)]",
     iconWrap: "border-sky-400/30 bg-sky-500/[0.11] text-sky-50 shadow-[0_0_28px_-8px_rgba(56,189,248,0.4)]",
     chip: "text-sky-200/85",
   },
@@ -175,9 +186,9 @@ const USE_CASE_CARD_ACCENTS = [
     chip: "text-violet-200/85",
   },
   {
-    mesh: "bg-[radial-gradient(ellipse_105%_80%_at_22%_102%,rgba(52,211,153,0.2),transparent_55%)]",
-    iconWrap: "border-emerald-400/30 bg-emerald-500/[0.11] text-emerald-50 shadow-[0_0_28px_-8px_rgba(52,211,153,0.4)]",
-    chip: "text-emerald-200/85",
+    mesh: "bg-[radial-gradient(ellipse_105%_80%_at_22%_102%,rgba(232,121,249,0.2),transparent_55%)]",
+    iconWrap: "border-fuchsia-400/30 bg-fuchsia-500/[0.11] text-fuchsia-50 shadow-[0_0_28px_-8px_rgba(232,121,249,0.4)]",
+    chip: "text-fuchsia-200/85",
   },
 ] as const
 
@@ -187,110 +198,106 @@ type IaService = {
   description: string
   detail: string
   bullets: readonly string[]
-  Icon: ComponentType<{ className?: string }>
+  Icon: ComponentType<{ className?: string; strokeWidth?: number }>
   /** Tailwind gradient classes for card glow */
   accent: string
   ringAccent: string
 }
 
-/** Servicios — tarjetas + contenido ampliado para modal */
+/**
+ * Servicios — tarjetas + contenido ampliado para modal.
+ * Los acentos siguen la rampa cian → violeta de la página (no un color por tarjeta).
+ */
 const iaServices: readonly IaService[] = [
   {
     id: "chatbots",
     name: "Chatbots inteligentes",
-    description:
-      "WhatsApp, web e Instagram con respuestas alineadas a tu marca y a tus procesos internos.",
+    description: "WhatsApp, web e Instagram que responden con la voz de tu marca.",
     detail:
-      "Diseñamos conversaciones que suenan a tu marca, respetan políticas internas y saben cuándo pasar el caso a una persona.",
+      "Conversaciones que suenan a tu marca, respetan tus políticas y saben cuándo pasarle el caso a una persona.",
     bullets: [
-      "Canales: WhatsApp Business, Instagram, widget web",
-      "Tono y FAQs acordes a tu negocio",
-      "Handoff a humano con contexto del chat",
+      "WhatsApp Business, Instagram y widget web",
+      "Derivación a humano con el contexto del chat",
       "Métricas de conversación y cuellos de botella",
     ],
     Icon: MessageCircle,
-    accent: "from-violet-500/25 via-fuchsia-500/10 to-transparent",
-    ringAccent: "group-hover:border-violet-400/35",
+    accent: "from-cyan-400/25 via-cyan-500/10 to-transparent",
+    ringAccent: "group-hover:border-cyan-400/40",
   },
   {
     id: "agentes",
     name: "Agentes conectados",
-    description: "Integración con Sheets, Gmail, CRM, WordPress, formularios, calendarios y bases de datos.",
+    description: "Leen y escriben donde ya trabaja tu equipo: Sheets, Gmail, CRM, calendarios.",
     detail:
-      "Los agentes no viven aislados: leen y escriben donde ya trabaja tu equipo, con permisos y logs claros.",
+      "Los agentes no viven aislados: operan sobre tus herramientas actuales, con permisos y registro de lo que hacen.",
     bullets: [
-      "Google Sheets / Excel, Gmail, CRM y calendarios",
-      "WordPress, formularios y webhooks",
-      "Sincronización y evitar datos duplicados",
-      "Roles: qué puede hacer la IA y qué no",
+      "Sheets, Gmail, CRM, calendarios y webhooks",
+      "Sincronización sin datos duplicados",
+      "Roles claros: qué puede hacer la IA y qué no",
     ],
     Icon: Bot,
-    accent: "from-cyan-500/20 via-blue-500/10 to-transparent",
-    ringAccent: "group-hover:border-cyan-400/35",
+    accent: "from-sky-400/22 via-sky-500/10 to-transparent",
+    ringAccent: "group-hover:border-sky-400/40",
   },
   {
     id: "n8n",
     name: "Automatización con n8n",
-    description: "Flujos robustos entre sistemas: menos errores manuales y más trazabilidad.",
+    description: "Flujos entre sistemas: menos error manual y más trazabilidad.",
     detail:
       "Orquestamos procesos entre APIs y herramientas con flujos revisables, reintentos y alertas cuando algo falla.",
     bullets: [
-      "Flujos entre sistemas sin copy-paste",
-      "Errores visibles y notificaciones",
+      "Procesos entre sistemas sin copiar y pegar",
+      "Errores visibles y notificados",
       "Versionado y documentación del flujo",
-      "Escalado cuando crece el volumen",
     ],
     Icon: Cog,
-    accent: "from-amber-500/20 via-orange-500/8 to-transparent",
-    ringAccent: "group-hover:border-amber-400/35",
+    accent: "from-blue-400/22 via-indigo-500/10 to-transparent",
+    ringAccent: "group-hover:border-blue-400/40",
   },
   {
     id: "mkt",
     name: "IA para marketing y ventas",
     description: "Contenido, priorización de leads y seguimiento sin quemar al equipo.",
     detail:
-      "Priorizamos impacto: borradores, resúmenes y seguimiento comercial con criterio humano en las decisiones finales.",
+      "Borradores, resúmenes y seguimiento comercial, con criterio humano en las decisiones finales.",
     bullets: [
       "Borradores y variantes de mensajes",
       "Priorización y etiquetado de leads",
       "Secuencias de seguimiento coherentes",
-      "Sin prometer resultados mágicos",
     ],
     Icon: Target,
-    accent: "from-rose-500/20 via-pink-500/10 to-transparent",
-    ringAccent: "group-hover:border-rose-400/35",
+    accent: "from-indigo-400/24 via-violet-500/10 to-transparent",
+    ringAccent: "group-hover:border-indigo-400/40",
   },
   {
     id: "dashboards",
     name: "Dashboards inteligentes",
-    description: "Métricas y alertas para decidir con datos reunidos en un solo lugar.",
+    description: "Tus métricas reunidas en un panel, con alertas cuando algo se sale de rango.",
     detail:
-      "Unificamos fuentes dispersas en vistas claras y alertas cuando un indicador se sale de rango.",
+      "Unificamos fuentes dispersas en vistas claras y avisamos cuando un indicador se corre de lo esperable.",
     bullets: [
       "KPIs en un solo panel",
-      "Alertas por umbral o anomalías simples",
-      "Export y lectura para reuniones",
-      "Menos Excel fuera de control",
+      "Alertas por umbral o anomalía",
+      "Lectura directa para reuniones",
     ],
     Icon: BarChart3,
-    accent: "from-emerald-500/22 via-teal-500/10 to-transparent",
-    ringAccent: "group-hover:border-emerald-400/35",
+    accent: "from-violet-400/24 via-violet-500/10 to-transparent",
+    ringAccent: "group-hover:border-violet-400/40",
   },
   {
     id: "software",
     name: "Software con IA",
-    description: "Desarrollo a medida cuando tu caso necesita algo más que integraciones estándar.",
+    description: "Desarrollo a medida cuando tu caso necesita más que integraciones estándar.",
     detail:
-      "Cuando no alcanza con ‘conectar cajas’, diseñamos pantallas, APIs y lógica propia con IA donde suma.",
+      "Cuando no alcanza con conectar cajas, diseñamos pantallas, APIs y lógica propia con IA donde suma.",
     bullets: [
       "Productos web a medida",
       "APIs y bases según tu operación",
-      "IA embebida donde aporta valor",
       "Entregas iterativas con tu equipo",
     ],
     Icon: Code2,
-    accent: "from-indigo-500/25 via-purple-500/12 to-transparent",
-    ringAccent: "group-hover:border-indigo-400/35",
+    accent: "from-fuchsia-400/22 via-purple-500/12 to-transparent",
+    ringAccent: "group-hover:border-fuchsia-400/40",
   },
 ] as const
 
@@ -470,13 +477,15 @@ function UseCaseParallaxCard({
   reduceMotion: boolean
 }) {
   const accent = USE_CASE_CARD_ACCENTS[index % USE_CASE_CARD_ACCENTS.length]
-  const parallaxY = useTransform(scrollProgress, [0, 1], [22 + index * 14, -36 - index * 20])
+  // Desfase mínimo entre tarjetas. Antes la última recorría ~160px: las tarjetas
+  // se desalineaban entre sí al scrollear y la grilla parecía desarmarse.
+  const parallaxY = useTransform(scrollProgress, [0, 1], [4 + index * 3, -6 - index * 4])
   const Icon = item.icon
 
   return (
     <motion.div style={reduceMotion ? undefined : { y: parallaxY }} className="h-full">
       <motion.div
-        initial={{ opacity: 0, y: 34 }}
+        initial={{ opacity: 0, y: 14 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-10% 0px", amount: 0.25 }}
         transition={{ delay: index * 0.08, duration: 0.72, ease: easePremium }}
@@ -515,39 +524,19 @@ function UseCaseParallaxCard({
   )
 }
 
-function SectionParticlesLayer({
-  uid,
-  reduceMotion,
-  color,
-  density = 36,
-  opacityClass = "opacity-[0.4] md:opacity-[0.52]",
-}: {
-  uid: string
-  reduceMotion: boolean
-  color: string
-  density?: number
-  opacityClass?: string
-}) {
-  if (reduceMotion) return null
-  return (
-    <div
-      className={cn("pointer-events-none absolute inset-0 z-[1] overflow-hidden mix-blend-screen", opacityClass)}
-      aria-hidden
-    >
-      <SparklesCore
-        id={`ia-section-${uid}`}
-        className="h-full min-h-[260px] w-full"
-        background="rgba(0,0,0,0)"
-        particleColor={color}
-        minSize={0.12}
-        maxSize={0.95}
-        speed={1.15}
-        particleDensity={density}
-        interactive={false}
-      />
-    </div>
-  )
-}
+/** Herramientas nombradas en las viñetas de servicios: son las que integramos de verdad. */
+const integraciones = [
+  "WhatsApp Business",
+  "Google Sheets",
+  "Gmail",
+  "Instagram",
+  "CRM",
+  "Google Calendar",
+  "WordPress",
+  "n8n",
+  "Webhooks",
+  "Excel",
+] as const
 
 const problemaSignals = [
   {
@@ -581,6 +570,10 @@ export function CosechaIaClient() {
   const chatMedidaSectionRef = useRef<HTMLElement>(null)
   const agentesSectionRef = useRef<HTMLElement>(null)
 
+  /** El robot 3D se monta 500px antes de entrar en pantalla, no en el arranque. */
+  const robotRef = useRef<HTMLDivElement>(null)
+  const robotVisible = useInView(robotRef, { once: true, margin: "500px" })
+
   const { scrollYProgress: serviciosScroll } = useScroll({
     target: serviciosSectionRef,
     offset: ["start end", "end start"],
@@ -607,49 +600,59 @@ export function CosechaIaClient() {
   })
 
   /** Parallax depth for #servicios — stars / grid / glow move at different rates */
-  const serviciosStarsY = useTransform(serviciosScroll, [0, 1], [72, -120])
-  const serviciosGridY = useTransform(serviciosScroll, [0, 1], [28, -62])
-  const serviciosGridOpacity = useTransform(serviciosScroll, [0, 0.35, 0.65, 1], [0.45, 0.85, 0.78, 0.5])
-  const serviciosGlowY = useTransform(serviciosScroll, [0, 1], [36, -88])
+  /**
+   * Parallax deliberadamente corto. Antes cada sección movía 4 o 5 capas con
+   * recorridos de 130 a 190px a velocidades distintas: sumado a la inercia del
+   * scroll suave, toda la página parecía flotar. Ahora ninguna capa decorativa
+   * se desplaza más de ~24px, y el texto no se mueve nunca.
+   */
+  const serviciosStarsY = useTransform(serviciosScroll, [0, 1], [12, -20])
+  const serviciosGridY = useTransform(serviciosScroll, [0, 1], [6, -12])
+  const serviciosGridOpacity = useTransform(serviciosScroll, [0, 0.35, 0.65, 1], [0.55, 0.8, 0.78, 0.6])
+  const serviciosGlowY = useTransform(serviciosScroll, [0, 1], [8, -16])
 
   /** Parallax decor #casos */
-  const casosBlobPrimaryY = useTransform(casosScroll, [0, 1], [64, -92])
-  const casosBlobSecondaryY = useTransform(casosScroll, [0, 1], [36, -120])
-  const casosGridFadeY = useTransform(casosScroll, [0, 1], [20, -58])
-  const casosHeaderY = useTransform(casosScroll, [0, 1], [12, -28])
-  const casosRadialGlowY = useTransform(casosScroll, [0, 1], [18, -52])
+  const casosBlobPrimaryY = useTransform(casosScroll, [0, 1], [12, -20])
+  const casosBlobSecondaryY = useTransform(casosScroll, [0, 1], [8, -18])
+  const casosGridFadeY = useTransform(casosScroll, [0, 1], [5, -10])
+  const casosRadialGlowY = useTransform(casosScroll, [0, 1], [5, -12])
 
   /** Parallax fondo #metodologia */
-  const metaGlowCyanY = useTransform(metodologiaScroll, [0, 1], [56, -78])
-  const metaGlowVioletY = useTransform(metodologiaScroll, [0, 1], [24, -105])
-  const metaGridParallaxY = useTransform(metodologiaScroll, [0, 1], [38, -68])
-  const metaBlobAccentY = useTransform(metodologiaScroll, [0, 1], [44, -88])
-  const metaHeaderParallaxY = useTransform(metodologiaScroll, [0, 1], [10, -22])
+  const metaGlowCyanY = useTransform(metodologiaScroll, [0, 1], [10, -18])
+  const metaGlowVioletY = useTransform(metodologiaScroll, [0, 1], [6, -16])
+  const metaGridParallaxY = useTransform(metodologiaScroll, [0, 1], [5, -10])
+  const metaBlobAccentY = useTransform(metodologiaScroll, [0, 1], [8, -16])
 
   /** Parallax fondo #chat-medida */
-  const chatBlobPrimaryY = useTransform(chatMedidaScroll, [0, 1], [46, -74])
-  const chatBlobSecondaryY = useTransform(chatMedidaScroll, [0, 1], [30, -98])
-  const chatGridParallaxY = useTransform(chatMedidaScroll, [0, 1], [22, -54])
-  const chatRadialGlowY = useTransform(chatMedidaScroll, [0, 1], [12, -46])
+  const chatBlobPrimaryY = useTransform(chatMedidaScroll, [0, 1], [10, -18])
+  const chatBlobSecondaryY = useTransform(chatMedidaScroll, [0, 1], [7, -16])
+  const chatGridParallaxY = useTransform(chatMedidaScroll, [0, 1], [5, -10])
+  const chatRadialGlowY = useTransform(chatMedidaScroll, [0, 1], [4, -10])
 
   /** Parallax fondo #agentes-autonomos */
-  const agentesBlobPrimaryY = useTransform(agentesScroll, [0, 1], [50, -82])
-  const agentesBlobSecondaryY = useTransform(agentesScroll, [0, 1], [34, -104])
-  const agentesGridParallaxY = useTransform(agentesScroll, [0, 1], [20, -58])
-  const agentesRadialGlowY = useTransform(agentesScroll, [0, 1], [14, -50])
+  const agentesBlobPrimaryY = useTransform(agentesScroll, [0, 1], [10, -18])
+  const agentesBlobSecondaryY = useTransform(agentesScroll, [0, 1], [7, -16])
+  const agentesGridParallaxY = useTransform(agentesScroll, [0, 1], [5, -10])
+  const agentesRadialGlowY = useTransform(agentesScroll, [0, 1], [4, -10])
 
+  /**
+   * `amount` bajo a propósito: con secciones de 2000px+, un umbral alto nunca
+   * llega a cumplirse en pantallas cortas y el bloque queda invisible.
+   */
   const sectionReveal = reduceMotion
     ? ({
         initial: { opacity: 0 },
         whileInView: { opacity: 1 },
-        viewport: { once: true, margin: "-14%" as const, amount: 0.18 },
+        viewport: { once: true, margin: "-8%" as const, amount: 0.05 },
         transition: { duration: 0.42 },
       } as const)
     : ({
-        initial: { opacity: 0, y: 52 },
+        // y bajo a propósito: con 9 secciones deslizándose 52px cada una al
+        // aparecer, la página entera se sentía inestable al scrollear.
+        initial: { opacity: 0, y: 14 },
         whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: "-6%" as const, amount: 0.22 },
-        transition: { duration: 0.82, ease: easePremium },
+        viewport: { once: true, margin: "-4%" as const, amount: 0.05 },
+        transition: { duration: 0.7, ease: easePremium },
       } as const)
 
   useEffect(() => {
@@ -688,6 +691,14 @@ export function CosechaIaClient() {
     <main className="relative min-h-screen overflow-x-hidden bg-black text-white">
       <Navigation />
 
+      {/* Velo bajo la barra flotante: al scrollear el header se despega a
+          `top-3` y el contenido se veía pasar por el hueco de arriba y por los
+          costados. Este degradado lo apaga sin tapar el hero. */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-24 bg-gradient-to-b from-black via-black/70 to-transparent"
+      />
+
       {/* Constelación de datos 3D detrás de TODA la página (red neuronal elegante
           que desciende con el scroll y acompaña al cursor). */}
       <TechConstellation />
@@ -701,7 +712,7 @@ export function CosechaIaClient() {
         />
       )}
 
-      {/* Hero — mismo stack visual que LO9Dx1UhR8y (gradiente, sparkles, spotlight, Spline) */}
+      {/* Hero — gradiente animado + spotlight + escena Spline */}
       <motion.section
         className="relative overflow-hidden bg-black/45 pt-24 pb-8 md:pt-28 md:pb-10"
         initial={reduceMotion ? false : { opacity: 0, y: 28 }}
@@ -727,30 +738,22 @@ export function CosechaIaClient() {
           <Card className="relative mt-0 w-full max-w-none overflow-hidden rounded-none border-x-0 border-white/12 bg-black/95 p-0 shadow-[0_40px_120px_-60px_rgba(167,139,250,0.25)] md:mt-2 md:mx-4 md:max-w-[calc(100%-2rem)] md:rounded-[1.75rem] md:border-x md:border-white/12 lg:mx-auto lg:max-w-[1400px] lg:rounded-[2rem]">
             <AnimatedGradientBackground
               Breathing={!reduceMotion}
+              /* Cian → violeta, la paleta de la página. Antes había dos verdes
+                 azulados (#134e4a, #0d1f1c) que ensuciaban el hero. */
               gradientColors={[
                 "#050505",
-                "#1a1520",
-                "#0f1729",
-                "#134e4a",
-                "#1e1b2e",
-                "#0d1f1c",
+                "#140f24",
+                "#0d1730",
+                "#10283a",
+                "#1a1338",
+                "#0a1220",
                 "#030303",
               ]}
               gradientStops={[36, 48, 55, 62, 70, 82, 100]}
               containerClassName="opacity-80"
             />
-            {!reduceMotion && (
-              <SparklesCore
-                id="ia-hero-sparkles"
-                className="pointer-events-none absolute inset-0 z-[1] h-full w-full"
-                background="#030303"
-                minSize={0.4}
-                maxSize={1.2}
-                particleDensity={80}
-                particleColor="#c4b5fd"
-                speed={2}
-              />
-            )}
+            {/* El polvo de estrellas lo aporta la constelación 3D del fondo (WebGL),
+                no un canvas 2D por sección: mismo efecto, sin repintar en CPU. */}
             <Spotlight className="-top-32 left-0 md:-top-20 md:left-40" size={240} />
 
             <div className="relative z-10 flex min-h-[min(520px,72vh)] flex-col lg:flex-row">
@@ -773,17 +776,17 @@ export function CosechaIaClient() {
                   className="max-w-[min(100%,900px)] font-display text-[clamp(2.35rem,6.8vw,4.75rem)] leading-[0.95] tracking-tight text-white"
                 >
                   Inteligencia Artificial para{" "}
-                  <span className="bg-gradient-to-r from-[#eca8d6] via-[#c4b5fd] to-[#67e8f9] bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-[#67e8f9] via-[#c4b5fd] to-[#e879f9] bg-clip-text text-transparent">
                     escalar tu empresa
                   </span>
                 </motion.h1>
 
                 <motion.p
                   variants={heroItemVariants}
-                  className="mt-8 max-w-2xl text-lg leading-relaxed text-white/75 md:text-xl"
+                  className="mt-7 max-w-xl text-lg leading-relaxed text-white/75 md:text-xl"
                 >
-                  Conectamos agentes de IA con las herramientas de tu negocio para automatizar procesos, mejorar la
-                  atención y transformar datos en decisiones — sin humo técnico ni promesas mágicas.
+                  Conectamos agentes de IA con las herramientas que ya usás: menos trabajo manual, mejor atención y
+                  datos que sirven para decidir. Sin humo técnico.
                 </motion.p>
 
                 <motion.div variants={heroItemVariants} className="mt-10 flex flex-wrap gap-3">
@@ -829,19 +832,11 @@ export function CosechaIaClient() {
                 </motion.div>
               </motion.div>
 
-              <div className="relative min-h-[280px] flex-1 lg:min-h-0">
-                {reduceMotion ? (
-                  <Image
-                    src={VIDEO_POSTER}
-                    alt=""
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    priority
-                  />
-                ) : (
-                  <SplineScene scene={SPLINE_SCENE_URL} className="h-full min-h-[280px] w-full lg:min-h-full" />
-                )}
+              {/* Recorrido del agente. Antes acá había un maniquí 3D genérico de
+                  Spline: no decía nada del producto, ocupaba ~420px de alto y
+                  arrastraba ~1 MB de runtime. */}
+              <div className="relative flex-1 border-t border-white/10 lg:border-l lg:border-t-0">
+                <IaAgentFlow />
               </div>
             </div>
           </Card>
@@ -903,16 +898,15 @@ export function CosechaIaClient() {
                 <span className="size-1.5 rounded-full bg-[#f472b6] shadow-[0_0_12px_rgba(244,114,182,0.7)]" aria-hidden />
                 El problema
               </span>
-              <h2 className="font-display text-[clamp(1.85rem,4.2vw,3.25rem)] leading-[1.08] tracking-tight text-white">
-                Herramientas sueltas, datos sin conversar entre sí y equipos atrapados en{" "}
-                <span className="bg-gradient-to-r from-[#fca5a5] via-[#c4b5fd] to-[#67e8f9] bg-clip-text text-transparent">
+              <h2 className="font-display text-[clamp(2.2rem,5.4vw,4rem)] font-semibold leading-[0.95] tracking-tight text-white">
+                Herramientas sueltas y equipos atrapados en{" "}
+                <span className="italic bg-gradient-to-r from-[#67e8f9] via-[#c4b5fd] to-[#e879f9] bg-clip-text text-transparent">
                   tareas repetitivas
                 </span>
-                .
               </h2>
-              <p className="mt-8 max-w-xl text-lg leading-relaxed text-white/72 md:text-xl">
-                Muchas empresas en San Juan ya usan WhatsApp, planillas y CRM… pero todo vive en silos. La IA sirve para
-                unir esos puntos con criterio: priorizar, responder y liberar tiempo sin perder el control humano.
+              <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/72 md:text-xl">
+                Ya usás WhatsApp, planillas y CRM, pero cada cosa vive en su isla. La IA sirve para unir esos puntos con
+                criterio: priorizar, responder y liberar tiempo sin perder el control humano.
               </p>
               <div className="mt-10 hidden h-px max-w-md bg-gradient-to-r from-[#a78bfa]/60 via-[#67e8f9]/40 to-transparent lg:block" aria-hidden />
             </div>
@@ -941,17 +935,11 @@ export function CosechaIaClient() {
             </motion.div>
           </div>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: easePremium }}
-            className="mx-auto mt-10 max-w-3xl text-center font-display text-lg italic leading-relaxed text-white/55 md:text-xl"
-          >
-            La IA no es magia: es ordenar el caos operativo para que tu equipo vuelva a mirar hacia afuera.
-          </motion.p>
         </div>
       </motion.section>
+
+      {/* Bisagra entre «todo vive en silos» y «lo que construimos». */}
+      <IaIntegrationsMarquee items={integraciones} />
 
       {/* Servicios — parallax estrellas + rejilla «robótica» */}
       <motion.section
@@ -1011,33 +999,16 @@ export function CosechaIaClient() {
           />
         </motion.div>
 
-        {/* Campo de estrellas (partículas) — parallax lento, tonos cyan/violeta */}
-        {!reduceMotion && (
-          <motion.div
-            className="pointer-events-none absolute inset-0 z-[1] h-[118%] w-full will-change-transform"
-            style={{ y: serviciosStarsY }}
-            aria-hidden
-          >
-            <SparklesCore
-              id="ia-servicios-sparkles"
-              className="absolute inset-0 h-full w-full opacity-[0.85]"
-              background="#030306"
-              minSize={0.35}
-              maxSize={1.35}
-              particleDensity={92}
-              particleColor="#67e8f9"
-              speed={1.35}
-            />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_38%,transparent_0%,rgba(3,3,6,0.55)_62%,rgba(3,3,6,0.92)_100%)]" />
-          </motion.div>
-        )}
-
-        {reduceMotion && (
-          <div
-            className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_70%_50%_at_50%_35%,rgba(103,232,249,0.07)_0%,transparent_65%)]"
-            aria-hidden
-          />
-        )}
+        {/* Viñeta: oscurece los bordes para que el texto respire sobre la
+            constelación 3D. Antes acá vivía un canvas 2D de 440×2459 px
+            (≈4,7 M px en una pantalla de 1080p) que se repintaba en CPU cada frame. */}
+        <motion.div
+          className="pointer-events-none absolute inset-0 z-[1] h-[118%] w-full will-change-transform"
+          style={reduceMotion ? undefined : { y: serviciosStarsY }}
+          aria-hidden
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_38%,transparent_0%,rgba(3,3,6,0.5)_62%,rgba(3,3,6,0.88)_100%)]" />
+        </motion.div>
 
         <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-[#a78bfa]/40 to-transparent" aria-hidden />
 
@@ -1048,15 +1019,15 @@ export function CosechaIaClient() {
                 <SparklesIcon className="size-3.5 text-[#c4b5fd]" aria-hidden />
                 Servicios
               </span>
-              <h2 className="font-display text-[clamp(2rem,4.5vw,3.25rem)] leading-[1.06] tracking-tight text-white md:text-5xl">
+              <h2 className="font-display text-[clamp(2.2rem,5.4vw,4.25rem)] font-semibold leading-[0.95] tracking-tight text-white">
                 Lo que podemos{" "}
-                <span className="bg-gradient-to-r from-white via-[#e8e8f8] to-[#67e8f9] bg-clip-text text-transparent">
+                <span className="italic bg-gradient-to-r from-[#67e8f9] via-[#c4b5fd] to-[#e879f9] bg-clip-text text-transparent">
                   construir con vos
                 </span>
               </h2>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/58 md:text-xl">
-                Soluciones pensadas para PyMEs, profesionales e instituciones — hablando en negocio, no en jerga de laboratorio.
-                <span className="mt-2 block text-sm text-white/45"> Tocá una tarjeta para ver el detalle.</span>
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/58">
+                Seis líneas de trabajo para PyMEs, profesionales e instituciones.
+                <span className="mt-2 block text-sm text-white/40">Tocá una tarjeta para ver el detalle.</span>
               </p>
             </div>
             <div className="hidden shrink-0 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 text-right lg:block">
@@ -1072,7 +1043,7 @@ export function CosechaIaClient() {
                 <motion.button
                   key={item.id}
                   type="button"
-                  initial={{ opacity: 0, y: 22 }}
+                  initial={{ opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.15 }}
                   transition={{ delay: idx * 0.05, duration: 0.55, ease: easePremium }}
@@ -1091,6 +1062,13 @@ export function CosechaIaClient() {
                     )}
                     aria-hidden
                   />
+                  {/* Índice en contorno: contraste de escala dentro de la tarjeta. */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute bottom-2 right-4 select-none font-display text-[5.5rem] leading-none tabular-nums text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.12)] transition-all duration-500 group-hover:[-webkit-text-stroke:1px_rgba(103,232,249,0.5)]"
+                  >
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
                   <div className="relative flex flex-1 flex-col">
                     <span className="inline-flex size-12 items-center justify-center rounded-2xl border border-white/12 bg-black/40 text-white shadow-inner ring-1 ring-white/10 transition-transform duration-300 group-hover:scale-105">
                       <Icon className="size-6 text-[#a5f3fc]" strokeWidth={1.15} aria-hidden />
@@ -1122,26 +1100,110 @@ export function CosechaIaClient() {
         </DialogContent>
       </Dialog>
 
-      {/* Beneficios — contenido en CardScanner (LbEErCxufs7): banda escaneada + cartas */}
       <motion.section
-        id="beneficios"
-        className={cn("relative scroll-mt-28 overflow-hidden bg-black/55", SECTION_PAD)}
+        ref={chatMedidaSectionRef}
+        id="chat-medida"
+        className={cn(
+          "relative scroll-mt-28 overflow-x-hidden bg-gradient-to-b from-black/55 via-violet-950/[0.16] to-black/55",
+          SECTION_PAD,
+        )}
         {...sectionReveal}
       >
-        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
-          <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <span className="liquid-glass mb-4 inline-flex rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
-                Beneficios
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -left-[16%] top-[10%] size-[min(440px,50vw)] rounded-full bg-violet-500/[0.11] blur-[96px]"
+          style={reduceMotion ? undefined : { y: chatBlobPrimaryY }}
+        />
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -right-[14%] bottom-[8%] size-[min(400px,46vw)] rounded-full bg-violet-500/[0.08] blur-[92px]"
+          style={reduceMotion ? undefined : { y: chatBlobSecondaryY }}
+        />
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.24] [mask-image:linear-gradient(to_bottom,black_22%,transparent)] bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:52px_52px]"
+          style={reduceMotion ? undefined : { y: chatGridParallaxY }}
+        />
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_68%_48%_at_50%_12%,rgba(167,139,250,0.10),transparent_56%)]"
+          style={reduceMotion ? undefined : { y: chatRadialGlowY }}
+        />
+        <div className="relative z-10">
+          <CosechaIaChatMedida />
+        </div>
+      </motion.section>
+
+      <motion.section
+        ref={agentesSectionRef}
+        id="agentes-autonomos"
+        className={cn(
+          "relative scroll-mt-28 overflow-x-hidden bg-gradient-to-b from-black/55 via-cyan-950/[0.10] to-black/55",
+          SECTION_PAD,
+        )}
+        {...sectionReveal}
+      >
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -left-[14%] top-[14%] size-[min(460px,52vw)] rounded-full bg-cyan-400/[0.09] blur-[100px]"
+          style={reduceMotion ? undefined : { y: agentesBlobPrimaryY }}
+        />
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -right-[12%] bottom-[10%] size-[min(380px,44vw)] rounded-full bg-violet-500/[0.08] blur-[88px]"
+          style={reduceMotion ? undefined : { y: agentesBlobSecondaryY }}
+        />
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.24] [mask-image:linear-gradient(to_bottom,black_25%,transparent)] bg-[linear-gradient(rgba(255,255,255,0.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.028)_1px,transparent_1px)] bg-[size:52px_52px]"
+          style={reduceMotion ? undefined : { y: agentesGridParallaxY }}
+        />
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_72%_50%_at_50%_18%,rgba(34,211,238,0.07),transparent_58%)]"
+          style={reduceMotion ? undefined : { y: agentesRadialGlowY }}
+        />
+        <div className="relative z-10 mx-auto max-w-4xl px-4 md:px-6">
+          <div className="mb-8 text-center md:mb-10">
+            <h2 className="font-display text-[clamp(2rem,4.8vw,3.5rem)] font-semibold leading-[0.95] tracking-tight text-white">
+              Agentes que{" "}
+              <span className="italic bg-gradient-to-r from-[#67e8f9] via-[#c4b5fd] to-[#e879f9] bg-clip-text text-transparent">
+                ejecutan solos
               </span>
-              <h2 className="font-display text-3xl text-white md:text-5xl">Por qué tiene sentido para tu equipo</h2>
-            </div>
-            <p className="max-w-md text-white/55">
-              Creemos que la IA amplifica criterio y ritmo: menos horas en lo repetible, más foco en clientes y estrategia.
+            </h2>
+            <p className="mx-auto mt-5 max-w-xl text-pretty text-base text-white/55 md:text-lg">
+              No solo responden: sincronizan datos, mueven pedidos y avisan a tu equipo, con reglas claras y sin que
+              nadie tenga que apretar botones todo el día.
             </p>
           </div>
-          <div className="relative overflow-hidden rounded-2xl border border-white/[0.1] bg-black/50 shadow-[0_40px_100px_-48px_rgba(103,232,249,0.14)]">
-            <CardScanner embedded className="min-h-[480px]" />
+          <CosechaIaAgentPlan />
+
+          {/* Probalo en vivo: el robot abre el asistente conectado a /api/crm/chat.
+              Se monta recién cuando la sección se acerca, para no descargar el
+              runtime de Spline en el arranque de la página. */}
+          <div ref={robotRef} className="mt-14">
+            <div className="mb-6 text-center">
+              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.3em] text-[#67e8f9]">
+                Probalo acá mismo
+              </p>
+              <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-white/60">
+                Tocá el robot y hablá con nuestro asistente. Es el mismo tipo de agente que
+                implementamos en los negocios que atendemos.
+              </p>
+            </div>
+
+            {/* Altura fija en el contenedor: el hueco y el robot montado miden
+                exactamente lo mismo, así el swap no corre nada de lugar. */}
+            <div className="relative h-[360px] sm:h-[440px] md:h-[520px]">
+              {robotVisible ? (
+                <IaSplineRobot scene={SPLINE_SCENE_URL} className="absolute inset-0" />
+              ) : (
+                <div
+                  aria-hidden
+                  className="absolute inset-0 rounded-[28px] border border-white/10 bg-black/35"
+                />
+              )}
+            </div>
           </div>
         </div>
       </motion.section>
@@ -1173,37 +1235,35 @@ export function CosechaIaClient() {
           className="pointer-events-none absolute inset-0 opacity-[0.35] [mask-image:linear-gradient(to_bottom,black,transparent)] bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]"
           style={reduceMotion ? undefined : { y: metaGridParallaxY }}
         />
-        <SectionParticlesLayer uid="metodologia" reduceMotion={reduceMotion} color="#c4b5fd" density={32} />
         <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
+          {/* Una sola barra, sobre el margen izquierdo. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute bottom-10 left-3 top-10 z-[1] flex gap-[5px] lg:left-6"
+            className="pointer-events-none absolute bottom-10 left-3 top-10 z-[1] flex lg:left-6"
           >
             <span className="w-[2px] shrink-0 rounded-full bg-gradient-to-b from-[#c4b5fd]/55 via-white/14 to-[#67e8f9]/40" />
-            <span className="w-px shrink-0 bg-white/[0.15]" />
-          </div>
-          <div
-            aria-hidden
-            className="pointer-events-none absolute bottom-10 right-3 top-10 z-[1] flex gap-[5px] lg:right-6"
-          >
-            <span className="w-px shrink-0 bg-white/[0.15]" />
-            <span className="w-[2px] shrink-0 rounded-full bg-gradient-to-b from-[#67e8f9]/45 via-white/14 to-[#c4b5fd]/50" />
           </div>
           <div className="relative z-[2]">
-            <motion.div style={reduceMotion ? undefined : { y: metaHeaderParallaxY }}>
+            {/* Sin parallax: el encabezado se queda quieto mientras se lee. */}
+            <div>
               <span className="liquid-glass mb-5 inline-flex rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
                 Metodología
               </span>
-              <h2 className="font-display text-3xl text-white md:text-5xl">Cómo trabajamos</h2>
-              <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/50 md:text-lg">
-                Pasá el cursor sobre cada paso: las tarjetas responden en 3D para leer el flujo como una secuencia espacial.
+              <h2 className="font-display text-[clamp(2.2rem,5.4vw,4.25rem)] font-semibold leading-[0.95] tracking-tight text-white">
+                Cómo{" "}
+                <span className="italic bg-gradient-to-r from-[#67e8f9] via-[#c4b5fd] to-[#e879f9] bg-clip-text text-transparent">
+                  trabajamos
+                </span>
+              </h2>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/50 md:text-lg">
+                Cuatro etapas, del diagnóstico a la medición.
               </p>
-            </motion.div>
+            </div>
             <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-7">
               {methodology.map((m, i) => (
                 <motion.div
                   key={m.step}
-                  initial={{ opacity: 0, y: 32 }}
+                  initial={{ opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08, duration: 0.72, ease: easePremium }}
@@ -1244,33 +1304,30 @@ export function CosechaIaClient() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(103,232,249,0.06),transparent_58%)]"
           style={reduceMotion ? undefined : { y: casosRadialGlowY }}
         />
-        <SectionParticlesLayer uid="casos" reduceMotion={reduceMotion} color="#67e8f9" density={34} />
         <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
+          {/* Una sola barra, sobre el margen izquierdo. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute bottom-10 left-3 top-10 z-[1] flex gap-[5px] lg:left-6"
+            className="pointer-events-none absolute bottom-10 left-3 top-10 z-[1] flex lg:left-6"
           >
             <span className="w-[2px] shrink-0 rounded-full bg-gradient-to-b from-[#67e8f9]/55 via-white/14 to-[#c4b5fd]/38" />
-            <span className="w-px shrink-0 bg-white/[0.15]" />
-          </div>
-          <div
-            aria-hidden
-            className="pointer-events-none absolute bottom-10 right-3 top-10 z-[1] flex gap-[5px] lg:right-6"
-          >
-            <span className="w-px shrink-0 bg-white/[0.15]" />
-            <span className="w-[2px] shrink-0 rounded-full bg-gradient-to-b from-[#c4b5fd]/42 via-white/14 to-[#67e8f9]/52" />
           </div>
           <div className="relative z-[2]">
-            <motion.div style={reduceMotion ? undefined : { y: casosHeaderY }}>
+            {/* Sin parallax: el encabezado se queda quieto mientras se lee. */}
+            <div>
               <span className="liquid-glass mb-5 inline-flex rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
                 Casos de uso
               </span>
-              <h2 className="font-display text-3xl text-white md:text-5xl">Dónde encaja primero</h2>
-              <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/55 md:text-lg">
-                No hace falta ser una startup de Silicon Valley: la IA aplicada bien ordena la realidad de un negocio
-                sanjuanino día a día.
+              <h2 className="font-display text-[clamp(2.2rem,5.4vw,4.25rem)] font-semibold leading-[0.95] tracking-tight text-white">
+                Dónde encaja{" "}
+                <span className="italic bg-gradient-to-r from-[#67e8f9] via-[#c4b5fd] to-[#e879f9] bg-clip-text text-transparent">
+                  primero
+                </span>
+              </h2>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/55 md:text-lg">
+                No hace falta ser una startup: esto ordena la operación de un negocio sanjuanino común.
               </p>
-            </motion.div>
+            </div>
 
             <div className="mt-10 grid gap-6 sm:grid-cols-2 sm:gap-7 lg:gap-8">
               {useCases.map((u, idx) => (
@@ -1296,19 +1353,19 @@ export function CosechaIaClient() {
         )}
         {...sectionReveal}
       >
-        <SectionParticlesLayer
-          uid="diferencial"
-          reduceMotion={reduceMotion}
-          color="#ddd6fe"
-          density={28}
-          opacityClass="opacity-[0.35] md:opacity-[0.45]"
-        />
         <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
           <span className="liquid-glass mb-5 inline-flex rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
             Por qué Cosecha Creativa
           </span>
-          <h2 className="font-display text-3xl text-white md:text-5xl">Creatividad + tecnología, con los pies en San Juan</h2>
-          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          <h2 className="max-w-4xl font-display text-[clamp(2.2rem,5.4vw,4.25rem)] font-semibold leading-[0.95] tracking-tight text-white">
+            Creatividad y tecnología, con los pies en{" "}
+            <span className="italic bg-gradient-to-r from-[#67e8f9] via-[#c4b5fd] to-[#e879f9] bg-clip-text text-transparent">
+              San Juan
+            </span>
+          </h2>
+          {/* Columnas separadas por hairline en vez de tarjetas: contrasta con las
+              grillas de arriba y deja respirar los numerales grandes. */}
+          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-white/[0.09] bg-white/[0.07] lg:grid-cols-3">
             {[
               {
                 title: "Agencia digital, no solo código",
@@ -1317,7 +1374,7 @@ export function CosechaIaClient() {
               },
               {
                 title: "Implementación acompañada",
-                body: "No te dejamos con un manual PDF: iteramos con tu equipo hasta que el flujo sea cotidiano.",
+                body: "No te dejamos con un manual en PDF: iteramos con tu equipo hasta que el flujo sea cotidiano.",
                 icon: CheckCircle2,
               },
               {
@@ -1328,121 +1385,52 @@ export function CosechaIaClient() {
             ].map((d, i) => (
               <motion.div
                 key={d.title}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08, duration: 0.6, ease: easePremium }}
-                className="rounded-2xl border border-white/[0.1] bg-white/[0.04] p-8"
+                className="group relative flex flex-col overflow-hidden bg-[#06060b] p-8 transition-colors duration-500 hover:bg-[#0a0a14] md:p-10"
               >
-                <d.icon className="size-9 text-[#eca8d6]" strokeWidth={1.15} aria-hidden />
-                <h3 className="mt-5 font-display text-xl text-white">{d.title}</h3>
-                <p className="mt-3 text-white/58">{d.body}</p>
+                {/* Barra superior de acento: crece al pasar el cursor. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute left-0 top-0 h-[2px] w-0 bg-gradient-to-r from-[#67e8f9] via-[#c4b5fd] to-[#e879f9] transition-all duration-500 group-hover:w-full"
+                />
+                {/* Numeral en contorno */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -bottom-4 right-4 select-none font-display text-[6rem] leading-none tabular-nums text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.1)] transition-all duration-500 group-hover:[-webkit-text-stroke:1px_rgba(103,232,249,0.45)]"
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+
+                <span className="relative inline-flex size-12 items-center justify-center rounded-xl border border-white/12 bg-black/50 text-[#a5f3fc] transition-all duration-300 group-hover:border-[#67e8f9]/45 group-hover:scale-105">
+                  <d.icon className="size-6" strokeWidth={1.15} aria-hidden />
+                </span>
+                <h3 className="relative mt-6 font-display text-xl leading-snug text-white md:text-[1.5rem]">
+                  {d.title}
+                </h3>
+                <p className="relative mt-3 text-[15px] leading-relaxed text-white/58">{d.body}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </motion.section>
 
-      <motion.section
-        ref={chatMedidaSectionRef}
-        id="chat-medida"
-        className={cn(
-          "relative scroll-mt-28 overflow-x-hidden bg-gradient-to-b from-black/55 via-fuchsia-950/[0.12] to-black/55",
-          SECTION_PAD,
-        )}
-        {...sectionReveal}
-      >
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -left-[16%] top-[10%] size-[min(440px,50vw)] rounded-full bg-fuchsia-500/[0.09] blur-[96px]"
-          style={reduceMotion ? undefined : { y: chatBlobPrimaryY }}
-        />
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -right-[14%] bottom-[8%] size-[min(400px,46vw)] rounded-full bg-violet-500/[0.08] blur-[92px]"
-          style={reduceMotion ? undefined : { y: chatBlobSecondaryY }}
-        />
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.24] [mask-image:linear-gradient(to_bottom,black_22%,transparent)] bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:52px_52px]"
-          style={reduceMotion ? undefined : { y: chatGridParallaxY }}
-        />
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_68%_48%_at_50%_12%,rgba(217,70,239,0.08),transparent_56%)]"
-          style={reduceMotion ? undefined : { y: chatRadialGlowY }}
-        />
-        <SectionParticlesLayer
-          uid="chat-medida"
-          reduceMotion={reduceMotion}
-          color="#e879f9"
-          density={30}
-          opacityClass="opacity-[0.3] md:opacity-[0.4]"
-        />
-        <div className="relative z-10">
-          <CosechaIaChatMedida />
-        </div>
-      </motion.section>
-
-      <motion.section
-        ref={agentesSectionRef}
-        id="agentes-autonomos"
-        className={cn(
-          "relative scroll-mt-28 overflow-x-hidden bg-gradient-to-b from-black/55 via-cyan-950/[0.10] to-black/55",
-          SECTION_PAD,
-        )}
-        {...sectionReveal}
-      >
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -left-[14%] top-[14%] size-[min(460px,52vw)] rounded-full bg-cyan-400/[0.09] blur-[100px]"
-          style={reduceMotion ? undefined : { y: agentesBlobPrimaryY }}
-        />
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -right-[12%] bottom-[10%] size-[min(380px,44vw)] rounded-full bg-emerald-500/[0.07] blur-[88px]"
-          style={reduceMotion ? undefined : { y: agentesBlobSecondaryY }}
-        />
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.24] [mask-image:linear-gradient(to_bottom,black_25%,transparent)] bg-[linear-gradient(rgba(255,255,255,0.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.028)_1px,transparent_1px)] bg-[size:52px_52px]"
-          style={reduceMotion ? undefined : { y: agentesGridParallaxY }}
-        />
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_72%_50%_at_50%_18%,rgba(34,211,238,0.07),transparent_58%)]"
-          style={reduceMotion ? undefined : { y: agentesRadialGlowY }}
-        />
-        <SectionParticlesLayer
-          uid="agentes-autonomos"
-          reduceMotion={reduceMotion}
-          color="#67e8f9"
-          density={32}
-          opacityClass="opacity-[0.32] md:opacity-[0.42]"
-        />
-        <div className="relative z-10 mx-auto max-w-4xl px-4 md:px-6">
-          <div className="mb-8 text-center md:mb-10">
-            <h2 className="font-display text-3xl font-semibold leading-tight text-white md:text-4xl">
-              Agentes que ejecutan solos
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-white/55 md:text-lg">
-              No solo respondemos mensajes: diseñamos <strong className="font-medium text-white/90">agentes que disparan acciones</strong>
-              — sincronizar datos, mover pedidos, avisar a tu equipo — con reglas claras y sin depender de que alguien pulse botones todo el día.
-            </p>
-          </div>
-          <CosechaIaAgentPlan />
-        </div>
-      </motion.section>
 
       {/* CTA final */}
       <motion.section id="cta-ia" className={cn("relative scroll-mt-28 bg-black/55", SECTION_PAD)} {...sectionReveal}>
         <div className="mx-auto max-w-[720px] px-4 text-center sm:px-6 lg:px-12">
-          <h2 className="font-display text-3xl leading-tight text-white md:text-5xl">
-            ¿Querés ver cómo la IA puede encajar en tu negocio?
+          <h2 className="font-display text-[clamp(2.2rem,5.4vw,4rem)] font-semibold leading-[0.95] tracking-tight text-white">
+            ¿Dónde encaja la IA en{" "}
+            <span className="italic bg-gradient-to-r from-[#67e8f9] via-[#c4b5fd] to-[#e879f9] bg-clip-text text-transparent">
+              tu negocio
+            </span>
+            ?
           </h2>
           <p className="mx-auto mt-6 max-w-lg text-lg text-white/60">
-            Pedí una reunión de diagnóstico sin compromiso: revisamos procesos, herramientas y prioridades — y te devolvemos
-            una lectura clara de próximos pasos.
+            Pedí un diagnóstico sin compromiso: revisamos procesos y prioridades, y te devolvemos una lectura clara de
+            próximos pasos.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Button size="sm" asChild className="h-11 gap-2 rounded-full bg-white px-8 text-black hover:bg-white/90 md:h-12">
@@ -1458,17 +1446,21 @@ export function CosechaIaClient() {
               </a>
             </Button>
           </div>
-        </div>
-      </motion.section>
 
-      <motion.section
-        id="robot-ia"
-        className={cn("relative scroll-mt-28 overflow-hidden border-t border-white/10 bg-black/55", SECTION_PAD)}
-        {...sectionReveal}
-      >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_100%,rgba(103,232,249,0.06),transparent_55%)]" aria-hidden />
-        <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
-          <IaSplineRobot scene={SPLINE_SCENE_URL} />
+          {/* Qué pasa después de escribir: quita la fricción de "¿y ahora qué?". */}
+          <ol className="mx-auto mt-14 grid max-w-2xl gap-px overflow-hidden rounded-2xl border border-white/[0.09] bg-white/[0.07] text-left sm:grid-cols-3">
+            {[
+              { k: "01", t: "Nos escribís", d: "Por WhatsApp o mail, contando qué te traba hoy." },
+              { k: "02", t: "Diagnóstico", d: "Una reunión para ver procesos y prioridades." },
+              { k: "03", t: "Propuesta", d: "Alcance, plazos y precio cerrado, por escrito." },
+            ].map((s) => (
+              <li key={s.k} className="group bg-[#06060b] p-6 transition-colors duration-500 hover:bg-[#0a0a14]">
+                <span className="font-mono text-[11px] font-semibold tabular-nums text-[#67e8f9]">{s.k}</span>
+                <p className="mt-3 font-display text-lg leading-snug text-white">{s.t}</p>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-white/55">{s.d}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </motion.section>
 

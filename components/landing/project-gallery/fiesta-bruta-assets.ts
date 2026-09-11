@@ -1,5 +1,7 @@
 /** Rutas bajo `public/eventos/` — FIESTA PRIVADA · BRUTA PANORÁMICA · Club Comunicaciones */
 
+import { opt } from "@/lib/optimized-images"
+
 const FIESTA_BRUTA_ROOT =
   "/eventos/FIESTA PRIVADA _ BRUTA PANORÁMICA _ CLUB COMUNICACIONES-20260503T155213Z-3-001/FIESTA PRIVADA _ BRUTA PANORÁMICA _ CLUB COMUNICACIONES"
 
@@ -33,7 +35,7 @@ const RELATIVE_IMAGE_PATHS = [
 ] as const
 
 function publicUrl(pathFromPublicRoot: string): string {
-  return encodeURI(pathFromPublicRoot)
+  return opt(pathFromPublicRoot)
 }
 
 /** Portada del slide (feed general). */

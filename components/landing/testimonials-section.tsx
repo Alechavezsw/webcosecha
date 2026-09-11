@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { KineticHeading } from "@/components/landing/kinetic-heading";
 import { ArrowLeft, ArrowRight, Star } from "lucide-react";
 
 const testimonials = [
@@ -85,7 +86,7 @@ export function TestimonialsSection() {
     <section
       ref={sectionRef}
       id="feedbacks"
-      className="cc-aura cc-aura-rose relative overflow-hidden py-32 text-white lg:py-40"
+      className="relative overflow-hidden py-32 text-white lg:py-40"
     >
       <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <header className="text-center">
@@ -96,13 +97,10 @@ export function TestimonialsSection() {
           >
             Feedbacks
           </p>
-          <h2
-            className={`font-display text-3xl font-bold tracking-tight transition-all duration-1000 md:text-4xl ${
-              isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-            }`}
-          >
-            Algunos de nuestros clientes
-          </h2>
+          <KineticHeading
+            className="font-display text-3xl font-bold tracking-tight md:text-4xl"
+            lines={[{ text: "Algunos de nuestros clientes" }]}
+          />
           <p
             className={`mt-3 text-base text-white/55 transition-all duration-1000 delay-100 ${
               isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"

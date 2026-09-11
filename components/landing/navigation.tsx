@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { motion } from "framer-motion";
 
 const navLinks = [
   { name: "Nosotros", href: "/nosotros" },
@@ -31,11 +32,18 @@ const navLinks = [
   { name: "Blog", href: "/blog" },
 ] as const;
 
-export function Navigation() {
+/**
+ * `onLight`: páginas de fondo claro (p. ej. /servicios/ai-first). Arriba de todo
+ * el header no tiene panel propio, así que el blanco por defecto se pierde
+ * contra el fondo; con esta bandera el estado sin scroll pasa a tinta oscura.
+ */
+export function Navigation({ onLight = false }: { onLight?: boolean } = {}) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
+  /** Ítem bajo el mouse: la píldora viaja hacia él con `layoutId`. */
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,26 +84,33 @@ export function Navigation() {
         >
           {/* Logo */}
           <a href="/" className="flex min-w-0 items-center gap-2 group">
-            <span className={`font-display tracking-tight transition-all duration-500 truncate ${isScrolled ? "text-lg text-foreground sm:text-xl" : "text-xl text-white sm:text-2xl"}`}>
+            <span className={`font-display tracking-tight transition-all duration-500 truncate ${isScrolled ? "text-lg text-foreground sm:text-xl" : onLight ? "text-xl text-[#111] sm:text-2xl" : "text-xl text-white sm:text-2xl"}`}>
               Cosecha Creativa
             </span>
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-8">
+          <div
+            className="hidden md:flex items-center gap-1 lg:gap-2"
+            onMouseLeave={() => setHoveredLink(null)}
+          >
             {navLinks.map((link) => {
               if (link.dropdown) {
                 return (
                   <div
                     key={link.name}
                     className="relative group py-2"
-                    onMouseEnter={() => setIsDropdownOpen(true)}
+                    onMouseEnter={() => {
+                      setIsDropdownOpen(true);
+                      setHoveredLink(link.name);
+                    }}
                     onMouseLeave={() => setIsDropdownOpen(false)}
                   >
+                    {hoveredLink === link.name && <NavPill isScrolled={isScrolled} onLight={onLight} />}
                     <a
                       href={link.href}
-                      className={`text-sm transition-colors duration-300 relative flex items-center gap-1 ${
-                        isScrolled ? "text-foreground/70 hover:text-foreground" : "text-white/70 hover:text-white"
+                      className={`relative z-10 flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition-colors duration-300 ${
+                        isScrolled ? "text-foreground/70 hover:text-foreground" : onLight ? "text-black/65 hover:text-black" : "text-white/70 hover:text-white"
                       }`}
                     >
                       {link.name}
@@ -138,14 +153,21 @@ export function Navigation() {
               }
 
               return (
-                <a
+                <div
                   key={link.name}
-                  href={link.href}
-                  className={`text-sm transition-colors duration-300 relative group ${isScrolled ? "text-foreground/70 hover:text-foreground" : "text-white/70 hover:text-white"}`}
+                  className="relative py-2"
+                  onMouseEnter={() => setHoveredLink(link.name)}
                 >
-                  {link.name}
-                  <span className={`absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full ${isScrolled ? "bg-foreground" : "bg-white"}`} />
-                </a>
+                  {hoveredLink === link.name && <NavPill isScrolled={isScrolled} onLight={onLight} />}
+                  <a
+                    href={link.href}
+                    className={`relative z-10 block rounded-full px-3 py-1.5 text-sm transition-colors duration-300 ${
+                      isScrolled ? "text-foreground/70 hover:text-foreground" : onLight ? "text-black/65 hover:text-black" : "text-white/70 hover:text-white"
+                    }`}
+                  >
+                    {link.name}
+                  </a>
+                </div>
               );
             })}
           </div>
@@ -155,7 +177,7 @@ export function Navigation() {
             <Button
               asChild
               size="sm"
-              className={`rounded-full transition-all duration-500 ${isScrolled ? "bg-foreground hover:bg-foreground/90 text-background px-4 h-8 text-xs" : "bg-white hover:bg-white/90 text-black px-6"}`}
+              className={`rounded-full transition-all duration-500 ${isScrolled ? "bg-foreground hover:bg-foreground/90 text-background px-4 h-8 text-xs" : onLight ? "bg-[#111] hover:bg-[#222] text-white px-6" : "bg-white hover:bg-white/90 text-black px-6"}`}
             >
               <a href="/contacto">Háblanos</a>
             </Button>
@@ -164,7 +186,7 @@ export function Navigation() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`md:hidden p-2 transition-colors duration-500 ${isScrolled || isMobileMenuOpen ? "text-foreground" : "text-white"}`}
+            className={`md:hidden p-2 transition-colors duration-500 ${isScrolled || isMobileMenuOpen ? "text-foreground" : onLight ? "text-[#111]" : "text-white"}`}
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -271,5 +293,22 @@ export function Navigation() {
         </div>
       </div>
     </header>
+  );
+}
+
+/**
+ * Fondo que viaja entre los ítems del nav. Al montarse en uno solo por vez y
+ * compartir `layoutId`, framer-motion anima el salto de posición y ancho.
+ */
+function NavPill({ isScrolled, onLight }: { isScrolled: boolean; onLight?: boolean }) {
+  return (
+    <motion.span
+      layoutId="cc-nav-pill"
+      className={`absolute inset-x-0 top-1/2 -z-0 h-9 -translate-y-1/2 rounded-full ${
+        isScrolled ? "bg-foreground/10" : onLight ? "bg-black/[0.07]" : "bg-white/10"
+      }`}
+      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+      aria-hidden
+    />
   );
 }

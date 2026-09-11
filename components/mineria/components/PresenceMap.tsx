@@ -1,8 +1,9 @@
 import React from 'react';
 import { MapPin, Pickaxe, Shield, Compass, Mountain, Activity } from 'lucide-react';
-import { asset } from '../lib/asset';
+import { assetOpt } from '../lib/asset';
+import SectionKicker from './SectionKicker';
 
-const PRESENCIA_BG_IMAGE = asset('543d28df-7bf5-48d8-a45e-302a3ff6829b.png');
+const PRESENCIA_BG_IMAGE = assetOpt('543d28df-7bf5-48d8-a45e-302a3ff6829b.png');
 
 const PresenceMap: React.FC = () => {
   return (
@@ -31,12 +32,7 @@ const PresenceMap: React.FC = () => {
           
           {/* Left Column: Context & Typography */}
           <div className="lg:col-span-5 flex flex-col justify-center">
-            <div className="mb-6 flex items-center gap-4">
-              <div className="h-px w-12 bg-[#ffb800]/50" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.45em] text-[#ffb800]/90 font-mono">
-                Raíz regional
-              </span>
-            </div>
+            <SectionKicker className="mb-6">Raíz regional</SectionKicker>
             
             <h2
               id="presencia-heading"
@@ -109,6 +105,7 @@ const PresenceMap: React.FC = () => {
                   src={PRESENCIA_BG_IMAGE}
                   alt="Mapa topográfico de San Juan"
                   className="absolute inset-0 w-full h-full object-cover object-center scale-[1.1] opacity-75 filter contrast-[1.08] saturate-[0.85] pointer-events-none z-0"
+                  loading="lazy"
                   decoding="async"
                 />
                 

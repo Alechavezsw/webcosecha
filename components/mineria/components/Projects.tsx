@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import gsap from 'gsap';
-import { asset } from '../lib/asset';
+import { assetOpt } from '../lib/asset';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import SectionKicker from './SectionKicker';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -267,9 +268,11 @@ const Projects: React.FC<ProjectsProps> = ({
       >
         <img
           ref={bgImgRef}
-          src={asset('cc%20(4).png')}
+          src={assetOpt('cc (4).png')}
           alt=""
           className="absolute inset-0 h-full min-h-full w-full object-cover object-center"
+          width={1600}
+          height={900}
           loading="lazy"
           decoding="async"
         />
@@ -298,13 +301,8 @@ const Projects: React.FC<ProjectsProps> = ({
         className="cases-stage relative z-10 mx-auto max-w-[1800px] px-6 sm:px-10 [transform-style:preserve-3d]"
       >
         <div ref={headerRef} className="mb-10 md:mb-14">
-          <div className="cases-intro-label mb-10 flex items-center gap-6">
-            <div className="h-0.5 w-20 bg-[#ffb800]" />
-            <span className="text-[12px] font-bold uppercase tracking-[0.55em] text-[#ffb800]">
-              Trabajos
-            </span>
-          </div>
-          <h2 className="relative mb-2 block font-display text-[clamp(2.5rem,9vw,7rem)] uppercase italic leading-[0.9] tracking-tighter text-white [overflow-wrap:anywhere]">
+          <SectionKicker className="cases-intro-label mb-10">Trabajos</SectionKicker>
+          <h2 className="relative mb-2 block font-display text-[clamp(2.5rem,8vw,7rem)] uppercase italic leading-[0.9] tracking-tighter text-white [overflow-wrap:anywhere]">
             <span className="cases-head-word inline-block">
               <span className="cases-head-word-scroll inline-block">IMPACTO</span>
             </span>{' '}
@@ -365,7 +363,10 @@ const Projects: React.FC<ProjectsProps> = ({
                     src={project.image}
                     alt={project.title}
                     className="h-full w-full object-cover grayscale transition-all duration-1000 group-hover:scale-110 group-hover:grayscale-0"
+                    width={1200}
+                    height={1600}
                     loading="lazy"
+                    decoding="async"
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 bg-black/40 transition-all duration-700 group-hover:bg-transparent" />

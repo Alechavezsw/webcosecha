@@ -1,18 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useRef } from "react"
-import {
-  motion,
-  useMotionTemplate,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type Variants,
-} from "framer-motion"
-import { Check, Cloud, Cpu, Link2, Rocket, Shield } from "lucide-react"
+import { motion, useReducedMotion, useScroll, useSpring, type Variants } from "framer-motion"
+import { ArrowLeft, ArrowUpRight, Check, Cpu, Link2, Server, Shield } from "lucide-react"
 import { Navigation } from "@/components/landing/navigation"
 import { FooterSection } from "@/components/landing/footer-section"
+import { Button } from "@/components/ui/button"
+import { WhatsAppMark } from "@/components/icons/whatsapp-mark"
+import { getWhatsAppHref } from "@/lib/whatsapp"
 import {
   DEPLOY_STACK,
   DeployLogoGrid,
@@ -21,782 +16,435 @@ import {
   LogoMarquee,
 } from "@/components/landing/servicios/nube-tech-logos"
 import RotatingEarth from "@/components/landing/servicios/rotating-earth"
-import { NubeOpenClawSection } from "@/components/landing/servicios/nube-openclaw-section"
-import { cn } from "@/lib/utils"
-
-const VIDEO_SRC =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"
 
 const easePremium = [0.22, 1, 0.36, 1] as const
 
-const introAllows = [
-  "Mayor velocidad.",
-  "Mejor disponibilidad.",
-  "Acceso remoto.",
-  "Escalabilidad.",
-  "Seguridad.",
-  "Backups.",
-  "Control técnico.",
-  "Integración con herramientas de IA.",
-  "Automatizaciones funcionando 24/7.",
-]
+/** Fondo claro propio de esta página (el globo usa este mismo color para integrarse). */
+const PAGE_BG = "#f0f0ee"
 
-const vpsDeploy = [
-  "WordPress avanzado.",
-  "Apps en Node.js.",
-  "Laravel.",
-  "React / Next.js.",
-  "n8n.",
-  "Supabase.",
-  "Appwrite.",
-  "Docker.",
-  "APIs privadas.",
-  "Chatbots.",
-  "Sistemas de gestión.",
-  "Automatizaciones empresariales.",
-  "Herramientas internas con IA.",
-]
+/** Ritmo vertical parejo entre bloques. */
+const sectionPy = "py-16 md:py-20 lg:py-24"
 
-const iaConnects = [
-  "Formularios web.",
-  "WhatsApp.",
-  "Gmail.",
-  "Google Sheets.",
-  "CRM.",
-  "Bases de datos.",
-  "WordPress.",
-  "Redes sociales.",
-  "Sistemas administrativos.",
-  "APIs externas.",
-  "Chatbots.",
-  "Asistentes internos.",
-  "Flujos de n8n.",
-]
+const HERO_CHIPS = ["VPS", "Docker", "n8n", "APIs privadas", "Chatbots"] as const
 
-const iaExamples = [
-  "Un formulario que carga automáticamente un cliente en una base de datos.",
-  "Un sistema que responde consultas frecuentes.",
-  "Una automatización que crea tareas internas.",
-  "Un panel que muestra ventas, pedidos o métricas.",
-  "Un asistente IA que ayuda a buscar información dentro de documentos.",
-  "Un flujo que conecta la web con WhatsApp, email y CRM.",
-]
+const HERO_STATS = [
+  { value: "24/7", label: "automatizaciones corriendo" },
+  { value: "VPS propio", label: "control técnico real" },
+  { value: "Escalable", label: "crece con tu empresa" },
+] as const
 
-const scalingItems = [
-  "Más usuarios.",
-  "Nuevos módulos.",
-  "Mayor capacidad de servidor.",
-  "Automatizaciones.",
-  "Integraciones.",
-  "IA.",
-  "Reportes avanzados.",
-  "Paneles de control.",
-  "App móvil.",
-  "E-commerce.",
-  "Sistemas internos.",
-]
+const capacidades = [
+  {
+    icon: Server,
+    title: "Servidores VPS",
+    body: "WordPress avanzado, Node.js, Laravel, Next.js, Docker y bases de datos en un servidor tuyo.",
+  },
+  {
+    icon: Cpu,
+    title: "Automatizaciones con IA",
+    body: "Flujos de n8n, chatbots y asistentes internos que trabajan sobre tus propios datos.",
+  },
+  {
+    icon: Link2,
+    title: "Integraciones",
+    body: "Formularios, WhatsApp, Gmail, Sheets, CRM y APIs externas hablando entre sí.",
+  },
+  {
+    icon: Shield,
+    title: "Seguridad y backups",
+    body: "Accesos controlados, copias automáticas y monitoreo del servidor.",
+  },
+] as const
 
-const empresaBenefits = [
-  "Menos tareas manuales.",
-  "Más orden interno.",
-  "Mejor atención al cliente.",
-  "Información centralizada.",
-  "Procesos más rápidos.",
-  "Menos errores.",
-  "Acceso desde cualquier lugar.",
-  "Mayor seguridad.",
-  "Ahorro de tiempo.",
-  "Sistemas preparados para escalar.",
-  "Automatizaciones funcionando todo el día.",
-]
+const ejemplos = [
+  "Un formulario que carga el cliente directo en la base de datos.",
+  "Un sistema que responde las consultas frecuentes solo.",
+  "Un panel que muestra ventas, pedidos y métricas al día.",
+  "Un asistente que busca información dentro de tus documentos.",
+] as const
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 36 },
+const beneficios = [
+  "Menos tareas manuales",
+  "Información centralizada",
+  "Procesos más rápidos",
+  "Menos errores de carga",
+  "Acceso desde cualquier lugar",
+  "Listo para escalar",
+] as const
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: easePremium } },
+}
+
+const sectionVariants: Variants = {
+  hidden: { opacity: 0, y: 26 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.75, ease: easePremium },
+    transition: { duration: 0.7, ease: easePremium, staggerChildren: 0.07 },
   },
 }
 
-const staggerHero: Variants = {
+const heroContainer: Variants = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.11, delayChildren: 0.06 },
-  },
+  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
 }
 
-const staggerContainer: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.08, delayChildren: 0.06 },
-  },
-}
-
-const staggerItem: Variants = {
-  hidden: { opacity: 0, y: 22 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: easePremium },
-  },
-}
-
-const listRowStagger: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.038, delayChildren: 0.04 },
-  },
-}
-
-const listRowItem: Variants = {
-  hidden: { opacity: 0, x: -12 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.45, ease: easePremium },
-  },
-}
-
-const headerStagger: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
-  },
-}
-
-const headerChild: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.62, ease: easePremium },
-  },
-}
-
-const headerStaggerStatic: Variants = { hidden: {}, visible: {} }
-const headerChildStatic: Variants = {
-  hidden: { opacity: 1, y: 0 },
-  visible: { opacity: 1, y: 0 },
-}
-
-type RevealDirection = "up" | "down" | "left" | "right"
-
-function revealOffset(direction: RevealDirection, reduce: boolean) {
-  if (reduce) return {}
-  switch (direction) {
-    case "down":
-      return { y: -28 }
-    case "left":
-      return { x: 28 }
-    case "right":
-      return { x: -28 }
-    default:
-      return { y: 32 }
-  }
-}
-
-function Reveal({
-  children,
-  className,
-  delay = 0,
-  direction = "up",
+/** Encabezado compartido por los cuatro bloques, para que todos lean igual. */
+function SectionHeader({
+  eyebrow,
+  title,
+  body,
 }: {
-  children: React.ReactNode
-  className?: string
-  delay?: number
-  direction?: RevealDirection
+  eyebrow: string
+  title: string
+  body?: string
 }) {
-  const reduce = useReducedMotion()
-  const off = revealOffset(direction, reduce)
-
   return (
-    <motion.div
-      className={className}
-      initial={reduce ? false : { opacity: 0, ...off }}
-      whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: "-50px", amount: 0.15 }}
-      transition={{ duration: 0.78, ease: easePremium, delay }}
-    >
-      {children}
-    </motion.div>
-  )
-}
-
-function ListCard({
-  items,
-  id,
-  className,
-}: {
-  items: readonly string[]
-  id?: string
-  className?: string
-}) {
-  const reduce = useReducedMotion()
-
-  const listBody = (
-    <>
-      <div
-        className="pointer-events-none absolute -right-20 -top-20 h-44 w-44 rounded-full bg-blue-400/15 blur-3xl transition-opacity duration-700 group-hover/card:opacity-100"
-        aria-hidden
-      />
-      {reduce ? (
-        <ul className="relative grid gap-2.5 sm:grid-cols-2">
-          {items.map((item) => (
-            <li
-              key={item}
-              className="flex gap-2 text-[15px] leading-snug text-gray-700"
-            >
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" aria-hidden />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <motion.ul
-          className="relative grid gap-2.5 sm:grid-cols-2"
-          variants={listRowStagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-20px" }}
-        >
-          {items.map((item) => (
-            <motion.li
-              key={item}
-              className="flex gap-2 text-[15px] leading-snug text-gray-700"
-              variants={listRowItem}
-            >
-              <motion.span
-                className="mt-0.5 inline-flex shrink-0"
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", stiffness: 380, damping: 20 }}
-              >
-                <Check className="h-4 w-4 text-blue-500" aria-hidden />
-              </motion.span>
-              <span>{item}</span>
-            </motion.li>
-          ))}
-        </motion.ul>
-      )}
-    </>
-  )
-
-  return (
-    <motion.div
-      id={id}
-      className={cn(
-        "group/card relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white/90 p-6 shadow-[0_24px_80px_-48px_rgba(15,23,42,0.15)] backdrop-blur-md transition-shadow duration-500 hover:shadow-[0_28px_90px_-44px_rgba(37,99,235,0.18)] sm:p-8",
-        className,
-      )}
-      initial={reduce ? false : { opacity: 0, y: 32, scale: 0.985 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ type: "spring", stiffness: 120, damping: 22, mass: 0.9 }}
-    >
-      {listBody}
-    </motion.div>
-  )
-}
-
-function SectionShell({
-  id,
-  icon: Icon,
-  tint,
-  children,
-}: {
-  id: string
-  icon: typeof Cloud
-  tint: string
-  children: React.ReactNode
-}) {
-  const reduce = useReducedMotion()
-
-  return (
-    <Reveal direction="left">
-      <motion.section
-        id={id}
-        className="group relative scroll-mt-28 overflow-hidden rounded-3xl border border-gray-200/70 bg-gradient-to-br from-white via-[#fafaf8] to-gray-100/80 p-8 shadow-[0_32px_100px_-56px_rgba(15,23,42,0.18)] transition-[transform,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_40px_120px_-50px_rgba(15,23,42,0.22)] sm:p-10"
-        whileHover={reduce ? undefined : { scale: 1.008 }}
-        transition={{ type: "spring", stiffness: 260, damping: 26 }}
+    <div className="max-w-2xl">
+      <motion.span
+        variants={itemVariants}
+        className="mb-5 inline-flex items-center gap-3 font-mono text-sm uppercase tracking-[0.22em] text-blue-600"
       >
-        <div
-          className={cn(
-            "pointer-events-none absolute -left-16 top-1/2 h-52 w-52 -translate-y-1/2 rounded-full opacity-40 blur-3xl transition-all duration-700 group-hover:opacity-80 group-hover:scale-105",
-            tint,
-          )}
-          aria-hidden
-        />
-        <motion.div
-          className="pointer-events-none absolute right-6 top-6 opacity-[0.07]"
-          aria-hidden
-          animate={reduce ? undefined : { rotate: [0, 6, 0], scale: [1, 1.06, 1] }}
-          transition={{
-            duration: 10,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "easeInOut",
-          }}
-        >
-          <Icon className="h-24 w-24 text-gray-900" strokeWidth={1} />
-        </motion.div>
-        <div className="relative">{children}</div>
-      </motion.section>
-    </Reveal>
+        <span className="h-px w-12 bg-gradient-to-r from-transparent to-blue-400" />
+        {eyebrow}
+      </motion.span>
+      <motion.h2
+        variants={itemVariants}
+        className="font-display text-4xl leading-[0.98] tracking-tight text-gray-900 md:text-5xl"
+      >
+        {title}
+      </motion.h2>
+      {body ? (
+        <motion.p variants={itemVariants} className="mt-5 text-lg leading-relaxed text-gray-600">
+          {body}
+        </motion.p>
+      ) : null}
+    </div>
   )
 }
 
 export function NubePageClient() {
-  const heroRef = useRef<HTMLDivElement>(null)
   const reduce = useReducedMotion()
+  const waHref = getWhatsAppHref("Soluciones en la nube")
 
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  })
-
-  const videoY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [0, 180])
-  const videoScale = useTransform(scrollYProgress, [0, 1], reduce ? [1, 1] : [1, 1.12])
-  const topGradientOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.96])
-  const radialGlowOpacity = useTransform(scrollYProgress, [0, 1], [0.88, 1])
-  const heroContentY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [0, 72])
-  const heroContentOpacity = useTransform(scrollYProgress, [0, 0.72], [1, 0])
-  const heroBlurPx = useTransform(scrollYProgress, [0, 0.85], reduce ? [0, 0] : [0, 5])
-  const blurFilter = useMotionTemplate`blur(${heroBlurPx}px)`
-
-  const decorativeFloat = reduce
-    ? {}
-    : {
-        animate: {
-          y: [0, -12, 0],
-          opacity: [0.4, 0.65, 0.4],
-        },
-        transition: {
-          duration: 8,
-          repeat: Number.POSITIVE_INFINITY,
-          ease: "easeInOut" as const,
-        },
-      }
+  const { scrollYProgress: pageScroll } = useScroll()
+  const pageScrollScaleX = useSpring(pageScroll, { stiffness: 120, damping: 30, mass: 0.3 })
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#f0f0ee] font-[system-ui,-apple-system,BlinkMacSystemFont,'Segoe_UI',Roboto,sans-serif]">
-      <Navigation />
+    <main
+      className="relative min-h-screen overflow-x-hidden text-gray-900"
+      style={{ backgroundColor: PAGE_BG }}
+    >
+      {/* Fondo claro: el header necesita tinta oscura arriba de todo. */}
+      <Navigation onLight />
 
-      <div
-        ref={heroRef}
-        className="relative flex min-h-[110vh] flex-col overflow-hidden"
-      >
-        <motion.video
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover will-change-transform"
-          style={{ y: videoY, scale: videoScale }}
-          src={VIDEO_SRC}
-          autoPlay
-          muted
-          loop
-          playsInline
+      {!reduce && (
+        <motion.div
+          aria-hidden
+          className="fixed inset-x-0 top-0 z-[100] h-[3px] origin-left bg-gradient-to-r from-blue-500 via-sky-400 to-indigo-500"
+          style={{ scaleX: pageScrollScaleX }}
+        />
+      )}
+
+      {/* ---------------------------------------------------------- *
+       * 1 · Hero                                                     *
+       * ---------------------------------------------------------- */}
+      <section className="relative overflow-hidden px-6 pb-16 pt-36 lg:px-12 lg:pb-24 lg:pt-40">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-[min(60vh,520px)] bg-[radial-gradient(ellipse_80%_70%_at_50%_0%,rgba(59,130,246,0.12)_0%,transparent_70%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -left-[10%] top-[20%] h-72 w-72 rounded-full bg-blue-300/25 blur-[110px]"
           aria-hidden
         />
 
         <motion.div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#f0f0ee]"
-          style={{ opacity: topGradientOpacity }}
-          aria-hidden
-        />
-
-        <motion.div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_70%_20%,rgba(59,130,246,0.2),transparent_55%),radial-gradient(ellipse_70%_50%_at_10%_80%,rgba(147,197,253,0.12),transparent_50%)]"
-          style={{ opacity: radialGlowOpacity }}
-          aria-hidden
-        />
-
-        {!reduce && (
-          <>
-            <motion.div
-              className="pointer-events-none absolute left-[8%] top-[22%] h-56 w-56 rounded-full bg-blue-400/25 blur-[100px]"
-              {...decorativeFloat}
-            />
-            <motion.div
-              className="pointer-events-none absolute bottom-[30%] right-[12%] h-44 w-44 rounded-full bg-indigo-400/20 blur-[90px]"
-              animate={{
-                y: [0, 18, 0],
-                opacity: [0.35, 0.55, 0.35],
-              }}
-              transition={{
-                duration: 10,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
-            />
-          </>
-        )}
-
-        <div className="relative z-10 flex flex-1 flex-col pt-20">
-          <motion.div
-            className="flex flex-1 flex-col justify-end px-6 pb-14 sm:px-12 sm:pb-16 md:px-20 lg:px-28 lg:pb-24"
-            style={{ y: heroContentY }}
-          >
-            <motion.div
-              className="max-w-3xl"
-              variants={staggerHero}
-              initial="hidden"
-              animate="visible"
-              style={{
-                opacity: heroContentOpacity,
-                filter: reduce ? "none" : blurFilter,
-              }}
-            >
-              <motion.div variants={fadeUp}>
-                <Link
-                  href="#despliegue"
-                  className="group mb-5 inline-flex items-center gap-1.5 text-[12px] font-medium text-blue-300 transition-colors hover:text-white sm:text-[13px]"
-                >
-                  <motion.span
-                    className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-md"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Digitalizamos tu empresa y la llevamos a la nube
-                    <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">
-                      →
-                    </span>
-                  </motion.span>
-                </Link>
-              </motion.div>
-
-              <motion.h1
-                className="mb-5 font-display text-[1.85rem] leading-[1.12] tracking-tight text-white sm:text-[2.25rem] lg:text-[2.7rem]"
-                variants={fadeUp}
+          variants={heroContainer}
+          initial={reduce ? false : "hidden"}
+          animate={reduce ? undefined : "visible"}
+          className="relative z-10 mx-auto grid max-w-[1400px] items-center gap-14 lg:grid-cols-12 lg:gap-16"
+        >
+          <div className="lg:col-span-7">
+            <motion.div variants={itemVariants}>
+              <Link
+                href="/#soluciones"
+                className="mb-9 inline-flex items-center gap-2 rounded-full border border-gray-300/80 bg-white/70 px-4 py-2 text-[13px] text-gray-600 backdrop-blur-sm transition-all hover:border-blue-400/60 hover:text-gray-900"
               >
-                Tu empresa no necesita más parches digitales. Necesita una infraestructura lista
-                para crecer.
-              </motion.h1>
-
-              <motion.p
-                className="mb-8 max-w-2xl text-[15px] leading-relaxed text-white/88 sm:text-[16px]"
-                variants={fadeUp}
-              >
-                En Cosecha Creativa desarrollamos sistemas, automatizaciones y soluciones en la
-                nube para transformar procesos manuales en herramientas inteligentes, seguras y
-                escalables.
-              </motion.p>
-
-              <motion.div variants={fadeUp}>
-                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                  <Link
-                    href="/#contacto"
-                    className="group inline-flex items-center gap-2 rounded-full border border-white/45 bg-white/12 px-7 py-3.5 text-[14px] font-medium text-white shadow-[0_20px_60px_-24px_rgba(0,0,0,0.45)] backdrop-blur-md transition-colors hover:border-white hover:bg-white hover:text-gray-900"
-                  >
-                    Digitalizá tu empresa con Cosecha Creativa
-                    <span className="transition-transform duration-200 group-hover:translate-x-1">
-                      →
-                    </span>
-                  </Link>
-                </motion.div>
-              </motion.div>
+                <ArrowLeft className="size-3.5" aria-hidden />
+                Volver a soluciones
+              </Link>
             </motion.div>
-          </motion.div>
 
-          <motion.div
-            className="pointer-events-none flex justify-center pb-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.8 }}
-            aria-hidden
-          >
-            <motion.div
-              animate={reduce ? {} : { y: [0, 8, 0] }}
-              transition={{
-                duration: 2.2,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
-              className="flex flex-col items-center gap-1 text-[11px] font-medium uppercase tracking-[0.2em] text-white/50"
+            <motion.span
+              variants={itemVariants}
+              className="mb-5 inline-flex items-center gap-3 font-mono text-sm uppercase tracking-[0.24em] text-blue-600"
             >
-              <span>Scroll</span>
-              <motion.span
-                className="block h-8 w-[1px] rounded-full bg-gradient-to-b from-white/60 to-transparent"
-                animate={reduce ? {} : { scaleY: [1, 1.4, 1] }}
-                transition={{
-                  duration: 2.2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-              />
-            </motion.div>
-          </motion.div>
-        </div>
-      </div>
+              <span className="h-px w-12 bg-gradient-to-r from-transparent to-blue-400" />
+              Nube e infraestructura · San Juan
+            </motion.span>
 
-      <article
-        id="despliegue"
-        className="relative z-10 -mt-4 overflow-hidden border-t border-gray-200/50 bg-[#f0f0ee] px-6 pb-24 pt-16 sm:px-12 md:px-20 lg:px-28"
-      >
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
+            <motion.h1
+              variants={itemVariants}
+              className="font-display text-[clamp(2.5rem,7vw,5rem)] leading-[0.94] tracking-tight text-gray-900"
+            >
+              Tu empresa,
+              <span className="mt-1 block bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-500 bg-clip-text text-transparent">
+                en la nube
+              </span>
+            </motion.h1>
 
-        {!reduce && (
-          <>
-            <motion.div
-              className="pointer-events-none absolute -left-20 top-[12%] h-[min(60vw,420px)] w-[min(60vw,420px)] rounded-full bg-blue-400/[0.07] blur-[120px]"
-              aria-hidden
-              animate={{ scale: [1, 1.12, 1], opacity: [0.45, 0.75, 0.45] }}
-              transition={{ duration: 16, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="pointer-events-none absolute bottom-[8%] right-[-8%] h-[min(55vw,380px)] w-[min(55vw,380px)] rounded-full bg-indigo-400/[0.06] blur-[110px]"
-              aria-hidden
-              animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.65, 0.4] }}
-              transition={{
-                duration: 18,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-                delay: 2,
-              }}
-            />
-          </>
-        )}
-
-        <div className="relative mx-auto max-w-3xl space-y-16 lg:max-w-4xl">
-          <motion.header
-            className="space-y-5"
-            variants={reduce ? headerStaggerStatic : headerStagger}
-            initial={reduce ? false : "hidden"}
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-          >
             <motion.p
-              className="text-[13px] font-semibold uppercase tracking-[0.2em] text-blue-600"
-              variants={reduce ? headerChildStatic : headerChild}
+              variants={itemVariants}
+              className="mt-7 max-w-xl text-lg leading-relaxed text-gray-600 md:text-xl"
             >
-              Despliegue en la nube
+              Servidores VPS, automatizaciones con IA y sistemas que crecen con vos. Se terminan los
+              parches digitales.
             </motion.p>
-            <motion.h2
-              className="font-display text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl lg:text-[2.15rem] lg:leading-tight"
-              variants={reduce ? headerChildStatic : headerChild}
-            >
-              Tus sistemas funcionando online, seguros y disponibles
-            </motion.h2>
-            <motion.div
-              className="space-y-4 text-[15px] leading-relaxed text-gray-600"
-              variants={reduce ? headerChildStatic : headerChild}
-            >
-              <p>
-                Nos encargamos de llevar tu proyecto a la nube para que pueda ser utilizado desde
-                cualquier lugar, con infraestructura preparada para crecer.
-              </p>
-              <p>
-                Trabajamos con servidores VPS, entornos cloud, bases de datos, contenedores Docker y
-                herramientas modernas para desplegar aplicaciones web, automatizaciones e
-                integraciones.
-              </p>
-              <p className="font-medium text-gray-800">Esto permite que tu empresa tenga:</p>
-            </motion.div>
-          </motion.header>
 
-          <Reveal direction="right">
-            <motion.div
-              className="space-y-4"
-              initial={reduce ? false : { opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.65, ease: easePremium }}
-            >
-              <p className="text-center text-[12px] font-semibold uppercase tracking-[0.25em] text-gray-500">
-                Stack &amp; herramientas
-              </p>
-              <LogoMarquee items={DEPLOY_STACK} durationSec={48} />
-            </motion.div>
-          </Reveal>
-
-          <Reveal direction="right">
-            <motion.div
-              className="w-full max-w-[min(100%,56rem)]"
-              initial={reduce ? false : { opacity: 0, scale: 0.96, y: 28 }}
-              whileInView={{ opacity: 1, scale: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.85, ease: easePremium }}
-            >
-              <RotatingEarth width={960} height={440} variant="light" />
-            </motion.div>
-          </Reveal>
-
-          <ListCard items={introAllows} />
-
-          <SectionShell id="vps" icon={Cpu} tint="bg-blue-400/30">
-            <h2 className="mb-5 font-display text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
-              Servidores VPS para empresas
-            </h2>
-            <div className="mb-5 space-y-4 text-[15px] leading-relaxed text-gray-600">
-              <p>
-                Implementamos y configuramos servidores privados virtuales para proyectos que
-                necesitan más potencia, independencia y control que un hosting tradicional.
-              </p>
-              <p>
-                Un VPS permite instalar sistemas personalizados, manejar bases de datos, correr
-                aplicaciones, automatizaciones, APIs, bots, paneles internos y herramientas de
-                inteligencia artificial.
-              </p>
-              <p className="font-medium text-gray-800">Podemos desplegar:</p>
-            </div>
-            <DeployLogoGrid className="mb-8" />
-            <HostingerDockerReference className="mb-8" />
-            <ListCard items={vpsDeploy} className="mb-6 border-blue-100/80 bg-blue-50/40" />
-            <p className="text-[15px] leading-relaxed text-gray-600">
-              Con infraestructura tipo VPS se obtiene acceso root, recursos dedicados, mayor
-              flexibilidad, discos rápidos NVMe, backups, firewall y capacidad para instalar software
-              personalizado.
-            </p>
-          </SectionShell>
-
-          <SectionShell id="automatizacion" icon={Link2} tint="bg-violet-400/25">
-            <h2 className="mb-3 font-display text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
-              Automatizaciones e inteligencia artificial
-            </h2>
-            <p className="mb-4 text-[15px] font-medium text-gray-800">
-              Conectamos herramientas para que tu empresa trabaje sola donde sea posible
-            </p>
-            <p className="mb-6 text-[15px] leading-relaxed text-gray-600">
-              Integramos agentes de IA y automatizaciones con las herramientas de tu empresa.
-            </p>
-            <p className="mb-3 font-medium text-gray-800">Podemos conectar:</p>
-            <IntegrationLogoGrid className="mb-8" />
-            <ListCard items={iaConnects} className="mb-8 border-violet-100/80 bg-violet-50/35" />
-            <p className="mb-4 font-medium text-gray-800">Ejemplos de uso:</p>
-            <motion.ul
-              className="space-y-3 rounded-2xl border border-violet-200/50 bg-white/90 p-6 shadow-inner backdrop-blur-sm sm:p-8"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-30px" }}
-            >
-              {iaExamples.map((ex) => (
-                <motion.li
-                  key={ex}
-                  className="flex gap-3 text-[15px] leading-snug text-gray-600"
-                  variants={staggerItem}
+            <motion.div variants={itemVariants} className="mt-7 flex flex-wrap gap-2">
+              {HERO_CHIPS.map((c) => (
+                <span
+                  key={c}
+                  className="rounded-full border border-gray-300/70 bg-white/80 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-gray-600 shadow-sm transition-colors hover:border-blue-400/60 hover:text-gray-900 sm:text-[11px]"
                 >
-                  <motion.span
-                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"
-                    initial={{ scale: 0 }}
-                    whileInView={{ scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ type: "spring", stiffness: 400, damping: 18 }}
-                    aria-hidden
-                  />
-                  {ex}
-                </motion.li>
+                  {c}
+                </span>
               ))}
-            </motion.ul>
-          </SectionShell>
+            </motion.div>
 
-          <NubeOpenClawSection />
+            <motion.div variants={itemVariants} className="mt-9 flex flex-wrap gap-3">
+              <Button
+                asChild
+                size="sm"
+                className="h-11 gap-2 rounded-full bg-gray-900 px-6 text-[13px] font-semibold text-white transition-all duration-300 hover:scale-[1.02] hover:bg-black"
+              >
+                <a href={waHref} target="_blank" rel="noopener noreferrer">
+                  <WhatsAppMark className="size-[17px] shrink-0 text-[#25D366]" />
+                  Digitalizar mi empresa
+                </a>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="group h-11 gap-2 rounded-full border-gray-300 bg-white/70 px-6 text-[13px] font-medium text-gray-700 backdrop-blur-sm transition-all hover:border-gray-400 hover:bg-white hover:text-gray-900"
+              >
+                <a href="#despliegue">
+                  Ver qué desplegamos
+                  <ArrowUpRight className="size-3.5 shrink-0 opacity-70 transition-transform duration-300 group-hover:translate-x-0.5" />
+                </a>
+              </Button>
+            </motion.div>
 
-          <SectionShell id="escalar" icon={Rocket} tint="bg-amber-400/25">
-            <h2 className="mb-5 font-display text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
-              Infraestructura preparada para crecer
-            </h2>
-            <div className="mb-5 space-y-4 text-[15px] leading-relaxed text-gray-600">
-              <p>Creamos soluciones que pueden empezar simples y escalar con el tiempo.</p>
-              <p className="font-medium text-gray-800">
-                Tu empresa puede comenzar con un sistema básico y luego sumar:
-              </p>
-            </div>
-            <ListCard items={scalingItems} className="mb-6 border-amber-100/80 bg-amber-50/30" />
-            <p className="text-[15px] leading-relaxed text-gray-600">
-              La idea es clara: construir una base tecnológica que no quede chica al primer
-              crecimiento.
-            </p>
-          </SectionShell>
+            <motion.dl
+              variants={itemVariants}
+              className="mt-9 grid w-full max-w-2xl grid-cols-1 gap-px overflow-hidden rounded-xl border border-gray-200 bg-gray-200 shadow-sm sm:grid-cols-3"
+            >
+              {HERO_STATS.map((s) => (
+                <div key={s.value} className="bg-white px-4 py-3.5">
+                  <dt className="font-display text-base font-semibold leading-none text-gray-900">
+                    {s.value}
+                  </dt>
+                  <dd className="mt-1.5 text-[11px] leading-snug text-gray-500">{s.label}</dd>
+                </div>
+              ))}
+            </motion.dl>
+          </div>
 
-          <SectionShell id="beneficios" icon={Shield} tint="bg-emerald-400/22">
-            <h2 className="mb-4 font-display text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
-              Beneficios para tu empresa
-            </h2>
-            <p className="mb-5 text-[15px] leading-relaxed text-gray-600">
-              Con nuestro servicio de digitalización y nube, tu negocio puede lograr:
-            </p>
-            <ListCard items={empresaBenefits} className="border-emerald-100/80 bg-emerald-50/25" />
-          </SectionShell>
+          {/* Globo: misma superficie que el fondo de la página para que se integre */}
+          <motion.div variants={itemVariants} className="lg:col-span-5">
+            <RotatingEarth variant="light" surfaceColor={PAGE_BG} className="mx-auto max-w-[440px]" />
+          </motion.div>
+        </motion.div>
+      </section>
 
-          <motion.figure
-            className="relative overflow-hidden rounded-3xl border border-blue-200/60 bg-gradient-to-br from-blue-50 via-white to-indigo-50/90 p-8 shadow-[0_28px_90px_-50px_rgba(37,99,235,0.35)] sm:p-11"
-            initial={reduce ? false : { opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.72, ease: easePremium }}
-            whileHover={reduce ? {} : { y: -6, transition: { duration: 0.35, ease: easePremium } }}
-          >
-              <motion.div
-                className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-blue-400/30 blur-3xl"
-                animate={
-                  reduce
-                    ? {}
-                    : {
-                        scale: [1, 1.08, 1],
-                        opacity: [0.5, 0.75, 0.5],
-                      }
-                }
-                transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                aria-hidden
-              />
-              <Cloud className="absolute right-8 top-8 h-16 w-16 text-blue-500/15" strokeWidth={1} aria-hidden />
-              <blockquote className="relative text-lg font-semibold leading-snug text-gray-900 sm:text-xl">
-                Digitalizamos tu empresa y la llevamos a la nube
-              </blockquote>
-              <figcaption className="relative mt-5 text-[15px] leading-relaxed text-gray-600">
-                Creamos sistemas, aplicaciones web, automatizaciones e infraestructura cloud para que
-                tu empresa trabaje de forma más ordenada, rápida y escalable. Desde un panel de
-                gestión hasta servidores VPS, bases de datos, IA y automatizaciones con n8n:
-                desarrollamos soluciones digitales pensadas para crecer con tu negocio.
-              </figcaption>
-          </motion.figure>
+      {/* ---------------------------------------------------------- *
+       * 2 · Qué desplegamos                                          *
+       * ---------------------------------------------------------- */}
+      <motion.section
+        id="despliegue"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.12 }}
+        className={`relative overflow-hidden px-6 lg:px-12 ${sectionPy}`}
+      >
+        <div className="relative z-10 mx-auto max-w-[1400px]">
+          <SectionHeader
+            eyebrow="Qué desplegamos"
+            title="Un servidor propio, no un alquiler compartido"
+            body="Instalamos y mantenemos el stack completo en un VPS que es tuyo: sistemas, bases de datos, APIs y automatizaciones."
+          />
 
-          <motion.section
-            className="relative overflow-hidden rounded-3xl bg-gray-950 px-8 py-12 text-center sm:px-14 sm:py-14"
-            initial={reduce ? false : { opacity: 0, scale: 0.95, y: 36 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.82, ease: easePremium }}
-            whileHover={reduce ? {} : { scale: 1.01 }}
-          >
-              <motion.div
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_50%_-20%,rgba(59,130,246,0.35),transparent_55%),radial-gradient(ellipse_60%_50%_at_100%_100%,rgba(167,139,250,0.12),transparent_50%)]"
-                aria-hidden
-                animate={
-                  reduce
-                    ? undefined
-                    : {
-                        opacity: [0.85, 1, 0.85],
-                      }
-                }
-                transition={{
-                  duration: 5,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-              />
-              <div className="relative">
-                <h2 className="mb-3 font-display text-xl font-semibold text-white sm:text-2xl">
-                  Digitalizá tu empresa con Cosecha Creativa.
-                </h2>
-                <p className="mx-auto mb-9 max-w-xl text-[15px] leading-relaxed text-gray-400">
-                  Creamos, desplegamos y conectamos la tecnología que tu negocio necesita para
-                  trabajar mejor.
-                </p>
-                <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }}>
-                  <Link
-                    href="/#contacto"
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-9 py-3.5 text-[14px] font-semibold text-gray-900 shadow-[0_20px_50px_-20px_rgba(255,255,255,0.35)] transition-colors hover:bg-gray-100"
-                  >
-                    Hablar con el equipo
-                    <span aria-hidden>→</span>
-                  </Link>
-                </motion.div>
-              </div>
-          </motion.section>
+          <motion.div variants={itemVariants} className="mt-12">
+            <DeployLogoGrid />
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="mt-10">
+            <HostingerDockerReference />
+          </motion.div>
         </div>
-      </article>
+      </motion.section>
+
+      {/* ---------------------------------------------------------- *
+       * 3 · Automatizaciones e IA                                    *
+       * ---------------------------------------------------------- */}
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.12 }}
+        className={`relative overflow-hidden px-6 lg:px-12 ${sectionPy}`}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_80%_25%,rgba(99,102,241,0.08)_0%,transparent_62%)]"
+          aria-hidden
+        />
+        <div className="relative z-10 mx-auto max-w-[1400px]">
+          <SectionHeader eyebrow="Automatización e IA" title="Que los sistemas hablen entre sí" />
+
+          <motion.div variants={itemVariants} className="mt-10">
+            <IntegrationLogoGrid />
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="mt-10">
+            <LogoMarquee items={DEPLOY_STACK} />
+          </motion.div>
+
+          {/* Ejemplos concretos, cortos */}
+          <div className="mt-12 grid gap-4 sm:grid-cols-2">
+            {ejemplos.map((e) => (
+              <motion.div
+                key={e}
+                variants={itemVariants}
+                className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-colors duration-300 hover:border-blue-300"
+              >
+                <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg border border-blue-200 bg-blue-50">
+                  <Check className="size-3.5 text-blue-600" strokeWidth={2} aria-hidden />
+                </span>
+                <p className="text-[0.95rem] leading-relaxed text-gray-600">{e}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ---------------------------------------------------------- *
+       * 4 · Capacidades y beneficios                                 *
+       * ---------------------------------------------------------- */}
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.12 }}
+        className={`relative overflow-hidden px-6 lg:px-12 ${sectionPy}`}
+      >
+        <div className="relative z-10 mx-auto max-w-[1400px]">
+          <SectionHeader eyebrow="Qué te llevás" title="Infraestructura lista para crecer" />
+
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            {capacidades.map((c) => (
+              <motion.article
+                key={c.title}
+                variants={itemVariants}
+                className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_20px_50px_-30px_rgba(15,23,42,0.35)]"
+              >
+                <span className="flex size-11 items-center justify-center rounded-xl border border-blue-200 bg-blue-50">
+                  <c.icon className="size-[19px] text-blue-600" strokeWidth={1.4} aria-hidden />
+                </span>
+                <h3 className="mt-5 font-display text-xl leading-tight tracking-tight text-gray-900">
+                  {c.title}
+                </h3>
+                <p className="mt-2 text-[0.9rem] leading-relaxed text-gray-600">{c.body}</p>
+              </motion.article>
+            ))}
+          </div>
+
+          {/* Beneficios en una tira compacta */}
+          <motion.ul variants={itemVariants} className="mt-10 flex flex-wrap gap-2.5">
+            {beneficios.map((b) => (
+              <li
+                key={b}
+                className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-[13px] text-gray-700 shadow-sm"
+              >
+                <Check className="size-3.5 shrink-0 text-blue-600" strokeWidth={2.2} aria-hidden />
+                {b}
+              </li>
+            ))}
+          </motion.ul>
+        </div>
+      </motion.section>
+
+      {/* ---------------------------------------------------------- *
+       * 5 · Cierre                                                   *
+       * ---------------------------------------------------------- */}
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className={`relative overflow-hidden px-6 lg:px-12 ${sectionPy}`}
+      >
+        <motion.div
+          variants={itemVariants}
+          className="relative mx-auto max-w-[1400px] overflow-hidden rounded-3xl border border-gray-200 bg-white p-8 shadow-[0_30px_80px_-60px_rgba(15,23,42,0.45)] md:p-12 lg:grid lg:grid-cols-[1fr_auto] lg:items-center lg:gap-12"
+        >
+          <div
+            className="pointer-events-none absolute -inset-10 opacity-90"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(59,130,246,0.08) 0%, transparent 42%, transparent 58%, rgba(99,102,241,0.08) 100%)",
+            }}
+            aria-hidden
+          />
+          <div className="relative">
+            <h2 className="font-display text-3xl tracking-tight text-gray-900 md:text-4xl lg:text-5xl">
+              ¿Arrancamos por tu infraestructura?
+            </h2>
+            <p className="mt-4 max-w-lg text-base leading-relaxed text-gray-600 md:text-lg">
+              Contanos qué procesos querés digitalizar y armamos el plan de despliegue.
+            </p>
+          </div>
+          <div className="relative mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:mt-0 lg:min-w-[240px] lg:flex-col">
+            <Button
+              asChild
+              size="sm"
+              className="h-11 gap-2 rounded-full bg-gray-900 px-6 text-[13px] font-semibold text-white transition-all duration-300 hover:scale-[1.02] hover:bg-black"
+            >
+              <a href={waHref} target="_blank" rel="noopener noreferrer">
+                <WhatsAppMark className="size-[17px] shrink-0 text-[#25D366]" />
+                WhatsApp
+              </a>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="h-11 rounded-full border-gray-300 bg-white px-6 text-[13px] font-medium text-gray-700 transition-all hover:border-gray-400 hover:text-gray-900"
+            >
+              <a href="mailto:contacto@cosechacreativa.com.ar?subject=Soluciones%20en%20la%20nube">
+                Email
+              </a>
+            </Button>
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="h-11 justify-start text-gray-500 hover:text-gray-900"
+            >
+              <Link href="/servicios" className="gap-1.5 px-2">
+                Ver otros servicios
+                <ArrowUpRight className="size-4 shrink-0" />
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
+      </motion.section>
 
       <FooterSection />
-    </div>
+    </main>
   )
 }

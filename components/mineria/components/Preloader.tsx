@@ -65,7 +65,7 @@ const Preloader: React.FC<PreloaderProps> = ({ onHandoff, onComplete }) => {
       ref={preloaderRef}
       className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#ffb800] via-[#f5b000] to-[#d9a000] will-change-transform"
     >
-      <div className="absolute inset-0 opacity-[0.15] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="absolute inset-0 opacity-[0.15] pointer-events-none bg-[url('/mineria/noise.svg')]" />
       <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 overflow-hidden pointer-events-none">
         <div className="h-full w-1/4 bg-gradient-to-r from-transparent via-black/25 to-transparent animate-preloader-scan" />
       </div>

@@ -75,6 +75,8 @@ export function SlideCard({ slide, isActive, dragOffset, index, currentIndex, sl
             transition={{ duration: 0.4, ease: "easeOut" }}
             crossOrigin="anonymous"
             draggable={false}
+            loading="lazy"
+            decoding="async"
           />
 
           {slide.eventGallery ? (

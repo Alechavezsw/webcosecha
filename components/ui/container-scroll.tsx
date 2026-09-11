@@ -83,9 +83,9 @@ function ContainerScrollCard({
         transformPerspective: 1200,
         transformOrigin: "center bottom",
       }}
-      className="mx-auto -mt-10 h-[26rem] w-full max-w-5xl rounded-[28px] border border-white/18 bg-zinc-950 p-1.5 shadow-2xl [transform-style:preserve-3d] will-change-transform md:-mt-12 md:h-[38rem] md:rounded-[30px] md:border-[3px] md:p-5 lg:h-[40rem]"
+      className="mx-auto -mt-10 h-[26rem] w-full max-w-5xl border border-[#23232B] bg-[#0B0B0E] p-1.5 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] [transform-style:preserve-3d] will-change-transform md:-mt-12 md:h-[38rem] md:border-[3px] md:p-4 lg:h-[40rem]"
     >
-      <div className="h-full w-full overflow-hidden rounded-[22px] bg-zinc-900 ring-1 ring-white/10 md:rounded-2xl md:p-3 [transform-style:preserve-3d]">
+      <div className="h-full w-full overflow-hidden border border-[#1E1E24] bg-[#050506] md:p-3 [transform-style:preserve-3d]">
         {children}
       </div>
     </motion.div>

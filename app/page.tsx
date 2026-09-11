@@ -13,6 +13,8 @@ import { TestimonialsSection } from "@/components/landing/testimonials-section";
 import { ProjectsSection } from "@/components/landing/projects-section";
 import { CtaSection } from "@/components/landing/cta-section";
 import { FooterSection } from "@/components/landing/footer-section";
+import { KineticMarquee } from "@/components/landing/kinetic-marquee";
+import { SectionBand } from "@/components/landing/section-band";
 import { SectionDivider } from "@/components/landing/section-divider";
 import { ScrollProgress } from "@/components/landing/scroll-progress";
 
@@ -31,45 +33,73 @@ export const metadata: Metadata = {
   },
 }
 
+/**
+ * Ritmo de la home.
+ *
+ * Cada sección va envuelta en una *banda* con superficie y profundidad propias
+ * (ver `SectionBand` y el bloque final de `globals.css`): antes todo compartía
+ * el mismo negro con aura y el scroll se leía como un solo bloque. El recorrido
+ * alterna planos —atmósfera, papel elevado, losa hundida, hueco, pozo— y nunca
+ * repite superficie en dos bandas seguidas, así que cada borde entre secciones
+ * ya es un corte visible por sí mismo y los `SectionDivider` de 1px dejaron de
+ * hacer falta salvo antes del footer.
+ */
 export default function Home() {
   return (
-    <main className="relative min-h-screen overflow-x-hidden">
+    <main className="relative min-h-screen overflow-x-clip">
       {/* Espacio 3D que acompaña toda la home: la cámara viaja con el scroll */}
       <Ambient3DBackground />
 
       <Navigation />
       <ScrollProgress />
 
+      {/* Hero y Features comparten la atmósfera del 3D, así que no llevan banda
+          propia. La junta entre los dos es una sola: el hero funde a negro en sus
+          últimos 192px y cierra con una hairline; Features arranca justo ahí. */}
       <HeroSection />
-
       <FeaturesSection />
-      <SectionDivider color="purple-rose" />
 
-      <HowItWorksSection />
-      <SectionDivider color="cyan" />
+      <SectionBand surface="bone">
+        <HowItWorksSection />
+      </SectionBand>
 
-      <ServicesSection />
-      <SectionDivider color="emerald" />
+      <SectionBand surface="slab">
+        <ServicesSection />
+      </SectionBand>
 
-      <MetricsSection />
-      <SectionDivider color="purple-cyan" />
+      <SectionBand surface="void">
+        {/* Variante "content": métricas de agencia en español y carrusel de piezas
+            reales. La variante "ai" que traía la plantilla eran datos de SaaS
+            inventados y en inglés. */}
+        <MetricsSection variant="content" />
+      </SectionBand>
 
-      <IntegrationsSection />
-      <SectionDivider color="purple" />
+      <KineticMarquee />
 
-      <SecuritySection />
-      <SectionDivider color="cyan" />
+      <SectionBand surface="deep">
+        <IntegrationsSection />
+      </SectionBand>
 
-      <DevelopersSection />
-      <SectionDivider color="rose" />
+      <SectionBand surface="slab">
+        <SecuritySection />
+      </SectionBand>
 
-      <TestimonialsSection />
-      <SectionDivider color="purple" />
+      <SectionBand surface="void">
+        <DevelopersSection />
+      </SectionBand>
 
-      <ProjectsSection />
-      <SectionDivider color="copper" />
+      <SectionBand surface="well">
+        <TestimonialsSection />
+      </SectionBand>
 
-      <CtaSection />
+      <SectionBand surface="void">
+        <ProjectsSection />
+      </SectionBand>
+
+      <SectionBand surface="signature">
+        <CtaSection />
+      </SectionBand>
+
       <SectionDivider color="dark" />
 
       <FooterSection />

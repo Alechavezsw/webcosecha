@@ -1,0 +1,252 @@
+/* Fuentes del diseño portado: condensada itálica para titulares, Barlow para
+   texto y IBM Plex Mono para las etiquetas de sistema. Se cargan acá y no en
+   `globals.css` para que solo las pague esta ruta — el resto del sitio sigue
+   con Instrument Sans / Serif. */
+@import url("https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+/**
+ * Diseño «JARVIS» aplicado a /servicios/diseno-web.
+ *
+ * Todo cuelga de `.jv` a propósito. El sitio ya define `.font-display` como una
+ * serif editorial y un `--radius` redondeado; este diseño necesita justo lo
+ * contrario (condensada itálica, radio cero). Scopear evita el choque y deja
+ * intactas las demás páginas.
+ */
+
+.jv {
+  /* Un solo lugar para el acento. El original venía en azul eléctrico
+     (#2196f3); acá va el cian de la marca para que la página no se despegue
+     del resto del sitio. Cambiar esta línea cambia toda la página. */
+  --jv-accent: #67e8f9;
+  --jv-accent-2: #a78bfa;
+
+  --jv-bg: #050505;
+  --jv-bg-soft: #080808;
+  --jv-surface: #0e0e0e;
+  --jv-fg: #f2ede6;
+  --jv-muted: #7d7d7d;
+  --jv-dim: #4a4a4a;
+  --jv-line: #1e1e1e;
+  --jv-line-bright: #2e2e2e;
+
+  --jv-sans: "Barlow", system-ui, sans-serif;
+  --jv-display: "Barlow Condensed", system-ui, sans-serif;
+  --jv-mono: "IBM Plex Mono", "JetBrains Mono", monospace;
+
+  background: var(--jv-bg);
+  color: var(--jv-fg);
+  font-family: var(--jv-sans);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A propósito NO hay un reseteo global de `border-radius`: adentro viven el
+   portafolio, la escalada SERP y los visuales de cada servicio, que se dibujan
+   con esquinas redondeadas propias y quedarían rotos. Todo lo que se maqueta
+   acá se escribe cuadrado y listo. */
+
+.jv ::selection {
+  background: var(--jv-accent);
+  color: var(--jv-bg);
+}
+
+/* ── TIPOGRAFÍA ──────────────────────────────────── */
+
+.jv .jv-display {
+  font-family: var(--jv-display);
+  font-weight: 700;
+  font-style: italic;
+  text-transform: uppercase;
+}
+
+/* Variante recta: para bloques largos donde la itálica cansa. */
+.jv .jv-display-straight {
+  font-family: var(--jv-display);
+  font-weight: 700;
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+.jv .jv-mono {
+  font-family: var(--jv-mono);
+}
+
+/* Titular «hueco»: el contrapunto del sólido en las cabeceras. */
+.jv .jv-outline {
+  -webkit-text-stroke: 1px var(--jv-dim);
+  color: transparent;
+}
+
+/* Etiqueta de sistema con punto: el sello del diseño. */
+.jv .jv-tag {
+  font-family: var(--jv-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--jv-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jv .jv-tag::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--jv-accent);
+  display: inline-block;
+  flex: none;
+}
+
+/* ── SUPERFICIES ─────────────────────────────────── */
+
+/* Retícula de fondo: la textura del diseño, sin pedir un solo byte. */
+.jv .jv-grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+.jv .jv-row-hover {
+  transition: background 0.15s ease;
+}
+
+.jv .jv-row-hover:hover {
+  background: var(--jv-surface);
+}
+
+/* ── ANIMACIONES ─────────────────────────────────── */
+
+@keyframes jv-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.jv .jv-marquee {
+  animation: jv-marquee 34s linear infinite;
+}
+
+.jv .jv-marquee-fast {
+  animation: jv-marquee 18s linear infinite;
+}
+
+.jv .jv-marquee-reverse {
+  animation: jv-marquee 24s linear infinite reverse;
+}
+
+@keyframes jv-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.jv .jv-fade-up {
+  animation: jv-fade-up 0.5s ease forwards;
+}
+
+@keyframes jv-status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.jv .jv-status-pulse {
+  animation: jv-status-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes jv-draw-line {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.jv .jv-draw-line {
+  animation: jv-draw-line 5s linear forwards;
+}
+
+/* ── MOTIVOS DE PUNTOS ───────────────────────────── */
+
+/* Los tres pulsos que animan los iconos: parpadeo, barrido y ecualizador.
+   Van con `animation-name` desde el JSX para poder escalonar cada punto. */
+
+@keyframes jv-dot-blink {
+  0%,
+  49% {
+    transform: scale(0.4);
+    opacity: 0.12;
+  }
+  50%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes jv-dot-scan {
+  0% {
+    transform: scale(0.5) translateY(0);
+    opacity: 0.15;
+  }
+  50% {
+    transform: scale(1.5) translateY(-2px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5) translateY(0);
+    opacity: 0.15;
+  }
+}
+
+@keyframes jv-dot-pulse {
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scaleY(1.6);
+    opacity: 0.9;
+  }
+}
+
+/* Quien pidió menos movimiento no ve ninguno de estos bucles. */
+@media (prefers-reduced-motion: reduce) {
+  .jv .jv-marquee,
+  .jv .jv-marquee-fast,
+  .jv .jv-marquee-reverse,
+  .jv .jv-status-pulse,
+  .jv .jv-draw-line,
+  .jv .jv-fade-up,
+  .jv .jv-dot {
+    animation: none !important;
+  }
+
+  .jv .jv-draw-line {
+    width: 100%;
+  }
+
+  /* Sin animación los puntos quedarían con la opacidad del primer keyframe:
+     se los deja legibles a mano. */
+  .jv .jv-dot {
+    opacity: 0.75 !important;
+    transform: none !important;
+  }
+}

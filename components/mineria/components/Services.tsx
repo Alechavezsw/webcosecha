@@ -1,8 +1,9 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import gsap from 'gsap';
-import { asset } from '../lib/asset';
+import { assetOpt } from '../lib/asset';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import SectionKicker from './SectionKicker';
 import ServiceWebModal from './ServiceWebModal';
 import ServiceGraphicModal from './ServiceGraphicModal';
 import ServicePositioningModal from './ServicePositioningModal';
@@ -177,9 +178,11 @@ const Services: React.FC<ServicesProps> = ({
       >
         <img
           ref={ambientImgRef}
-          src={asset('cc%20(3).png')}
+          src={assetOpt('cc (3).png')}
           alt=""
           className="services-ambient-img absolute inset-0 h-full min-h-full w-full object-cover object-center"
+          width={1600}
+          height={900}
           loading="lazy"
           decoding="async"
         />
@@ -207,18 +210,13 @@ const Services: React.FC<ServicesProps> = ({
       </div>
       <div className="relative z-10 mx-auto max-w-[1800px] px-6 sm:px-10">
         <div ref={introHeaderRef} className="mb-14 md:mb-20">
-          <div className="services-intro-line mb-10 flex items-center gap-6">
-            <div className="h-0.5 w-20 bg-[#ffb800]" />
-            <span className="text-[12px] font-bold uppercase tracking-[0.55em] text-[#ffb800]">
-              Nuestras Capacidades
-            </span>
-          </div>
+          <SectionKicker className="services-intro-line mb-10">Nuestras Capacidades</SectionKicker>
           <div className="mb-10 max-w-5xl">
-            <h2 className="services-intro-line font-display text-[clamp(2.5rem,7vw,6rem)] uppercase italic leading-[0.9] tracking-tighter text-white">
-              MARKETING <span className="text-[#ffb800]">DIGITAL</span>
+            <h2 className="services-intro-line font-display text-[clamp(2.5rem,8vw,7rem)] uppercase italic leading-[0.9] tracking-tighter text-white">
+              MARKETING <span className="text-gradient-amber">DIGITAL</span>
             </h2>
-            <h2 className="services-intro-line font-display text-[clamp(2rem,6vw,5rem)] uppercase italic leading-[0.9] tracking-tighter text-[#ffb800]">
-              PARA PROVEEDORES <span className="text-white">MINEROS</span>
+            <h2 className="services-intro-line font-display text-[clamp(2rem,6.6vw,5.8rem)] uppercase italic leading-[0.9] tracking-tighter text-white/85">
+              PARA PROVEEDORES MINEROS
             </h2>
           </div>
           <p className="services-intro-line max-w-xl text-lg text-white/60 md:text-xl md:leading-relaxed">

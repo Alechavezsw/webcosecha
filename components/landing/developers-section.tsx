@@ -11,6 +11,7 @@ import {
   type Variants,
 } from "framer-motion";
 import { DevelopersMouseParticles } from "@/components/landing/developers-mouse-particles";
+import { StairsRabbit } from "@/components/landing/stairs-rabbit";
 
 const easePremium = [0.22, 1, 0.36, 1] as const;
 
@@ -130,7 +131,9 @@ export function DevelopersSection() {
     <section
       id="developers"
       ref={sectionRef}
-      className="cc-aura cc-aura-cyan relative overflow-hidden py-24 lg:py-32"
+      /* Aura dorada, no cian: la sección se ilumina con la misma luz cálida de
+         la foto de la escalera en vez de pelearse con ella. */
+      className="cc-aura cc-aura-gold relative overflow-hidden py-24 lg:py-32"
     >
       {/* Capas decorativas — pulso muy suave */}
       {!reduce && (
@@ -142,7 +145,10 @@ export function DevelopersSection() {
             transition={{ duration: 14, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
           />
           <motion.div
-            className="pointer-events-none absolute bottom-[10%] right-[5%] h-[min(45vw,400px)] w-[min(45vw,400px)] rounded-full bg-foreground/[0.04] blur-[100px]"
+            /* Antes era un gris neutro que no decía nada. Ahora es el rebote
+               cálido de la escalera, puesto donde la foto tiene su foco de
+               luz. */
+            className="pointer-events-none absolute bottom-[18%] right-[12%] h-[min(45vw,400px)] w-[min(45vw,400px)] rounded-full bg-[#ffd27a]/[0.09] blur-[100px]"
             aria-hidden
             animate={{ scale: [1, 1.06, 1], opacity: [0.25, 0.45, 0.25] }}
             transition={{
@@ -160,7 +166,12 @@ export function DevelopersSection() {
       {/* Imagen — parallax + fade al entrar */}
       <motion.div
         className="pointer-events-none absolute bottom-0 right-0 z-[3] h-[85%] w-[55%]"
-        style={{ y: imageParallaxY, scale: imageParallaxScale }}
+        /* `screen` borra el negro de la foto: la escalera está fotografiada
+           sobre fondo negro puro y, mezclada así, ese negro deja pasar el
+           fondo real de la sección en vez de recortar un rectángulo. El efecto
+           colateral útil es que los degradados negros de abajo dejan de pintar
+           negro y pasan a funcionar como desvanecidos. */
+        style={{ y: imageParallaxY, scale: imageParallaxScale, mixBlendMode: "screen" }}
         initial={reduce ? false : { opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-80px" }}
@@ -170,10 +181,27 @@ export function DevelopersSection() {
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Upscaled%20Image%20%2813%29-OQ2DiR3ElVsUg8kTvTL1kC5A3Q6maM.png"
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover object-left-top"
+          /* `object-left-top` anclaba el recorte en el borde negro de la foto:
+             en la mayoría de los viewports no entraba ni un peldaño y la
+             imagen se leía como una mancha cálida. Centrado, la escalera —que
+             es la metáfora de la sección— queda en cuadro siempre. */
+          /* `object-top` es `center top`, que es el par exacto del
+             `xMidYMin` con el que se monta el SVG del conejo. */
+          className="h-full w-full object-cover object-top"
+          loading="lazy"
+          decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-transparent" />
+        {/* Negro puro, no `background`: bajo el `screen` de arriba el negro es
+            exactamente lo que desaparece, así que estos degradados desvanecen
+            la foto por los lados que dan contra el texto y contra la banda
+            siguiente, sin dejar ningún velo gris. El lateral es más suave que
+            antes (60% → 45%): con el recorte corregido ya hay escalera que
+            mostrar, y taparla no tenía sentido. */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/45 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black to-transparent" />
+        {/* Sube la escalera de la foto, peldaño por peldaño. */}
+        <StairsRabbit />
       </motion.div>
 
       <motion.div
@@ -255,7 +283,7 @@ export function DevelopersSection() {
             whileInView={reduce ? undefined : "visible"}
             viewport={{ once: true, margin: "-40px" }}
           >
-            {pillars.map((pillar) => (
+            {pillars.map((pillar, index) => (
               <MotionLink
                 key={pillar.title}
                 href={pillar.href}
@@ -265,20 +293,42 @@ export function DevelopersSection() {
                   reduce
                     ? {}
                     : {
-                        y: -4,
+                        y: -6,
                         transition: { duration: 0.28, ease: easePremium },
                       }
                 }
-                className="group block rounded-xl border border-foreground/[0.06] bg-background/[0.02] p-4 backdrop-blur-[2px] outline-none transition-shadow duration-300 hover:border-foreground/10 hover:shadow-[0_20px_60px_-40px_rgba(0,0,0,0.35)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                /* Cada tarjeta es un peldaño: filo de luz arriba, cuerpo que se
+                   apaga hacia abajo y número de escalón. Es el mismo lenguaje
+                   de la foto del fondo, así que la grilla deja de ser cuatro
+                   rectángulos genéricos y pasa a ser parte de la escalera.
+                   El vidrio, además, es necesario: por debajo de `lg` las
+                   tarjetas se apoyan sobre la piedra iluminada. */
+                className="group relative block overflow-hidden rounded-xl border border-white/[0.07] bg-gradient-to-b from-white/[0.07] via-background/60 to-background/70 p-5 backdrop-blur-md outline-none transition-all duration-300 hover:border-[#ffd27a]/25 hover:shadow-[0_24px_70px_-32px_rgba(255,210,122,0.4)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
-                <h3 className="mb-2 font-display text-lg text-foreground md:text-xl">
-                  {pillar.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{pillar.description}</p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors group-hover:text-foreground">
-                  {pillar.linkLabel}
-                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
-                </span>
+                {/* El filo iluminado del peldaño. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#ffd9a0]/45 to-transparent transition-all duration-300 group-hover:via-[#ffd9a0]/90"
+                />
+                {/* La luz que cae sobre el peldaño al acercarse. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(255,210,122,0.16)_0%,transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                />
+
+                <div className="relative">
+                  <span className="mb-3 block font-mono text-[11px] tracking-[0.22em] text-[#ffd27a]/45 transition-colors duration-300 group-hover:text-[#ffd27a]/80">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mb-2 font-display text-lg text-foreground md:text-xl">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{pillar.description}</p>
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors group-hover:text-[#ffd9a0]">
+                    {pillar.linkLabel}
+                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+                  </span>
+                </div>
               </MotionLink>
             ))}
           </motion.div>

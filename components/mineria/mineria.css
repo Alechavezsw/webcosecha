@@ -1,0 +1,230 @@
+/**
+ * Sistema visual de la landing de minería.
+ *
+ * Venía de la app Vite original (`index.css`), donde era una hoja global con su
+ * propio `@import "tailwindcss"` y su propio `@theme`. Al portar la página a
+ * Next quedó huérfana: ninguna ruta la importaba, así que la landing se estaba
+ * renderizando con la tipografía y los tokens del sitio principal, sin grano,
+ * sin cursor propio y sin el marco industrial.
+ *
+ * Acá está reescrita para convivir con `app/globals.css`:
+ *   - Sin `@import "tailwindcss"`: duplicaría todo el framework.
+ *   - Sin `@theme`: sus tokens se filtrarían al resto del sitio. En su lugar
+ *     redefine las variables de fuente sobre `.mineria-root`, y como las
+ *     utilidades de Tailwind v4 leen `var(--font-*)`, `font-display` y
+ *     `font-sans` cambian sólo dentro de la landing.
+ *
+ * Se importa desde `app/mineria/page.tsx`, así que el CSS sólo viaja en esa ruta.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Syne:wght@400;500;600;700;800&display=swap');
+
+.mineria-root {
+  /* Anton para los titulares, Syne para el cuerpo: la landing se diseñó con
+     estas dos y estaba cayendo en la serif corporativa del sitio principal. */
+  --font-display: 'Anton', 'Arial Narrow', sans-serif;
+  --font-sans: 'Syne', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display);
+
+  --cc-void: #07080a;
+  --cc-amber: #ffb800;
+
+  font-family: var(--font-sans);
+  background-color: var(--cc-void);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 184, 0, 0.12), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 100% 40%, rgba(212, 165, 116, 0.06), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 0% 80%, rgba(255, 184, 0, 0.04), transparent 45%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* El cursor propio sólo tiene sentido donde hay mouse: en touch dejaría al
+   usuario sin puntero y sin reemplazo (los dos divs están ocultos en móvil). */
+@media (min-width: 768px) and (pointer: fine) {
+  html:has(.mineria-root),
+  html:has(.mineria-root) body {
+    cursor: none;
+  }
+}
+
+.custom-cursor {
+  width: 20px;
+  height: 20px;
+  background: var(--cc-amber, #ffb800);
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  transition: transform 0.1s ease-out;
+}
+
+.custom-cursor-follower {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 184, 0, 0.5);
+  border-radius: 50%;
+  position: fixed;
+  top: -10px;
+  left: -10px;
+  pointer-events: none;
+  z-index: 9998;
+  transition: transform 0.15s ease-out;
+}
+
+/* `splitText` parte cada titular en spans; GSAP los sube desde abajo. */
+.mineria-root .char {
+  display: inline-block;
+  transform: translateY(100%);
+}
+
+.mineria-root .vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.noise-bg {
+  position: fixed;
+  inset: 0;
+  background: url('/mineria/noise.svg');
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.grid-overlay {
+  background-image:
+    linear-gradient(to right, rgba(255, 184, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 30%, black 20%, transparent 75%);
+}
+
+.grain-overlay {
+  background-image: url('/mineria/noise.svg');
+  opacity: 0.1;
+  filter: contrast(150%) brightness(100%);
+}
+
+@keyframes preloader-scan {
+  0% { transform: translateX(-100%); opacity: 0.35; }
+  50% { opacity: 1; }
+  100% { transform: translateX(400%); opacity: 0.35; }
+}
+
+.animate-preloader-scan {
+  animation: preloader-scan 2.4s ease-in-out infinite;
+}
+
+.text-gradient-amber {
+  background: linear-gradient(135deg, #fff4cc 0%, #ffb800 40%, #c48a00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass-nav {
+  background: linear-gradient(180deg, rgba(7, 8, 10, 0.92) 0%, rgba(7, 8, 10, 0.75) 100%);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  border-bottom: 1px solid rgba(255, 184, 0, 0.08);
+}
+
+.industrial-frame {
+  transition: opacity 0.8s ease-in-out, visibility 0.8s;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.industrial-frame.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mineria-root .split-heading {
+  display: block;
+  overflow: visible !important;
+  line-height: 1.1;
+  padding-top: 0.1em;
+}
+
+/* La interfaz del cinematic no debe verse mientras el preloader todavía se
+   está corriendo: si no, el barrido la descubre entera y recién después la
+   animación de entrada la reinicia desde cero. */
+.post-cinematic-root[data-ui-ready='false'] .post-cinematic-ui-layer,
+.post-cinematic-root[data-ui-ready='false'] .post-cinematic-chrome,
+.post-cinematic-root[data-ui-ready='false'] .video-label {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .industrial-frame {
+    display: none !important;
+  }
+
+  .mineria-root .vertical-text {
+    writing-mode: horizontal-tb;
+    text-orientation: initial;
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    padding: 1rem;
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 1rem !important;
+  }
+}
+
+/* Carriles horizontales (servicios y casos): scroll táctil sin barra visible. */
+.services-scroll-clip,
+.projects-cases-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.services-scroll-clip::-webkit-scrollbar,
+.projects-cases-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Mapa de presencia: anillos luminosos sobre San Juan. */
+@keyframes presence-pulse-ring {
+  0%, 100% { opacity: 0.25; transform: scale(0.92); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+
+@keyframes presence-pulse-ring-delayed {
+  0%, 100% { opacity: 0.2; transform: scale(0.88); }
+  50% { opacity: 0.55; transform: scale(1.12); }
+}
+
+.presence-map-pulse-outer {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: presence-pulse-ring 3.2s ease-in-out infinite;
+}
+
+.presence-map-pulse-mid {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: presence-pulse-ring-delayed 3.2s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presence-map-pulse-outer,
+  .presence-map-pulse-mid {
+    animation: none;
+    opacity: 0.45;
+    transform: none;
+  }
+
+  .animate-preloader-scan {
+    animation: none;
+  }
+}

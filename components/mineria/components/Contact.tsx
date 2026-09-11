@@ -1,8 +1,9 @@
 import React from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import Magnetic from './Magnetic';
+import SectionKicker from './SectionKicker';
 import { getWhatsAppHref } from '../data/cosechaChat';
-import { asset } from '../lib/asset';
+import { assetOpt } from '../lib/asset';
 
 interface ContactProps {
   onMouseEnter: () => void;
@@ -23,14 +24,18 @@ const Contact: React.FC<ContactProps> = ({ onMouseEnter, onMouseLeave }) => {
         <div className="absolute inset-0 z-0 opacity-[0.22] pointer-events-none">
         <div className="absolute inset-0 bg-[#07080a] mix-blend-multiply opacity-60" />
         <img 
-          src={asset('media__1779585325500.jpg')} 
+          src={assetOpt('media__1779585325500.jpg')} 
           alt="Night Mining" 
           className="w-full h-full object-cover grayscale"
+          width={1600}
+          height={900}
           loading="lazy"
+          decoding="async"
         />
       </div>
       <div className="max-w-[1800px] mx-auto px-10 text-center relative z-10">
-        <h2 className="text-[clamp(2.5rem,8vw,8rem)] font-display uppercase italic leading-[1] tracking-tighter mb-10 text-white relative z-0 [overflow-wrap:anywhere]">
+        <SectionKicker className="mb-8 justify-center">Contacto</SectionKicker>
+        <h2 className="text-[clamp(2.5rem,8vw,7rem)] font-display uppercase italic leading-[1] tracking-tighter mb-10 text-white relative z-0 [overflow-wrap:anywhere]">
           <span className="inline-block">EMPIEZA A</span>{' '}
           <span className="inline-block text-[#ffb800]">EXCAVAR</span>
         </h2>

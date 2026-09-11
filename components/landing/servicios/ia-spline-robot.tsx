@@ -177,6 +177,9 @@ export function IaSplineRobot({
     }
   }, [input, typing])
 
+  // La cadena interna es `h-full`: si el contenedor padre define una altura fija,
+  // el robot la respeta exactamente. Así el hueco reservado mientras carga y el
+  // robot ya montado miden lo mismo y no hay salto de layout.
   return (
     <div className={cn("relative overflow-hidden rounded-[28px]", className)}>
       <FallingStars className="z-0" />
@@ -185,14 +188,11 @@ export function IaSplineRobot({
         aria-hidden
       />
 
-      <div className="relative z-[2] p-2 md:p-3">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/35 shadow-inner shadow-black/60 ring-1 ring-white/[0.06]">
+      <div className="relative z-[2] h-full p-2 md:p-3">
+        <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-black/35 shadow-inner shadow-black/60 ring-1 ring-white/[0.06]">
           <SplineScene
             scene={scene}
-            className={cn(
-              "h-[min(52vh,520px)] min-h-[280px] w-full md:h-[min(56vh,600px)]",
-              canvasClassName,
-            )}
+            className={cn("h-full min-h-[240px] w-full", canvasClassName)}
             onLoad={onLoad}
             onSplineMouseDown={handleSplineMeshEvent}
           />

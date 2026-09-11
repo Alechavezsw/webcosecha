@@ -165,7 +165,7 @@ function CpuArchitecture({
           <stop offset="100%" stopColor="transparent" />
         </radialGradient>
         <radialGradient id="cpu-cyan-grad" fx="1">
-          <stop offset="0%" stopColor="#06b6d4" />
+          <stop offset="0%" stopColor="#C8FF00" />
           <stop offset="100%" stopColor="transparent" />
         </radialGradient>
         <radialGradient id="cpu-rose-grad" fx="1">

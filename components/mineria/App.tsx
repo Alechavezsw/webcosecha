@@ -17,6 +17,7 @@ import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import { opt } from '@/lib/optimized-images';
 
 // Component Imports
 import Preloader from './components/Preloader';
@@ -25,7 +26,7 @@ import Hero from './components/Hero';
 import Stats from './components/Stats';
 import Services from './components/Services';
 import VideoFrame from './components/VideoFrame';
-import PostIntroCinematic from './components/PostIntroCinematic';
+import PostIntroCinematic, { INTRO_VIDEO_MP4 } from './components/PostIntroCinematic';
 import Projects from './components/Projects';
 import PresenceMap from './components/PresenceMap';
 
@@ -84,22 +85,22 @@ const projects = [
   {
     title: "Credencial Corporativa",
     category: "Branding",
-    image: "/mineria/moca/CREDENCIAL.jpg.jpeg",
+    image: opt("/mineria/moca/CREDENCIAL.jpg.jpeg"),
   },
   {
     title: "Folleto Industrial 01",
     category: "Diseño Gráfico",
-    image: "/mineria/moca/FOLLETO 01.jpg.jpeg",
+    image: opt("/mineria/moca/FOLLETO 01.jpg.jpeg"),
   },
   {
     title: "Folleto Industrial 02",
     category: "Diseño Gráfico",
-    image: "/mineria/moca/FOLLETO 02.jpg.jpeg",
+    image: opt("/mineria/moca/FOLLETO 02.jpg.jpeg"),
   },
   {
     title: "Revista Editorial",
     category: "Branding",
-    image: "/mineria/moca/REVISTA.jpg.jpeg",
+    image: opt("/mineria/moca/REVISTA.jpg.jpeg"),
   },
 ];
 
@@ -109,6 +110,8 @@ export default function App() {
   const [, setIsLoading] = useState(true);
   const [preloaderVisible, setPreloaderVisible] = useState(true);
   const [postIntroCinematicVisible, setPostIntroCinematicVisible] = useState(false);
+  /** El preloader ya terminó de salir: recién ahí entra la interfaz del cinematic. */
+  const [postIntroUiReady, setPostIntroUiReady] = useState(false);
   
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
@@ -391,10 +394,12 @@ export default function App() {
 
   const handlePostIntroCinematicEnded = useCallback(() => {
     setPostIntroCinematicVisible(false);
+    setPostIntroUiReady(false);
   }, []);
 
   const handlePostIntroSectionNavigate = useCallback((sectionId: string) => {
     setPostIntroCinematicVisible(false);
+    setPostIntroUiReady(false);
     heroIntroTlRef.current?.restart(true);
     requestAnimationFrame(() => {
       lenisRef.current?.scrollTo(`#${sectionId}`, {
@@ -415,6 +420,7 @@ export default function App() {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     setPreloaderVisible(false);
+    setPostIntroUiReady(true);
   };
 
   useEffect(() => {
@@ -434,12 +440,16 @@ export default function App() {
   };
 
   return (
-    <div ref={layoutRootRef} className="relative min-h-screen font-sans text-white selection:bg-[#ffb800] selection:text-black">
+    <div ref={layoutRootRef} className="mineria-root relative min-h-screen font-sans text-white selection:bg-[#ffb800] selection:text-black">
+      {/* El cinematic monta recién cuando cae el preloader; esto arranca su
+          descarga desde el primer frame para que llegue ya cacheado. */}
+      <link rel="preload" as="video" type="video/mp4" href={INTRO_VIDEO_MP4} />
       {preloaderVisible && (
         <Preloader onHandoff={handlePreloaderHandoff} onComplete={handlePreloaderComplete} />
       )}
       {postIntroCinematicVisible && (
         <PostIntroCinematic
+          uiReady={postIntroUiReady}
           onEnded={handlePostIntroCinematicEnded}
           onSectionNavigate={handlePostIntroSectionNavigate}
           onRevealStart={handlePostIntroRevealStart}

@@ -44,8 +44,8 @@ const serviciosMarquee: ServicioItem[] = [
   {
     label: "Banners publicitarios",
     icon: RectangleHorizontal,
-    accent: "from-[#67e8f9] to-[#38bdf8]",
-    glow: "rgba(103,232,249,0.38)",
+    accent: "from-[#e879f9] to-[#c026d3]",
+    glow: "rgba(232,121,249,0.42)",
   },
   {
     label: "Creatividades para Meta Ads y Google Ads",
@@ -56,8 +56,8 @@ const serviciosMarquee: ServicioItem[] = [
   {
     label: "Diseño de carruseles para Instagram",
     icon: GalleryHorizontal,
-    accent: "from-[#fda4af] to-[#fb7185]",
-    glow: "rgba(253,164,175,0.4)",
+    accent: "from-[#f0abfc] to-[#d946ef]",
+    glow: "rgba(240,171,252,0.4)",
   },
   {
     label: "Historias y placas informativas",
@@ -68,8 +68,8 @@ const serviciosMarquee: ServicioItem[] = [
   {
     label: "Portadas para reels",
     icon: Clapperboard,
-    accent: "from-[#a5b4fc] to-[#818cf8]",
-    glow: "rgba(165,180,252,0.4)",
+    accent: "from-[#c4b5fd] to-[#8b5cf6]",
+    glow: "rgba(196,181,253,0.4)",
   },
   {
     label: "Presentaciones comerciales",
@@ -80,8 +80,8 @@ const serviciosMarquee: ServicioItem[] = [
   {
     label: "Catálogos digitales",
     icon: BookOpen,
-    accent: "from-[#7dd3fc] to-[#67e8f9]",
-    glow: "rgba(125,211,252,0.38)",
+    accent: "from-[#d8b4fe] to-[#9333ea]",
+    glow: "rgba(216,180,254,0.38)",
   },
   {
     label: "Dossiers institucionales",
@@ -92,14 +92,14 @@ const serviciosMarquee: ServicioItem[] = [
   {
     label: "Diseño de piezas para WhatsApp",
     icon: MessageCircle,
-    accent: "from-[#86efac] to-[#4ade80]",
-    glow: "rgba(134,239,172,0.32)",
+    accent: "from-[#f9a8d4] to-[#db2777]",
+    glow: "rgba(249,168,212,0.38)",
   },
   {
     label: "Gráficas para sitios web y landing pages",
     icon: Layout,
-    accent: "from-[#67e8f9] to-[#a78bfa]",
-    glow: "rgba(103,232,249,0.35)",
+    accent: "from-[#eca8d6] to-[#8b5cf6]",
+    glow: "rgba(236,168,214,0.38)",
   },
   {
     label: "Diseño de identidad visual para campañas",
@@ -110,8 +110,8 @@ const serviciosMarquee: ServicioItem[] = [
   {
     label: "Material gráfico para eventos",
     icon: PartyPopper,
-    accent: "from-[#fcd34d] to-[#fbbf24]",
-    glow: "rgba(252,211,77,0.35)",
+    accent: "from-[#e879f9] to-[#a78bfa]",
+    glow: "rgba(232,121,249,0.38)",
   },
 ]
 
@@ -124,7 +124,7 @@ function MarqueeGem() {
     <span className="mx-2 inline-flex shrink-0 items-center md:mx-4" aria-hidden>
       <span className="relative flex h-2 w-2 items-center justify-center">
         <span className="absolute inset-0 animate-ping rounded-full bg-[#eca8d6]/30" />
-        <span className="relative h-1.5 w-1.5 rotate-45 rounded-[1px] bg-gradient-to-br from-[#eca8d6] via-white to-[#67e8f9] shadow-[0_0_14px_rgba(236,168,214,0.8)]" />
+        <span className="relative h-1.5 w-1.5 rotate-45 rounded-[1px] bg-gradient-to-br from-[#eca8d6] via-white to-[#a78bfa] shadow-[0_0_14px_rgba(236,168,214,0.8)]" />
       </span>
     </span>
   )
@@ -206,7 +206,7 @@ function MarqueeBackdrop() {
   return (
   <>
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_0%,rgba(236,168,214,0.14)_0%,transparent_55%),radial-gradient(ellipse_70%_60%_at_0%_80%,rgba(167,139,250,0.1)_0%,transparent_50%),radial-gradient(ellipse_60%_50%_at_100%_70%,rgba(103,232,249,0.08)_0%,transparent_48%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_0%,rgba(236,168,214,0.14)_0%,transparent_55%),radial-gradient(ellipse_70%_60%_at_0%_80%,rgba(167,139,250,0.1)_0%,transparent_50%),radial-gradient(ellipse_60%_50%_at_100%_70%,rgba(232,121,249,0.09)_0%,transparent_48%)]"
         aria-hidden
       />
       <div
@@ -244,7 +244,7 @@ export function DisenoServiciosMarquee() {
 
   if (reduce) {
     return (
-      <div className="relative mt-12 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-sm md:p-8">
+      <div className="relative mt-10 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-sm md:p-8">
         <MarqueeBackdrop />
         <ul className="relative z-10 flex flex-wrap justify-center gap-3">
           {serviciosMarquee.map((item, i) => (
@@ -258,10 +258,10 @@ export function DisenoServiciosMarquee() {
   }
 
   return (
-    <div className="relative mt-12 overflow-hidden rounded-3xl border border-white/[0.1] bg-[linear-gradient(180deg,rgba(14,10,18,0.95)_0%,rgba(0,0,0,0.92)_50%,rgba(10,8,14,0.95)_100%)] py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_40px_100px_-40px_rgba(236,168,214,0.2)] md:py-10">
+    <div className="relative mt-10 overflow-hidden rounded-3xl border border-white/[0.1] bg-[linear-gradient(180deg,rgba(14,10,18,0.95)_0%,rgba(0,0,0,0.92)_50%,rgba(10,8,14,0.95)_100%)] py-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_40px_100px_-40px_rgba(236,168,214,0.2)] md:py-8">
       <MarqueeBackdrop />
 
-      <div className="relative z-10 space-y-5 md:space-y-6">
+      <div className="relative z-10 space-y-4 md:space-y-5">
         <div className="relative left-1/2 w-screen max-w-none -translate-x-1/2">
           <MarqueeRow items={rowA} durationClass="[--duration:95s]" />
         </div>

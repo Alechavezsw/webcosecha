@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import App from "@/components/mineria/App";
+// Sólo viaja en esta ruta: son los tokens y overlays propios de la landing.
+import "@/components/mineria/mineria.css";
 
 export const metadata: Metadata = {
   title: "Minería y Proveedores Industriales — Posicionamiento B2B | Cosecha Creativa",

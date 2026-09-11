@@ -112,15 +112,20 @@ export default function RotatingEarth({
       const context = canvas.getContext("2d")
       if (!context) return
 
-      const containerWidth = Math.min(width, window.innerWidth - 48)
-      const containerHeight = Math.min(height, Math.round(height * 0.85))
-      const radius = Math.min(containerWidth, containerHeight) / 2.45
+      // El canvas se dibuja cuadrado: `globals.css` aplica `canvas { max-width: 100% }`,
+      // así que fijar ancho y alto en px distintos achataba el globo cuando el
+      // contenedor era más angosto que `width`.
+      const parentWidth = canvas.parentElement?.clientWidth ?? width
+      const containerWidth = Math.max(240, Math.min(width, parentWidth || width))
+      const containerHeight = containerWidth
+      const radius = containerWidth / 2.45
 
       const dpr = window.devicePixelRatio || 1
       canvas.width = containerWidth * dpr
       canvas.height = containerHeight * dpr
-      canvas.style.width = `${containerWidth}px`
-      canvas.style.height = `${containerHeight}px`
+      // Dejamos que el alto salga del ratio intrínseco (1:1) para que nunca se deforme.
+      canvas.style.width = "100%"
+      canvas.style.height = "auto"
       context.scale(dpr, dpr)
 
       const projection = d3

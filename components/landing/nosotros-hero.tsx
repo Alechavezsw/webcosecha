@@ -19,6 +19,13 @@ const easePremium = [0.22, 1, 0.36, 1] as const;
 /** Imagen en `public/` */
 const HERO_IMAGE_SRC = "/nosotros-cover.png";
 
+const HERO_CHIPS = [
+  "Desde 2003",
+  "Equipo in-house",
+  "IA aplicada",
+  "Proyectos medibles",
+] as const;
+
 export function NosotrosHero({ className }: { className?: string }) {
   const reduce = useReducedMotion();
 
@@ -60,18 +67,24 @@ export function NosotrosHero({ className }: { className?: string }) {
           )}
         >
           <CardHeader className="space-y-4 px-6 pb-2 pt-8 md:px-10 md:pt-10 lg:px-12">
-            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.35em] text-[#eca8d6]/90">
-              Nosotros
-            </p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.35em] text-[#eca8d6]/90">
+                Nosotros
+              </p>
+              <span className="h-px w-8 bg-[#eca8d6]/35" aria-hidden />
+              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-white/35">
+                San Juan, Argentina
+              </p>
+            </div>
             <h1 className="font-display text-3xl font-semibold leading-[1.08] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[3.25rem]">
               Innovación y tecnología para tu negocio
             </h1>
             <p className="max-w-xl pt-1 text-sm text-white/55 md:text-[15px]">
-              Estrategia, diseño y desarrollo desde San Juan.
+              Agencia de marketing digital, desarrollo e IA aplicada.
             </p>
           </CardHeader>
 
-          <CardContent className="space-y-3 px-6 pb-2 pt-1 md:px-10 lg:px-12">
+          <CardContent className="space-y-6 px-6 pb-2 pt-1 md:px-10 lg:px-12">
             <motion.div
               initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={reduce ? undefined : { opacity: 1, y: 0 }}
@@ -79,10 +92,27 @@ export function NosotrosHero({ className }: { className?: string }) {
               className="max-w-2xl text-lg leading-relaxed text-white/75 md:text-xl"
             >
               <p>
-                Cada proyecto es único. Diseñamos soluciones a medida para las necesidades reales de tu
-                empresa. Desde San Juan acompañamos a marcas que quieren crecer en el entorno digital.
+                Empezamos a hacer sitios web en 2003, mucho antes de que en San Juan se hablara de
+                marketing digital. Hoy somos un equipo de seis que diseña, desarrolla, comunica y
+                automatiza — todo en la misma casa, y todo medido.
               </p>
             </motion.div>
+
+            <motion.ul
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              animate={reduce ? undefined : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.14, ease: easePremium }}
+              className="flex flex-wrap gap-2"
+            >
+              {HERO_CHIPS.map((chip) => (
+                <li
+                  key={chip}
+                  className="rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.18em] text-white/50"
+                >
+                  {chip}
+                </li>
+              ))}
+            </motion.ul>
           </CardContent>
 
           <CardFooter className="flex flex-wrap gap-4 border-t border-white/10 bg-black/20 px-6 py-8 md:px-10 lg:px-12">
@@ -106,7 +136,7 @@ export function NosotrosHero({ className }: { className?: string }) {
                 variant="outline"
                 className="h-auto min-h-11 rounded-full border-white/15 bg-white/5 px-7 py-3.5 text-base font-semibold text-white hover:bg-white/10"
               >
-                <Link href="/servicios/consultoria-estrategica">Servicios</Link>
+                <Link href="/servicios">Ver servicios</Link>
               </Button>
             </motion.div>
           </CardFooter>

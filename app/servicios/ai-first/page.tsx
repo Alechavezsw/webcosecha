@@ -53,7 +53,7 @@ function BentoCard({ children, className = "", delay = 0 }: { children: React.Re
 // ─── Pill tag ─────────────────────────────────────────────────────────────────
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 bg-black/[0.04]">
+    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/70 bg-white/60 border border-black/[0.08] backdrop-blur-sm">
       {children}
     </span>
   )
@@ -87,7 +87,7 @@ export default function AgenticPage() {
       <IntroAnimation onDone={handleIntroDone} />
 
       {/* ── STICKY NAV ────────────────────────────────────────────────────── */}
-      <Navigation />
+      <Navigation onLight />
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative h-screen overflow-hidden">
@@ -144,7 +144,7 @@ export default function AgenticPage() {
           </h1>
 
           <div
-            className="text-sm sm:text-base md:text-lg text-black/55 font-light max-w-2xl mb-8 space-y-4 leading-relaxed"
+            className="text-sm sm:text-base md:text-lg text-black/72 font-light max-w-2xl mb-8 space-y-4 leading-relaxed"
             style={{
               opacity: heroReady ? 1 : 0,
               filter: heroReady ? "blur(0px)" : "blur(16px)",
@@ -177,7 +177,7 @@ export default function AgenticPage() {
                 }}
               >
                 <div className="font-display text-3xl font-light tracking-tight text-[#111] sm:text-4xl">{stat.value}</div>
-                <div className="mt-1 font-mono text-xs uppercase tracking-widest text-black/40">{stat.label}</div>
+                <div className="mt-1 font-mono text-xs uppercase tracking-widest text-black/60">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -200,7 +200,7 @@ export default function AgenticPage() {
             <BentoCard className="col-span-12 p-8 min-h-[200px] flex flex-col justify-between relative overflow-hidden" delay={0}>
               {/* Arc background image */}
               <img
-                src="/images/arc.png"
+                src="/_lite/arc.webp"
                 alt=""
                 aria-hidden="true"
                 className="absolute inset-0 w-full h-full object-cover"
@@ -226,10 +226,10 @@ export default function AgenticPage() {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><path d="m4.93 4.93 2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>
                 </div>
                 <h3 className="text-xl font-light mb-3">¿Qué significa ser una empresa AI First?</h3>
-                <p className="text-sm text-black/55 leading-relaxed max-w-2xl">
+                <p className="text-sm text-black/72 leading-relaxed max-w-2xl">
                   Una empresa AI First es aquella que incorpora la inteligencia artificial como parte central de su estrategia. La IA deja de ser una herramienta aislada y se convierte en un motor para mejorar la productividad, automatizar tareas, reducir tiempos y potenciar resultados.
                 </p>
-                <p className="text-sm text-black/55 leading-relaxed max-w-2xl mt-3 font-semibold">
+                <p className="text-sm text-black/72 leading-relaxed max-w-2xl mt-3 font-semibold">
                   En criollo: menos tareas repetitivas, más decisiones inteligentes y más tiempo para hacer crecer el negocio.
                 </p>
               </div>
@@ -241,7 +241,7 @@ export default function AgenticPage() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
               </div>
               <h3 className="text-lg font-light mb-2">Automatización de procesos</h3>
-              <p className="text-sm text-black/45 leading-relaxed">Creamos flujos inteligentes para automatizar tareas repetitivas como carga de datos, respuestas a clientes, generación de reportes, seguimiento comercial, gestión de consultas y organización interna.</p>
+              <p className="text-sm text-black/65 leading-relaxed">Creamos flujos inteligentes para automatizar tareas repetitivas como carga de datos, respuestas a clientes, generación de reportes, seguimiento comercial, gestión de consultas y organización interna.</p>
             </BentoCard>
 
             <BentoCard className="col-span-12 md:col-span-4 p-8 min-h-[200px]" delay={160}>
@@ -249,7 +249,7 @@ export default function AgenticPage() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
               </div>
               <h3 className="text-lg font-light mb-2">Asistentes virtuales inteligentes</h3>
-              <p className="text-sm text-black/45 leading-relaxed">Desarrollamos chatbots y asistentes con IA capaces de responder consultas, guiar clientes, tomar pedidos, brindar información y acompañar procesos comerciales o administrativos.</p>
+              <p className="text-sm text-black/65 leading-relaxed">Desarrollamos chatbots y asistentes con IA capaces de responder consultas, guiar clientes, tomar pedidos, brindar información y acompañar procesos comerciales o administrativos.</p>
             </BentoCard>
 
             <BentoCard className="col-span-12 md:col-span-4 p-8 min-h-[200px]" delay={200}>
@@ -257,7 +257,7 @@ export default function AgenticPage() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
               <h3 className="text-lg font-light mb-2">IA conectada a tus herramientas</h3>
-              <p className="text-sm text-black/45 leading-relaxed">Integramos agentes de inteligencia artificial con sistemas, planillas, CRM, WhatsApp, sitios web, bases de datos, correos y plataformas de gestión. Conectamos agentes de IA con las herramientas reales de tu empresa.</p>
+              <p className="text-sm text-black/65 leading-relaxed">Integramos agentes de inteligencia artificial con sistemas, planillas, CRM, WhatsApp, sitios web, bases de datos, correos y plataformas de gestión. Conectamos agentes de IA con las herramientas reales de tu empresa.</p>
             </BentoCard>
           </div>
         </div>
@@ -274,7 +274,7 @@ export default function AgenticPage() {
                 {"Diseñamos e implementamos\nsoluciones de IA."}
               </RevealText>
             </div>
-            <p className="text-sm text-black/45 leading-relaxed max-w-md">
+            <p className="text-sm text-black/65 leading-relaxed max-w-md">
               Diseñamos e implementamos soluciones de inteligencia artificial adaptadas a cada empresa, según su tamaño, rubro y objetivos.
             </p>
           </div>
@@ -316,12 +316,12 @@ export default function AgenticPage() {
                 </div>
                 {/* Number top-left */}
                 <div className="relative z-10 p-7">
-                  <span className="mb-1 block font-mono text-[11px] tracking-widest text-black/20">{step.n}</span>
+                  <span className="mb-1 block font-mono text-[11px] tracking-widest text-black/55">{step.n}</span>
                 </div>
                 {/* Text pushed further down */}
                 <div className="relative z-10 px-7 pb-7 mt-auto pt-16">
                   <h3 className="text-2xl font-light mb-3">{step.title}</h3>
-                  <p className="text-sm text-black/45 leading-relaxed">{step.desc}</p>
+                  <p className="text-sm text-black/65 leading-relaxed">{step.desc}</p>
                 </div>
               </BentoCard>
             ))}
@@ -340,7 +340,7 @@ export default function AgenticPage() {
                 {"Conectamos la IA\ncon tu ecosistema diario."}
               </RevealText>
             </div>
-            <p className="text-sm text-black/45 leading-relaxed max-w-xs">
+            <p className="text-sm text-black/65 leading-relaxed max-w-xs">
               Conectamos agentes de IA con las herramientas reales de tu empresa: WhatsApp, CRM, planillas de cálculo, bases de datos y correos.
             </p>
           </div>
@@ -368,12 +368,12 @@ export default function AgenticPage() {
               >
                 <Tag>INTEGRACIÓN</Tag>
                 <h3 className="mt-3 text-lg font-light mb-2">IA conectada</h3>
-                <p className="text-xs text-black/45 leading-relaxed mb-4">No aislamos los sistemas. Creamos flujos automatizados de extremo a extremo conectando planillas, CRM y chats.</p>
-                <div className="bg-black/[0.05] rounded-lg border border-black/[0.07] p-3 font-mono text-[11px] text-black/50 leading-relaxed">
-                  <span className="text-black/25">// flujo integrador</span><br />
+                <p className="text-xs text-black/65 leading-relaxed mb-4">No aislamos los sistemas. Creamos flujos automatizados de extremo a extremo conectando planillas, CRM y chats.</p>
+                <div className="bg-black/[0.05] rounded-lg border border-black/[0.07] p-3 font-mono text-[11px] text-black/70 leading-relaxed">
+                  <span className="text-black/55">// flujo integrador</span><br />
                   <span className="text-blue-600/70">conectarAgente</span>{"({"}<br />
                   {"  "}<span className="text-amber-700/70">canal</span>: <span className="text-green-700/70">&apos;WhatsAppBusiness&apos;</span>,<br />
-                  {"  "}<span className="text-amber-700/70">ejecutar</span>: <span className="text-black/35">async (datos) </span>={">"}<br />
+                  {"  "}<span className="text-amber-700/70">ejecutar</span>: <span className="text-black/60">async (datos) </span>={">"}<br />
                   {"    "}<span className="text-blue-600/70">CRM</span>.actualizarCliente(datos)<br />
                   {"})"}
                 </div>
@@ -389,9 +389,9 @@ export default function AgenticPage() {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500/80 animate-pulse" />
-                  <span className="text-xs text-black/40 tracking-widest">IA APLICADA</span>
+                  <span className="text-xs text-black/60 tracking-widest">IA APLICADA</span>
                 </div>
-                <p className="text-sm text-black/45">Automatización robusta y medible orientada 100% a la productividad de tu equipo.</p>
+                <p className="text-sm text-black/65">Automatización robusta y medible orientada 100% a la productividad de tu equipo.</p>
               </div>
             </div>
           </div>
@@ -412,7 +412,7 @@ export default function AgenticPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left side — descriptions */}
             <div className="space-y-6">
-              <div className="text-sm text-black/55 leading-relaxed space-y-4">
+              <div className="text-sm text-black/72 leading-relaxed space-y-4">
                 <p>
                   En Cosecha Creativa no vendemos promesas futuristas. Diseñamos soluciones concretas, aplicables y medibles.
                 </p>
@@ -434,7 +434,7 @@ export default function AgenticPage() {
                     <div className="w-1 bg-black/10 rounded-full shrink-0" />
                     <div>
                       <h3 className="text-sm font-light mb-1">{item.label}</h3>
-                      <p className="text-xs text-black/35">{item.desc}</p>
+                      <p className="text-xs text-black/60">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -443,7 +443,7 @@ export default function AgenticPage() {
               {/* Compliance badges — vertical stack */}
               <div className="pt-4 flex flex-col gap-2">
                 {["Privacidad Encriptada", "Monitoreo 24/7", "Integración Segura", "Fórmula AI First"].map((badge) => (
-                  <div key={badge} className="flex items-center gap-2 text-xs text-black/25">
+                  <div key={badge} className="flex items-center gap-2 text-xs text-black/55">
                     <span className="w-1 h-1 rounded-full bg-black/25" />
                     {badge}
                   </div>
@@ -453,7 +453,7 @@ export default function AgenticPage() {
 
             {/* Right side — live audit log visualization */}
             <BentoCard className="p-6 lg:row-span-1" delay={0}>
-              <div className="text-xs text-black/30 tracking-widest uppercase mb-4">Registro Operativo en Vivo</div>
+              <div className="text-xs text-black/55 tracking-widest uppercase mb-4">Registro Operativo en Vivo</div>
               <div className="space-y-2">
                 {[
                   { time: "12:34:21", action: "consulta_whatsapp_respondida", status: "success" },
@@ -469,8 +469,8 @@ export default function AgenticPage() {
                       animation: `fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 80}ms both`,
                     }}
                   >
-                    <span className="text-[10px] text-black/25 font-mono min-w-[60px]">{log.time}</span>
-                    <span className="text-[11px] text-black/50 font-light flex-1">{log.action}</span>
+                    <span className="text-[10px] text-black/55 font-mono min-w-[60px]">{log.time}</span>
+                    <span className="text-[11px] text-black/70 font-light flex-1">{log.action}</span>
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500/60 group-hover:bg-green-500 transition-colors" />
                   </div>
                 ))}
@@ -497,7 +497,7 @@ export default function AgenticPage() {
               {["Carga de datos", "Asistente de WhatsApp", "Respuestas automáticas", "Orden de información", "Interpretación de datos", "Generación de ideas", "Optimización de textos", "Integración CRM", "Flujos inteligentes", "Monitoreo 24/7"].map((cap) => (
                 <div key={cap} className="flex items-center gap-6 px-10 py-5 border-r border-black/[0.06] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-black/20 shrink-0" />
-                  <span className="text-sm text-black/45 whitespace-nowrap tracking-wide">{cap}</span>
+                  <span className="text-sm text-black/65 whitespace-nowrap tracking-wide">{cap}</span>
                 </div>
               ))}
             </div>
@@ -509,7 +509,7 @@ export default function AgenticPage() {
               {["Reportes automatizados", "Respuesta a clientes", "Toma de pedidos", "Dashboard estratégico", "Gestión de correos", "Sincronización WhatsApp", "Reducción de errores", "Ahorro de tiempo", "Vender mejor", "Escalar operaciones"].map((cap) => (
                 <div key={cap} className="flex items-center gap-6 px-10 py-5 border-r border-black/[0.06] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-black/12 shrink-0" />
-                  <span className="text-sm text-black/30 whitespace-nowrap tracking-wide">{cap}</span>
+                  <span className="text-sm text-black/55 whitespace-nowrap tracking-wide">{cap}</span>
                 </div>
               ))}
             </div>
@@ -527,12 +527,12 @@ export default function AgenticPage() {
               <RevealText className="mt-5 font-display text-4xl md:text-5xl lg:text-6xl tracking-tight leading-[1.05]">
                 {"Agentes trabajando\n24/7 de forma autónoma."}
               </RevealText>
-              <p className="mt-6 text-base text-black/40 leading-relaxed max-w-sm">
+              <p className="mt-6 text-base text-black/60 leading-relaxed max-w-sm">
                 Diseñamos agentes de inteligencia artificial y automatizaciones que operan ininterrumpidamente, resolviendo tareas críticas para que tu equipo se concentre en lo importante.
               </p>
               <div className="mt-10 flex items-end gap-2">
                 <LiveAgentCounter />
-                <span className="text-black/30 text-sm mb-1 tracking-wide">tareas resueltas globalmente hoy</span>
+                <span className="text-black/55 text-sm mb-1 tracking-wide">tareas resueltas globalmente hoy</span>
               </div>
             </div>
             <div className="relative">
@@ -584,15 +584,15 @@ export default function AgenticPage() {
                 delay={plan.delay}
               >
                 <div className="mb-8">
-                  <div className="mb-4 font-mono text-[11px] tracking-widest text-black/40">{plan.name}</div>
+                  <div className="mb-4 font-mono text-[11px] tracking-widest text-black/60">{plan.name}</div>
                   <div className="flex items-baseline gap-1 mb-1">
                     <span className="text-4xl font-light">{plan.price}</span>
                   </div>
-                  <p className="text-xs text-black/35 tracking-wide">{plan.sub}</p>
+                  <p className="text-xs text-black/60 tracking-wide">{plan.sub}</p>
                 </div>
                 <ul className="space-y-3 flex-1 mb-8">
                   {plan.features.map(f => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-black/55">
+                    <li key={f} className="flex items-center gap-3 text-sm text-black/72">
                       <div className="w-1.5 h-1.5 rounded-full bg-black/25 shrink-0" />
                       {f}
                     </li>
@@ -608,7 +608,7 @@ export default function AgenticPage() {
       <section className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] overflow-hidden">
         {/* Glass panels image — anchored to bottom center */}
         <img
-          src="/images/footer.png"
+          src="/_lite/footer.webp"
           alt=""
           aria-hidden="true"
           className="absolute bottom-0 left-0 w-full object-cover object-bottom pointer-events-none select-none"
@@ -635,10 +635,10 @@ export default function AgenticPage() {
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl tracking-tight leading-[1.05] mb-6">
             Llevá tu empresa al<br />próximo nivel
           </h2>
-          <p className="text-sm md:text-base text-black/45 leading-relaxed mb-4 max-w-xl mx-auto">
+          <p className="text-sm md:text-base text-black/65 leading-relaxed mb-4 max-w-xl mx-auto">
             El futuro no espera, y tus competidores tampoco. En Cosecha Creativa te ayudamos a convertir tu empresa en una organización más ágil, inteligente y preparada para crecer.
           </p>
-          <p className="text-xs text-black/35 tracking-widest uppercase mb-10 max-w-xl mx-auto">
+          <p className="text-xs text-black/60 tracking-widest uppercase mb-10 max-w-xl mx-auto">
             Cosecha Creativa · Marketing, tecnología e inteligencia artificial para empresas que quieren escalar.
           </p>
 

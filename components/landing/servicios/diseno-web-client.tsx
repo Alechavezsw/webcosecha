@@ -2,411 +2,65 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import dynamic from "next/dynamic"
 import { useEffect, useRef, useState } from "react"
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion"
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion"
 import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
-  BarChart3,
-  Code2,
   CreditCard,
   ExternalLink,
+  Gauge,
   Globe2,
-  Layout,
+  Link2,
   Mail,
   Megaphone,
-  MessageCircle,
-  Palette,
+  PenLine,
   Puzzle,
   RefreshCw,
   Search,
   Share2,
-  Shield,
-  ShoppingBag,
-  Smartphone,
-  Truck,
   Sparkles,
   Target,
-  Users,
+  Truck,
   Workflow,
-  Zap,
 } from "lucide-react"
 import { Navigation } from "@/components/landing/navigation"
 import { TechConstellation } from "@/components/landing/servicios/tech-constellation"
+
+/** El hero 3D es WebGL: fuera del bundle inicial y sin render en servidor. */
+const DisenoWebHero3D = dynamic(
+  () => import("@/components/landing/servicios/diseno-web-hero-3d").then((m) => m.DisenoWebHero3D),
+  { ssr: false },
+)
 import {
   PortfolioMacbookShowcase,
   PORTFOLIO_PUBLIC_URL as PORTFOLIO_URL,
 } from "@/components/landing/servicios/portfolio-macbook-showcase"
 import { PortfolioWebdisGallery } from "@/components/landing/servicios/portfolio-webdis-gallery"
+import { ServiceVisual, SerpClimbVisual, CheckoutVisual } from "@/components/landing/servicios/diseno-web-visuals"
+import { DisenoWebCierre } from "@/components/landing/servicios/diseno-web-cierre"
 import { FooterSection } from "@/components/landing/footer-section"
 import { Button } from "@/components/ui/button"
 import { WhatsAppMark } from "@/components/icons/whatsapp-mark"
 import { getWhatsAppHref } from "@/lib/whatsapp"
 import { cn } from "@/lib/utils"
-type ServiceSpotlightVariant = "landing" | "wordpress" | "crm"
+import { DisenoWebServicios } from "@/components/landing/servicios/diseno-web-servicios"
 
-const SERVICE_SPOTLIGHT_FLOAT_POS = [
-  "left-[4%] top-[8%] z-[1] hidden md:block",
-  "right-[5%] top-[12%] z-[1] hidden lg:block",
-  "left-[8%] top-[42%] z-[1] hidden md:block",
-  "right-[12%] top-[48%] z-[1] hidden lg:block",
-] as const
 
-function ServiceSpotlightSection({
-  variant,
-  prefersReducedMotion,
-}: {
-  variant: ServiceSpotlightVariant
-  prefersReducedMotion: boolean | null
-}) {
-  const cfg =
-    variant === "landing"
-      ? {
-          id: "landing" as const,
-          reverse: true,
-          bg: "bg-[linear-gradient(180deg,rgba(45,25,8,0.4)_0%,rgba(0,0,0,0.96)_48%,rgba(9,9,11,1)_100%)]",
-          radial:
-            "bg-[radial-gradient(ellipse_95%_75%_at_12%_12%,rgba(251,191,36,0.15)_0%,transparent_56%),radial-gradient(ellipse_70%_65%_at_92%_88%,rgba(244,114,182,0.1)_0%,transparent_52%)]",
-          glow:
-            "bg-gradient-to-br from-amber-500/22 via-orange-400/12 to-transparent blur-[100px]",
-          badgeRing: "border-amber-400/28 bg-amber-500/12 text-amber-100",
-          titleGradient: "from-amber-100 via-orange-200 to-rose-300",
-          iconRing: "ring-amber-400/30",
-          cardGlow:
-            "shadow-[0_40px_100px_-48px_rgba(251,191,36,0.28)] ring-1 ring-amber-500/15",
-          badgeLabel: "Conversión",
-          titleBefore: "Landing ",
-          titleAccent: "pages",
-          description:
-            "Páginas de aterrizaje enfocadas en una sola acción: leads, reservas o campañas pagas — copys y estructura pensados para conversión.",
-          chips: ["CTA", "Forms", "A/B", "Ads"],
-          Icon: ArrowUpRight,
-          floats: [
-            { Icon: Target, label: "Una acción clara" },
-            { Icon: BarChart3, label: "Métricas" },
-            { Icon: Megaphone, label: "Campañas" },
-            { Icon: Zap, label: "Rapidez" },
-          ],
-          floatTint: "rgba(251,191,36,0.35)",
-        }
-      : variant === "wordpress"
-        ? {
-            id: "wordpress" as const,
-            reverse: false,
-            bg: "bg-[linear-gradient(180deg,rgba(15,23,42,0.45)_0%,rgba(0,0,0,0.96)_48%,rgba(9,9,11,1)_100%)]",
-            radial:
-              "bg-[radial-gradient(ellipse_90%_72%_at_82%_8%,rgba(59,130,246,0.14)_0%,transparent_55%),radial-gradient(ellipse_68%_58%_at_8%_92%,rgba(147,197,253,0.09)_0%,transparent_50%)]",
-            glow:
-              "bg-gradient-to-br from-blue-500/18 via-indigo-400/12 to-transparent blur-[100px]",
-            badgeRing: "border-blue-400/28 bg-blue-500/12 text-blue-100",
-            titleGradient: "from-sky-200 via-blue-200 to-indigo-300",
-            iconRing: "ring-blue-400/28",
-            cardGlow:
-              "shadow-[0_40px_100px_-48px_rgba(59,130,246,0.26)] ring-1 ring-blue-500/15",
-            badgeLabel: "CMS & soporte",
-            titleBefore: "WordPress & ",
-            titleAccent: "mantenimiento",
-            description:
-              "Implementamos WordPress cuando necesitás autonomía para editar contenidos. Sumamos mantenimiento, backups y actualizaciones para que todo siga estable.",
-            chips: ["Editor", "Plugins", "Backups", "Updates"],
-            Icon: Code2,
-            floats: [
-              { Icon: Shield, label: "Seguridad" },
-              { Icon: Puzzle, label: "Temas & plugins" },
-              { Icon: RefreshCw, label: "Actualizaciones" },
-              { Icon: Search, label: "SEO técnico" },
-            ],
-            floatTint: "rgba(96,165,250,0.35)",
-          }
-        : {
-            id: "crm" as const,
-            reverse: true,
-            bg: "bg-[linear-gradient(180deg,rgba(35,15,45,0.42)_0%,rgba(0,0,0,0.96)_48%,rgba(9,9,11,1)_100%)]",
-            radial:
-              "bg-[radial-gradient(ellipse_92%_74%_at_88%_12%,rgba(167,139,250,0.14)_0%,transparent_55%),radial-gradient(ellipse_65%_58%_at_10%_85%,rgba(236,168,214,0.1)_0%,transparent_52%)]",
-            glow:
-              "bg-gradient-to-br from-violet-500/20 via-fuchsia-400/12 to-transparent blur-[100px]",
-            badgeRing: "border-violet-400/28 bg-violet-500/12 text-violet-100",
-            titleGradient: "from-violet-100 via-fuchsia-200 to-[#eca8d6]",
-            iconRing: "ring-violet-400/28",
-            cardGlow:
-              "shadow-[0_40px_100px_-48px_rgba(167,139,250,0.28)] ring-1 ring-violet-500/15",
-            badgeLabel: "Operación",
-            titleBefore: "CRM & ",
-            titleAccent: "automatización",
-            description:
-              "Conectamos formularios y flujos con herramientas de gestión para que los contactos no se pierdan y tu equipo trabaje más ordenado.",
-            chips: ["Leads", "Flujos", "Alertas", "Integraciones"],
-            Icon: Workflow,
-            floats: [
-              { Icon: Users, label: "Pipeline" },
-              { Icon: Mail, label: "Contactos" },
-              { Icon: Share2, label: "Integraciones" },
-              { Icon: Zap, label: "Automatizar" },
-            ],
-            floatTint: "rgba(167,139,250,0.38)",
-          }
-
-  const sectionRef = useRef<HTMLElement | null>(null)
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  })
-
-  const dropA = useTransform(scrollYProgress, [0, 1], [-72, 212])
-  const dropB = useTransform(scrollYProgress, [0, 1], [48, 318])
-  const dropC = useTransform(scrollYProgress, [0, 1], [-34, 268])
-  const dropD = useTransform(scrollYProgress, [0, 1], [88, 382])
-  const dropBRot = useTransform(scrollYProgress, [0, 1], [5, -11])
-  const sway = useTransform(scrollYProgress, [0, 1], [-6, 15])
-  const cardY = useTransform(scrollYProgress, [0, 0.42, 1], [26, 0, -14])
-  const iconScale = useTransform(scrollYProgress, [0, 0.52, 1], [0.94, 1, 1.06])
-  const glowY = useTransform(scrollYProgress, [0, 1], [110, -72])
-
-  const drops = [dropA, dropB, dropC, dropD]
-  const RmIcon = cfg.Icon
-
-  if (prefersReducedMotion) {
-    return (
-      <motion.section
-        id={cfg.id}
-        className="relative overflow-hidden border-t border-white/10 bg-black/55 py-20 lg:py-28"
-        {...sectionEnter}
-      >
-        <div className={cn("pointer-events-none absolute inset-0", cfg.bg)} aria-hidden />
-        <div className={cn("pointer-events-none absolute inset-0", cfg.radial)} aria-hidden />
-        <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
-          <div
-            className={cn(
-              "liquid-glass rounded-[1.85rem] border border-white/[0.08] bg-black/40 p-8 md:p-12",
-              cfg.cardGlow,
-            )}
-          >
-            <div
-              className={cn(
-                "md:flex md:items-center md:justify-between md:gap-12",
-                cfg.reverse && "md:flex-row-reverse",
-              )}
-            >
-              <div className={cn("max-w-xl", cfg.reverse && "md:text-right")}>
-                <span
-                  className={cn(
-                    "mb-4 inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em]",
-                    cfg.badgeRing,
-                  )}
-                >
-                  {cfg.badgeLabel}
-                </span>
-                <h2 className="font-display text-3xl tracking-tight text-white md:text-4xl lg:text-[2.65rem]">
-                  {cfg.titleBefore}
-                  <span className={cn("bg-gradient-to-r bg-clip-text text-transparent", cfg.titleGradient)}>
-                    {cfg.titleAccent}
-                  </span>
-                </h2>
-                <p className="mt-5 text-lg leading-relaxed text-white/70">{cfg.description}</p>
-              </div>
-              <div
-                className={cn(
-                  "mt-10 flex shrink-0 justify-center md:mt-0",
-                  cfg.reverse ? "md:justify-start" : "md:justify-end",
-                )}
-              >
-                <div
-                  className={cn(
-                    "liquid-glass-strong flex size-28 items-center justify-center rounded-3xl ring-2 ring-offset-2 ring-offset-black/75 md:size-32",
-                    cfg.iconRing,
-                  )}
-                >
-                  <RmIcon className="size-14 text-white md:size-16" strokeWidth={1} aria-hidden />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-    )
-  }
-
-  const MainIcon = cfg.Icon
-
-  return (
-    <motion.section
-      ref={sectionRef}
-      id={cfg.id}
-      className="relative min-h-[min(520px,78vh)] overflow-hidden border-t border-white/10 bg-black/55 py-24 lg:py-32"
-      {...sectionEnter}
-    >
-      <div className={cn("pointer-events-none absolute inset-0", cfg.bg)} aria-hidden />
-      <div className={cn("pointer-events-none absolute inset-0", cfg.radial)} aria-hidden />
-      <motion.div
-        style={{ y: glowY }}
-        className={cn(
-          "pointer-events-none absolute left-1/2 top-[14%] h-[min(460px,52vw)] w-[min(460px,52vw)] -translate-x-1/2 rounded-full blur-[100px]",
-          cfg.glow,
-        )}
-        aria-hidden
-      />
-
-      {cfg.floats.map((item, i) => {
-        const Fi = item.Icon
-        return (
-          <motion.div
-            key={`${cfg.id}-float-${item.label}`}
-            style={{
-              y: drops[i],
-              rotate: i === 1 ? dropBRot : sway,
-            }}
-            className={cn("pointer-events-none absolute", SERVICE_SPOTLIGHT_FLOAT_POS[i])}
-          >
-            {i === 3 ? (
-              <div
-                className="flex size-14 items-center justify-center rounded-2xl border border-white/15 bg-black/55 shadow-lg backdrop-blur-md"
-                style={{ boxShadow: `0 16px 50px -18px ${cfg.floatTint}` }}
-              >
-                <Fi className="size-7 text-white/90" aria-hidden />
-              </div>
-            ) : (
-              <span
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/16 bg-black/50 px-3.5 py-2 text-[11px] font-medium text-white/90 shadow-lg backdrop-blur-md md:px-4 md:py-2.5 md:text-xs"
-                style={{ boxShadow: `0 18px 55px -22px ${cfg.floatTint}` }}
-              >
-                <Fi className="size-3.5 shrink-0 opacity-90" aria-hidden />
-                {item.label}
-              </span>
-            )}
-          </motion.div>
-        )
-      })}
-
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-px"
-        style={{
-          backgroundImage:
-            variant === "landing"
-              ? "linear-gradient(90deg, transparent, rgba(251,191,36,0.45), transparent)"
-              : variant === "wordpress"
-                ? "linear-gradient(90deg, transparent, rgba(96,165,250,0.45), transparent)"
-                : "linear-gradient(90deg, transparent, rgba(167,139,250,0.45), transparent)",
-        }}
-      />
-
-      <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
-        <motion.div
-          style={{ y: cardY }}
-          className={cn(
-            "group relative overflow-hidden rounded-[1.85rem] border border-white/[0.09] bg-gradient-to-br from-white/[0.06] via-black/42 to-black/72 p-8 backdrop-blur-xl md:p-12",
-            cfg.cardGlow,
-          )}
-        >
-          <div className="pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden>
-            <div
-              className="h-full w-full"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.5) 1px, transparent 0)",
-                backgroundSize: "26px 26px",
-              }}
-            />
-          </div>
-
-          <div
-            className={cn(
-              "relative md:flex md:items-center md:justify-between md:gap-14",
-              cfg.reverse && "md:flex-row-reverse",
-            )}
-          >
-            <div className={cn("max-w-xl", cfg.reverse && "md:text-right")}>
-              <motion.span
-                className={cn(
-                  "mb-5 inline-flex rounded-full border px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]",
-                  cfg.badgeRing,
-                )}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, ease: easePremium }}
-              >
-                {cfg.badgeLabel}
-              </motion.span>
-              <h2 className="font-display text-3xl tracking-tight text-white md:text-4xl lg:text-[2.75rem] lg:leading-[1.08]">
-                {cfg.titleBefore}
-                <span
-                  className={cn(
-                    "bg-gradient-to-r bg-clip-text text-transparent",
-                    variant === "landing" &&
-                      "from-amber-100 via-orange-200 to-rose-300",
-                    variant === "wordpress" &&
-                      "from-sky-100 via-blue-200 to-indigo-300",
-                    variant === "crm" &&
-                      "from-violet-100 via-fuchsia-200 to-[#eca8d6]",
-                  )}
-                >
-                  {cfg.titleAccent}
-                </span>
-              </h2>
-              <p className="mt-5 text-lg leading-relaxed text-white/68 md:text-xl">{cfg.description}</p>
-              <ul
-                className={cn(
-                  "mt-8 flex flex-wrap gap-2.5",
-                  cfg.reverse && "md:justify-end",
-                )}
-              >
-                {cfg.chips.map((label) => (
-                  <li
-                    key={label}
-                    className="rounded-full border border-white/10 bg-black/35 px-3.5 py-1.5 text-xs font-medium text-white/78"
-                  >
-                    {label}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div
-              className={cn(
-                "mt-10 flex shrink-0 justify-center md:mt-0",
-                cfg.reverse ? "md:justify-start" : "md:justify-end",
-              )}
-            >
-              <motion.div
-                style={{ scale: iconScale }}
-                className={cn(
-                  "liquid-glass-strong relative flex size-28 items-center justify-center rounded-3xl ring-2 ring-offset-2 ring-offset-black/75 md:size-36",
-                  cfg.iconRing,
-                )}
-              >
-                <motion.div
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{
-                    duration: 5 + (variant === "wordpress" ? 0.4 : 0),
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                >
-                  <MainIcon className="size-14 text-white md:size-[4.25rem]" strokeWidth={1} aria-hidden />
-                </motion.div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </motion.section>
-  )
-}
-
-const VIDEO_POSTER = "/images/bridge.png"
-const HERO_BG_VIDEO_BASE = "continue_with_a_lot_of_202605020801"
-const HERO_BG_VIDEO_SOURCES = [
-  `/videos/${HERO_BG_VIDEO_BASE}.mp4`,
-  `/videos/${HERO_BG_VIDEO_BASE}.webm`,
-  `/videos/${HERO_BG_VIDEO_BASE}.mov`,
-  `/${HERO_BG_VIDEO_BASE}.mp4`,
-  `/${HERO_BG_VIDEO_BASE}.webm`,
-] as const
-
-const MID_BG_SRC = "/Gemini_Generated_Image_txjgz6txjgz6txjg.jpg"
-/** Vídeo de la carpeta `Diseño web` del proyecto, servido desde `public/videos/` */
-const SEO_SECTION_VIDEO = "/videos/diseno-web-seo-bg.mp4"
+// Acá vivían las rutas del vídeo de stock que usaban el hero, la sección SEO y
+// «¿Por qué elegirnos?». Las tres pasaron a fondos propios, así que la página ya
+// no descarga ningún vídeo — y de paso desaparecieron los 404 de la cadena de
+// respaldo, que pedía cinco rutas hasta encontrar la buena.
 const CONTACT_EMAIL = "contacto@cosechacreativa.com.ar"
 const MARQUEE_TAGS = [
   "Next.js",
@@ -446,149 +100,43 @@ const heroItemVariants = {
   },
 } as const
 
-const porQueItems = [
-  {
-    title: "Diseño personalizado",
-    body: "Sitios a medida, alineados con tu marca y tus objetivos de negocio.",
-    icon: Palette,
-  },
-  {
-    title: "Optimización SEO",
-    body: "Estrategias para posicionarte en Google y ganar visibilidad en San Juan.",
-    icon: Search,
-  },
-  {
-    title: "Responsive design",
-    body: "Experiencia impecable en móvil, tablet y escritorio.",
-    icon: Smartphone,
-  },
-  {
-    title: "Velocidad y rendimiento",
-    body: "Carga rápida y navegación fluida — cada milisegundo cuenta.",
-    icon: Zap,
-  },
-  {
-    title: "Redes sociales",
-    body: "Integración con Instagram, Facebook y el ecosistema que uses.",
-    icon: Globe2,
-  },
-  {
-    title: "Tiendas online",
-    body: "E-commerce seguros y funcionales para vender productos o servicios.",
-    icon: ShoppingBag,
-  },
-  {
-    title: "Soporte y mantenimiento",
-    body: "Tu web actualizada, estable y protegida en el tiempo.",
-    icon: Sparkles,
-  },
-  {
-    title: "Diseño UX/UI",
-    body: "Interfaces claras y atractivas para mejorar la interacción.",
-    icon: Layout,
-  },
-  {
-    title: "WordPress",
-    body: "Sitios autoadministrables, escalables y fáciles de gestionar.",
-    icon: Code2,
-  },
-  {
-    title: "Landing pages",
-    body: "Páginas de aterrizaje para campañas y captación de leads.",
-    icon: ArrowUpRight,
-  },
-  {
-    title: "CRM y automatización",
-    body: "Conexión con herramientas de gestión para eficientar tu operación.",
-    icon: Users,
-  },
-  {
-    title: "Chatbots",
-    body: "Atención automática y respuestas en tiempo real.",
-    icon: MessageCircle,
-  },
-  {
-    title: "Seguridad web",
-    body: "Buenas prácticas para proteger datos y reducir riesgos.",
-    icon: Shield,
-  },
-] as const
-
 const seoTactics = [
   {
     title: "Investigación de palabras clave",
     body: "Detectamos lo que tu audiencia busca en San Juan y alrededores.",
+    icon: Search,
   },
   {
     title: "Contenido optimizado",
     body: "Textos únicos y persuasivos para mejorar ranking y conversión.",
+    icon: PenLine,
   },
   {
     title: "SEO técnico",
     body: "Indexación, estructura y velocidad alineadas a las guías de Google.",
+    icon: Gauge,
   },
   {
     title: "Link building local",
     body: "Referencias relevantes que fortalecen la autoridad de tu sitio.",
+    icon: Link2,
   },
 ] as const
 
 /** Vídeo de fondo recortado al ancho del contenido (no borde a borde). `narrow` = mismo ancho que el CTA central (820px). */
-function SectionVideoFrame({
-  narrow,
-  children,
-}: {
-  narrow?: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <div className="pointer-events-none absolute inset-0 z-0 px-6 lg:px-12">
-      <div className={cn("mx-auto h-full", narrow ? "max-w-[820px]" : "max-w-[1400px]")}>
-        <div className="relative h-full min-h-[240px] overflow-hidden rounded-[1.75rem] border border-white/[0.08] ring-1 ring-white/[0.05]">
-          {children}
-        </div>
-      </div>
-    </div>
-  )
-}
 
-function SpotlightFeatureCard({
-  children,
-  className,
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [glow, setGlow] = useState({ x: 50, y: 50 })
-
-  const onMove = (e: React.MouseEvent) => {
-    const el = ref.current
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    setGlow({
-      x: ((e.clientX - r.left) / r.width) * 100,
-      y: ((e.clientY - r.top) / r.height) * 100,
-    })
-  }
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={() => setGlow({ x: 50, y: 50 })}
-      className={cn("group relative overflow-hidden rounded-2xl", className)}
-    >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(520px circle at ${glow.x}% ${glow.y}%, rgba(236,168,214,0.24), transparent 42%), radial-gradient(420px circle at ${glow.x}% ${glow.y}%, rgba(103,232,249,0.14), transparent 48%)`,
-        }}
-      />
-      {children}
-    </div>
-  )
-}
+/**
+ * Tarjeta con foco que sigue al puntero.
+ *
+ * Sobre la versión anterior (solo el degradado radial) agrega tres cosas: la
+ * tarjeta se inclina en 3D hacia el cursor, el borde se enciende donde está el
+ * puntero, y un brillo diagonal barre la superficie al entrar.
+ *
+ * Todo se escribe sobre `MotionValue`s y se compone con `useMotionTemplate`, así
+ * que mover el mouse no dispara un solo render de React. La versión anterior
+ * hacía `setState` en cada `mousemove` y volvía a renderizar toda la tarjeta,
+ * hijos incluidos, sesenta veces por segundo.
+ */
 
 function TechMarquee({ reducedMotion }: { reducedMotion: boolean | null }) {
   const TagSep = () => (
@@ -640,511 +188,57 @@ function TechMarquee({ reducedMotion }: { reducedMotion: boolean | null }) {
       <div className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-28 bg-gradient-to-r from-black via-black/90 to-transparent md:w-36" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-28 bg-gradient-to-l from-black via-black/90 to-transparent md:w-36" />
 
-      <div
-        className="marquee flex w-max items-center"
-        style={{ animationDuration: "52s" }}
-      >
-        {[0, 1].map((dup) => (
-          <div key={dup} className="flex items-center px-3 md:px-5">
-            {MARQUEE_TAGS.map((t, i) => (
-              <span key={`${dup}-${t}`} className="flex items-center">
-                {i > 0 ? <TagSep /> : null}
-                <span className="font-display text-xl italic tracking-tight text-transparent md:text-2xl lg:text-[1.7rem] [text-shadow:0_1px_32px_rgba(167,139,250,0.12)] bg-gradient-to-b from-white via-white/88 to-white/55 bg-clip-text">
-                  {t}
-                </span>
-              </span>
-            ))}
-            <TagSep />
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function HeroBackgroundVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  useEffect(() => {
-    const el = videoRef.current
-    if (!el) return
-    const tryPlay = () => {
-      el.muted = true
-      void el.play().catch(() => {})
-    }
-    el.addEventListener("loadeddata", tryPlay)
-    el.addEventListener("canplay", tryPlay)
-    tryPlay()
-    return () => {
-      el.removeEventListener("loadeddata", tryPlay)
-      el.removeEventListener("canplay", tryPlay)
-    }
-  }, [])
-
-  return (
-    <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={VIDEO_POSTER}
-        alt=""
-        className="absolute inset-0 h-full w-full scale-105 object-cover object-[center_58%] opacity-45"
-      />
-      <video
-        ref={videoRef}
-        className="absolute inset-0 z-[1] h-full min-h-full w-full min-w-full scale-[1.06] object-cover object-center opacity-95"
-        autoPlay
-        muted
-        playsInline
-        loop
-        preload="auto"
-        poster={VIDEO_POSTER}
-      >
-        {HERO_BG_VIDEO_SOURCES.map((src) => (
-          <source
-            key={src}
-            src={src}
-            type={
-              src.endsWith(".webm")
-                ? "video/webm"
-                : src.endsWith(".mov")
-                  ? "video/quicktime"
-                  : "video/mp4"
-            }
-          />
-        ))}
-      </video>
-      <div className="absolute inset-0 z-[2] bg-gradient-to-b from-black/78 via-black/55 to-black/88" />
-      <div className="absolute inset-0 z-[2] bg-gradient-to-r from-black/88 via-black/35 to-black/70" />
-      <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_90%_65%_at_50%_0%,rgba(236,168,214,0.16)_0%,transparent_52%)]" />
-      <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_50%_45%_at_90%_100%,rgba(103,232,249,0.1)_0%,transparent_50%)]" />
-    </div>
-  )
-}
-
-function SeoSectionBackground({
-  reducedMotion,
-  videoSources,
-}: {
-  reducedMotion: boolean | null
-  /** Clip alternativo (p. ej. mismo paquete que el hero). Por defecto: `SEO_SECTION_VIDEO`. */
-  videoSources?: readonly string[]
-}) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const underlayImage = videoSources ? VIDEO_POSTER : MID_BG_SRC
-  const underlayPosition = videoSources ? "object-[center_58%]" : "object-[center_35%]"
-
-  useEffect(() => {
-    if (reducedMotion) return
-    const el = videoRef.current
-    if (!el) return
-    const tryPlay = () => {
-      el.muted = true
-      void el.play().catch(() => {})
-    }
-    el.addEventListener("loadeddata", tryPlay)
-    el.addEventListener("canplay", tryPlay)
-    tryPlay()
-    return () => {
-      el.removeEventListener("loadeddata", tryPlay)
-      el.removeEventListener("canplay", tryPlay)
-    }
-  }, [reducedMotion])
-
-  if (reducedMotion) {
-    return (
-      <>
-        <Image src={MID_BG_SRC} alt="" fill className="object-cover object-[center_35%] opacity-55" sizes="100vw" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/72 via-black/52 to-black/76" />
-      </>
-    )
-  }
-
-  return (
-    <>
-      <Image
-        src={underlayImage}
-        alt=""
-        fill
-        className={cn("opacity-[0.12]", underlayPosition, "object-cover")}
-        sizes="100vw"
-        aria-hidden
-      />
-      <video
-        ref={videoRef}
-        className="absolute inset-0 z-[1] h-full min-h-full w-full min-w-full scale-[1.02] object-cover object-center opacity-100"
-        autoPlay
-        muted
-        playsInline
-        loop
-        preload="auto"
-        poster={underlayImage}
-      >
-        {videoSources ? (
-          videoSources.map((src) => (
-            <source
-              key={src}
-              src={src}
-              type={
-                src.endsWith(".webm")
-                  ? "video/webm"
-                  : src.endsWith(".mov")
-                    ? "video/quicktime"
-                    : "video/mp4"
-              }
-            />
-          ))
-        ) : (
-          <source src={SEO_SECTION_VIDEO} type="video/mp4" />
-        )}
-      </video>
-      {/* Velada ligera extra para contraste del texto; el vídeo sigue dominante */}
-      <div className="absolute inset-0 z-[2] bg-black/10" />
-      <div className="absolute inset-0 z-[2] bg-gradient-to-b from-black/44 via-black/22 to-black/50" />
-      <div className="absolute inset-0 z-[2] bg-gradient-to-r from-black/38 via-black/5 to-black/40" />
-      <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_95%_85%_at_50%_40%,transparent_32%,rgba(0,0,0,0.3)_100%)]" />
-    </>
-  )
-}
-
-function EcommerceSpotlightSection({
-  prefersReducedMotion,
-}: {
-  prefersReducedMotion: boolean | null
-}) {
-  const sectionRef = useRef<HTMLElement | null>(null)
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  })
-
-  const dropA = useTransform(scrollYProgress, [0, 1], [-70, 210])
-  const dropB = useTransform(scrollYProgress, [0, 1], [50, 320])
-  const dropC = useTransform(scrollYProgress, [0, 1], [-30, 260])
-  const dropD = useTransform(scrollYProgress, [0, 1], [90, 380])
-  const dropBRot = useTransform(scrollYProgress, [0, 1], [4, -10])
-  const sway = useTransform(scrollYProgress, [0, 1], [-5, 14])
-  const cardY = useTransform(scrollYProgress, [0, 0.45, 1], [28, 0, -16])
-  const iconScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.94, 1, 1.05])
-  const glowY = useTransform(scrollYProgress, [0, 1], [120, -80])
-
-  if (prefersReducedMotion) {
-    return (
-      <motion.section
-        id="ecommerce"
-        className="relative overflow-hidden border-t border-white/10 bg-black/55 py-20 lg:py-28"
-        {...sectionEnter}
-      >
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_75%_15%,rgba(52,211,153,0.12)_0%,transparent_58%),radial-gradient(ellipse_60%_50%_at_10%_80%,rgba(236,168,214,0.08)_0%,transparent_50%)]"
-          aria-hidden
-        />
-        <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
-          <div className="liquid-glass rounded-[1.85rem] border border-emerald-500/15 bg-black/35 p-8 md:p-12">
-            <div className="md:flex md:items-center md:justify-between md:gap-12">
-              <div className="max-w-xl">
-                <span className="mb-4 inline-flex rounded-full border border-white/12 bg-white/[0.05] px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-emerald-300/90">
-                  Venta online
-                </span>
-                <h2 className="font-display text-3xl tracking-tight text-white md:text-4xl lg:text-[2.75rem]">
-                  Tiendas online &{" "}
-                  <span className="bg-gradient-to-r from-emerald-300 via-[#67e8f9] to-[#a78bfa] bg-clip-text text-transparent">
-                    e-commerce
+      {/* Cinta en 3D: dos filas cruzándose sobre un plano inclinado. Era una
+          sola línea plana de texto corriendo; con la perspectiva y la fila de
+          contra, la banda gana volumen y deja de leerse como un ticker. */}
+      <div className="[perspective:700px]">
+        <div className="space-y-1 [transform:rotateX(24deg)] [transform-style:preserve-3d]">
+          <div className="marquee flex w-max items-center" style={{ animationDuration: "52s" }}>
+            {[0, 1].map((dup) => (
+              <div key={dup} className="flex items-center px-3 md:px-5">
+                {MARQUEE_TAGS.map((t, i) => (
+                  <span key={`${dup}-${t}`} className="flex items-center">
+                    {i > 0 ? <TagSep /> : null}
+                    <span className="font-display bg-gradient-to-b from-white via-white/88 to-white/55 bg-clip-text text-xl italic tracking-tight text-transparent [text-shadow:0_1px_32px_rgba(167,139,250,0.12)] md:text-2xl lg:text-[1.7rem]">
+                      {t}
+                    </span>
                   </span>
-                </h2>
-                <p className="mt-5 text-lg leading-relaxed text-white/70">
-                  Si querés vender online, desarrollamos comercios electrónicos seguros, claros para el usuario y listos
-                  para escalar — integrados con medios de pago y tu operación.
-                </p>
-              </div>
-              <div className="mt-10 flex shrink-0 justify-center md:mt-0 md:justify-end">
-                <div className="liquid-glass-strong flex size-28 items-center justify-center rounded-3xl ring-1 ring-emerald-400/25 md:size-32">
-                  <ShoppingBag className="size-14 text-white/90 md:size-16" strokeWidth={1} aria-hidden />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-    )
-  }
-
-  return (
-    <motion.section
-      ref={sectionRef}
-      id="ecommerce"
-      className="relative min-h-[min(560px,82vh)] overflow-hidden border-t border-white/10 bg-black/55 py-24 lg:py-32"
-      {...sectionEnter}
-    >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(6,24,18,0.35)_0%,rgba(0,0,0,0.96)_45%,rgba(9,9,11,1)_100%)]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_80%_10%,rgba(52,211,153,0.14)_0%,transparent_55%),radial-gradient(ellipse_70%_60%_at_5%_90%,rgba(236,168,214,0.1)_0%,transparent_52%)]"
-        aria-hidden
-      />
-      <motion.div
-        style={{ y: glowY }}
-        className="pointer-events-none absolute left-1/2 top-[15%] h-[min(480px,55vw)] w-[min(480px,55vw)] -translate-x-1/2 rounded-full bg-gradient-to-br from-emerald-500/20 via-[#67e8f9]/10 to-transparent blur-[100px]"
-        aria-hidden
-      />
-
-      {/* Elementos que “caen” con el scroll */}
-      <motion.div
-        style={{ y: dropA, rotate: sway }}
-        className="pointer-events-none absolute left-[4%] top-[8%] z-[1] hidden md:block"
-      >
-        <span className="inline-flex items-center gap-2 rounded-2xl border border-white/18 bg-black/50 px-4 py-2.5 text-xs font-medium text-white/95 shadow-[0_20px_60px_-24px_rgba(52,211,153,0.35)] backdrop-blur-md">
-          <ShoppingBag className="size-3.5 text-emerald-300" aria-hidden />
-          Carrito & catálogo
-        </span>
-      </motion.div>
-      <motion.div
-        style={{ y: dropB, rotate: dropBRot }}
-        className="pointer-events-none absolute right-[5%] top-[12%] z-[1] hidden lg:block"
-      >
-        <span className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-black/45 px-4 py-2.5 text-xs font-medium text-white/90 backdrop-blur-md">
-          <CreditCard className="size-3.5 text-[#67e8f9]" aria-hidden />
-          Pagos integrados
-        </span>
-      </motion.div>
-      <motion.div
-        style={{ y: dropC }}
-        className="pointer-events-none absolute left-[8%] top-[42%] z-[1] hidden md:block"
-      >
-        <span className="inline-flex items-center gap-2 rounded-2xl border border-white/12 bg-black/40 px-3.5 py-2 text-[11px] font-medium tracking-wide text-white/75 backdrop-blur-sm">
-          <Truck className="size-3.5 text-[#eca8d6]" aria-hidden />
-          Envíos & logística
-        </span>
-      </motion.div>
-      <motion.div
-        style={{ y: dropD }}
-        className="pointer-events-none absolute right-[12%] top-[48%] z-[1] hidden lg:block"
-      >
-        <div className="flex size-14 items-center justify-center rounded-2xl border border-emerald-400/25 bg-gradient-to-br from-emerald-500/15 to-black/60 shadow-[0_16px_50px_-20px_rgba(52,211,153,0.4)]">
-          <Zap className="size-7 text-emerald-200/90" aria-hidden />
-        </div>
-      </motion.div>
-
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-emerald-400/25 to-transparent" />
-
-      <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
-        <motion.div
-          style={{ y: cardY }}
-          className="group relative overflow-hidden rounded-[1.85rem] border border-white/[0.1] bg-gradient-to-br from-white/[0.07] via-black/40 to-black/70 p-8 shadow-[0_40px_100px_-48px_rgba(52,211,153,0.22)] backdrop-blur-xl md:p-12"
-        >
-          <div className="pointer-events-none absolute -right-24 top-0 size-56 rounded-full bg-emerald-500/15 blur-3xl transition-opacity duration-500 group-hover:opacity-100 md:size-72" />
-          <div className="pointer-events-none absolute -bottom-16 -left-16 size-48 rounded-full bg-[#67e8f9]/10 blur-3xl md:size-56" />
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.07]"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.45) 1px, transparent 0)",
-              backgroundSize: "28px 28px",
-            }}
-            aria-hidden
-          />
-
-          <div className="relative md:flex md:items-center md:justify-between md:gap-14">
-            <div className="max-w-xl">
-              <motion.span
-                className="mb-5 inline-flex rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200/95"
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, ease: easePremium }}
-              >
-                Venta online
-              </motion.span>
-              <h2 className="font-display text-3xl tracking-tight text-white md:text-4xl lg:text-[2.85rem] lg:leading-[1.08]">
-                Tiendas online &{" "}
-                <span className="bg-gradient-to-r from-emerald-200 via-[#67e8f9] to-[#c4b5fd] bg-clip-text text-transparent">
-                  e-commerce
-                </span>
-              </h2>
-              <p className="mt-5 text-lg leading-relaxed text-white/68 md:text-xl">
-                Si querés vender online, desarrollamos comercios electrónicos seguros, claros para el usuario y listos
-                para escalar — integrados con medios de pago y tu operación.
-              </p>
-              <ul className="mt-8 flex flex-wrap gap-2.5">
-                {["Checkout", "Stock", "Pagos", "Envíos"].map((label) => (
-                  <li
-                    key={label}
-                    className="rounded-full border border-white/10 bg-black/35 px-3.5 py-1.5 text-xs font-medium text-white/75"
-                  >
-                    {label}
-                  </li>
                 ))}
-              </ul>
-            </div>
-            <div className="mt-10 flex shrink-0 justify-center md:mt-0 md:justify-end">
-              <motion.div
-                style={{ scale: iconScale }}
-                className="liquid-glass-strong relative flex size-28 items-center justify-center rounded-3xl ring-2 ring-emerald-400/20 ring-offset-2 ring-offset-black/80 md:size-36"
-              >
-                <motion.div
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <ShoppingBag className="size-14 text-white md:size-[4.25rem]" strokeWidth={1} aria-hidden />
-                </motion.div>
-              </motion.div>
-            </div>
+                <TagSep />
+              </div>
+            ))}
           </div>
-        </motion.div>
+
+          {/* Fila de atrás: más chica, más tenue y en sentido contrario. Es la
+              que crea la sensación de profundidad. */}
+          <div
+            className="marquee-reverse flex w-max items-center opacity-40 [transform:translateZ(-60px)]"
+            style={{ animationDuration: "64s" }}
+            aria-hidden
+          >
+            {[0, 1].map((dup) => (
+              <div key={dup} className="flex items-center px-3 md:px-5">
+                {MARQUEE_TAGS.map((t, i) => (
+                  <span key={`b-${dup}-${t}`} className="flex items-center">
+                    {i > 0 ? <TagSep /> : null}
+                    <span className="font-display text-base italic tracking-tight text-white/45 md:text-lg lg:text-xl">
+                      {t}
+                    </span>
+                  </span>
+                ))}
+                <TagSep />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </motion.section>
+    </div>
   )
 }
+
+
 
 /** Cierre: layout editorial + panel de contacto (sin pastillas flotantes ni chips duplicados). */
-function CierreSpotlightSection({ prefersReducedMotion }: { prefersReducedMotion: boolean | null }) {
-  const ambient = !prefersReducedMotion
-
-  const ctaButtons = (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:flex-col">
-      <Button
-        size="sm"
-        asChild
-        className={cn(
-          "group relative h-12 w-full justify-center gap-2 overflow-hidden rounded-2xl border-0 px-6 text-[13px] font-semibold text-white sm:flex-1 lg:w-full",
-          "bg-gradient-to-br from-[#25D366] via-[#1ebe57] to-[#128C7E]",
-          "shadow-[0_14px_44px_-12px_rgba(37,211,102,0.5),inset_0_1px_0_rgba(255,255,255,0.2)]",
-          "transition-all duration-300 hover:brightness-[1.06] hover:shadow-[0_18px_52px_-10px_rgba(37,211,102,0.68)] active:scale-[0.98]",
-          "focus-visible:ring-2 focus-visible:ring-[#4ade80]/90 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0c]",
-          "before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-t before:from-transparent before:to-white/14 before:opacity-0 before:transition-opacity hover:before:opacity-100",
-        )}
-      >
-        <a
-          href={getWhatsAppHref("Diseño web — consulta")}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative inline-flex w-full items-center justify-center gap-2.5"
-        >
-          <span className="flex size-8 items-center justify-center rounded-full bg-black/15 ring-1 ring-white/20 transition-transform duration-300 group-hover:scale-105">
-            <WhatsAppMark className="size-[18px] text-white drop-shadow-sm" aria-hidden />
-          </span>
-          WhatsApp
-        </a>
-      </Button>
-      <Button
-        size="sm"
-        asChild
-        variant="outline"
-        className={cn(
-          "h-12 w-full rounded-2xl border-white/[0.22] bg-white/[0.05] px-6 font-medium text-white/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition-all duration-300 hover:border-[#67e8f9]/45 hover:bg-white/[0.08] hover:shadow-[0_0_28px_-8px_rgba(103,232,249,0.28)] sm:flex-1 lg:w-full",
-        )}
-      >
-        <a href={PORTFOLIO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2">
-          <Globe2 className="size-3.5 text-[#67e8f9]/85" aria-hidden />
-          Portafolio
-        </a>
-      </Button>
-      <Button
-        size="sm"
-        asChild
-        className="h-12 w-full rounded-2xl border border-white/12 bg-white/[0.07] px-6 text-[13px] font-medium text-white hover:bg-white/[0.11] sm:flex-1 lg:w-full"
-      >
-        <a
-          href={`mailto:${CONTACT_EMAIL}`}
-          title={CONTACT_EMAIL}
-          className="inline-flex w-full items-center justify-center"
-        >
-          Email
-        </a>
-      </Button>
-    </div>
-  )
-
-  return (
-    <motion.section
-      className="relative overflow-hidden border-t border-white/10 bg-[#030305]/55 py-24 lg:py-32"
-      {...sectionEnter}
-    >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(165deg,rgba(40,20,55,0.45)_0%,rgba(0,0,0,0.55)_42%,rgba(3,3,5,0.6)_100%)]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_65%_at_15%_20%,rgba(167,139,250,0.14)_0%,transparent_55%),radial-gradient(ellipse_70%_55%_at_92%_78%,rgba(236,168,214,0.09)_0%,transparent_52%),radial-gradient(ellipse_50%_45%_at_50%_100%,rgba(103,232,249,0.06)_0%,transparent_48%)]"
-        aria-hidden
-      />
-
-      {ambient ? (
-        <>
-          <motion.div
-            className="pointer-events-none absolute -left-[18%] top-[12%] size-[min(62vw,480px)] rounded-full bg-[#a78bfa]/18 blur-[110px]"
-            animate={{ opacity: [0.22, 0.38, 0.22] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            aria-hidden
-          />
-          <motion.div
-            className="pointer-events-none absolute -right-[12%] bottom-[8%] size-[min(52vw,420px)] rounded-full bg-[#eca8d6]/14 blur-[100px]"
-            animate={{ opacity: [0.18, 0.32, 0.18] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-            aria-hidden
-          />
-          <motion.div
-            className="pointer-events-none absolute left-[55%] top-[38%] size-[min(40vw,320px)] -translate-x-1/2 rounded-full bg-[#67e8f9]/10 blur-[90px]"
-            animate={{ opacity: [0.12, 0.22, 0.12] }}
-            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-            aria-hidden
-          />
-        </>
-      ) : null}
-
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
-      <div className="relative z-10 mx-auto max-w-[1200px] px-6 lg:px-12">
-        <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 xl:gap-20">
-          <div className="text-left">
-            <p className="cc-eyebrow-accent text-white/45">
-              Cosecha Creativa · San Juan
-            </p>
-            <h2 className="font-display mt-5 text-[2.05rem] leading-[1.07] tracking-tight text-white sm:text-5xl lg:text-[3.15rem] xl:text-[3.45rem]">
-              <span className="block text-white/[0.92]">Una web que trabaje</span>
-              <span className="mt-1 block bg-gradient-to-r from-[#f5f0ff] via-[#e9d5ff] to-[#67e8f9] bg-clip-text text-transparent">
-                para tu negocio.
-              </span>
-            </h2>
-            <p className="mt-8 max-w-xl text-lg leading-relaxed text-white/58 lg:text-xl">
-              Combinamos creatividad y tecnología para convertir visitas en clientes: diseño profesional, SEO y una
-              estrategia clara. Si querés dar el siguiente paso, escribinos.
-            </p>
-            <div className="mt-10 hidden h-px w-full max-w-md bg-gradient-to-r from-[#a78bfa]/50 via-[#67e8f9]/35 to-transparent lg:block" aria-hidden />
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
-            transition={{ duration: 0.75, ease: easePremium }}
-            className="relative"
-          >
-            <div
-              className={cn(
-                "relative overflow-hidden rounded-[2rem] border border-white/[0.12] bg-gradient-to-br from-white/[0.09] via-black/55 to-black/85 p-8 shadow-[0_48px_120px_-56px_rgba(103,232,249,0.18)] backdrop-blur-2xl md:p-10",
-                "before:pointer-events-none before:absolute before:inset-0 before:rounded-[2rem] before:p-px before:content-['']",
-                "before:bg-[linear-gradient(135deg,rgba(167,139,250,0.35),transparent_42%,rgba(103,232,249,0.2))]",
-                "before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[mask-composite:xor] before:[mask-clip:padding-box,border-box]",
-              )}
-            >
-              <div className="pointer-events-none absolute -right-24 top-0 size-56 rounded-full bg-violet-500/15 blur-3xl" aria-hidden />
-              <div className="pointer-events-none absolute -bottom-20 -left-12 size-44 rounded-full bg-[#67e8f9]/10 blur-3xl" aria-hidden />
-
-              <p className="font-display text-lg italic leading-snug text-white/88 md:text-xl">
-                “Estrategias digitales con identidad sanjuanina.”
-              </p>
-              <p className="mt-3 text-sm text-white/45">Respuesta ágil · Presupuesto sin compromiso</p>
-
-              <div className="mt-10">{ctaButtons}</div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </motion.section>
-  )
-}
 
 function HeroAmbientOrbs({ active }: { active: boolean }) {
   if (!active) return null
@@ -1204,7 +298,17 @@ export function DisenoWebClient() {
       )}
 
       <section className="relative min-h-[min(92vh,900px)] overflow-hidden pt-24 md:pt-28">
-        <HeroBackgroundVideo />
+        {/* Hero 3D propio: maquetas de sitios flotando en profundidad. Antes acá
+            había un vídeo de stock de flores, que no decía nada de lo que la
+            página vende. */}
+        <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+          <DisenoWebHero3D reducedMotion={!!prefersReducedMotion} />
+          {/* Velos: la escena queda dominante a la derecha y el titular
+              conserva contraste sobre la izquierda. */}
+          <div className="absolute inset-0 z-[2] bg-gradient-to-r from-black/88 via-black/30 to-black/5 md:from-black/92 md:via-black/40" />
+          <div className="absolute inset-0 z-[2] bg-gradient-to-b from-black/60 via-black/45 to-black/85 md:via-transparent md:to-black/80" />
+          <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_90%_65%_at_50%_0%,rgba(236,168,214,0.14)_0%,transparent_52%)]" />
+        </div>
         <HeroAmbientOrbs active={!prefersReducedMotion} />
         <div className="pointer-events-none absolute left-0 right-0 top-0 z-[3] h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
 
@@ -1384,117 +488,79 @@ export function DisenoWebClient() {
         </div>
       </motion.section>
 
-      {/* Por qué elegirnos */}
+      {/* SEO — columna angosta fija + columna ancha que corre. El título deja
+          de perderse arriba y el bloque queda deliberadamente desbalanceado
+          (4/12 contra 8/12) en vez del 50/50 de antes. */}
       <motion.section
-        id="por-que"
-        className="relative overflow-hidden border-t border-white/10 bg-black/55 py-20 lg:py-28"
+        id="seo"
+        className="relative scroll-mt-28 border-t border-white/10 bg-black/55 py-20 lg:py-28"
         {...sectionEnter}
       >
-        <div className="pointer-events-none absolute inset-0 z-0">
-          <div className="relative h-full min-h-full w-full">
-            <SeoSectionBackground reducedMotion={prefersReducedMotion} />
-          </div>
-        </div>
-        {/* Velada fuerte: el vídeo queda muy atenuado detrás del contenido */}
-        <div className="pointer-events-none absolute inset-0 z-[1] bg-black/55" aria-hidden />
+        {/* Fondo propio en vez del vídeo de stock que había acá: la sección
+            habla de posicionamiento y ahora eso se ve en la escalada de abajo.
+            Sin `overflow-hidden`: rompería el `sticky` de la columna izquierda
+            y las capas ya están clavadas a `inset-0`, así que nada se escapa. */}
         <div
-          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/45 via-black/38 to-black/58"
           aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_10%,rgba(167,139,250,0.16)_0%,transparent_55%),radial-gradient(ellipse_65%_55%_at_88%_85%,rgba(103,232,249,0.1)_0%,transparent_52%)]"
         />
-        <div
-          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-black/40 via-black/22 to-black/44"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_95%_90%_at_50%_42%,transparent_18%,rgba(0,0,0,0.72)_100%)]"
-          aria-hidden
-        />
-        <div className="pointer-events-none absolute left-0 right-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-        <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
-          <div className="mb-14 max-w-3xl">
-            <span className="liquid-glass mb-5 inline-flex rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
-              ¿Por qué elegirnos?
-            </span>
-            <h2 className="font-display text-4xl tracking-tight text-white md:text-5xl lg:text-6xl">
-              Webs premium pensadas para{" "}
-              <span className="text-white/75">convertir y posicionar</span>.
-            </h2>
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-            {porQueItems.map((item, idx) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px 0px", amount: 0.08 }}
-                transition={{ duration: 0.72, delay: idx * 0.04, ease: easePremium }}
-                whileHover={
-                  prefersReducedMotion
-                    ? undefined
-                    : { y: -6, transition: { duration: 0.35, ease: easePremium } }
-                }
-              >
-                <SpotlightFeatureCard className="liquid-glass h-full border border-white/[0.07] bg-black/30 p-7 transition-shadow duration-300 group-hover:border-white/15 group-hover:shadow-[0_28px_70px_-28px_rgba(167,139,250,0.22)]">
-                  <div className="relative z-10">
-                    <motion.div
-                      className="liquid-glass-strong mb-4 inline-flex size-10 items-center justify-center rounded-full"
-                      whileHover={{ rotate: [0, -8, 8, 0] }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <item.icon className="size-[18px] text-white/90" strokeWidth={1.35} aria-hidden />
-                    </motion.div>
-                    <h3 className="font-display text-xl tracking-tight text-white">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-white/65 md:text-base">{item.body}</p>
-                  </div>
-                </SpotlightFeatureCard>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* SEO */}
-      <motion.section className="relative overflow-hidden border-t border-white/10 bg-black/55 py-20 lg:py-28" {...sectionEnter}>
-        <SectionVideoFrame>
-          <SeoSectionBackground reducedMotion={prefersReducedMotion} videoSources={HERO_BG_VIDEO_SOURCES} />
-        </SectionVideoFrame>
         <div className="pointer-events-none absolute left-0 right-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
 
         <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
-          <div className="grid gap-12 lg:grid-cols-[1fr_1.05fr] lg:items-start lg:gap-16">
-            <div>
-              <span className="liquid-glass mb-5 inline-flex rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
+          <div className="grid gap-12 lg:grid-cols-12 lg:gap-x-16">
+            <div className="lg:sticky lg:top-28 lg:col-span-4 lg:self-start">
+              <span className="liquid-glass mb-5 inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-medium text-white/95">
+                <Search className="size-3.5 text-[#67e8f9]" aria-hidden />
                 SEO en San Juan
               </span>
-              <h2 className="font-display text-3xl leading-tight tracking-tight text-white md:text-5xl">
-                Diseño web con SEO: la clave para destacar
+              <h2 className="font-display text-4xl leading-[1.06] tracking-tight text-white md:text-5xl">
+                Diseño web con SEO:{" "}
+                <span className="bg-gradient-to-r from-white via-[#e9d5ff] to-[#67e8f9] bg-clip-text text-transparent">
+                  la clave para destacar
+                </span>
               </h2>
-              <p className="mt-6 text-lg leading-relaxed text-white/65">
+              {/* Medida en `ch`: la columna angosta ya acota el renglón, pero
+                  esto lo deja legible también en tablet. */}
+              <p className="mt-6 max-w-[44ch] text-lg leading-relaxed text-white/60">
                 Un sitio atractivo sin optimización no genera el tráfico que merecés. Aplicamos técnicas concretas para
                 que tu marca sea encontrada.
               </p>
             </div>
-            <div className="liquid-glass rounded-3xl p-8 md:p-10">
-              <ul className="space-y-4">
+
+            {/* Columna ancha: primero el mecanismo, después las cuatro tácticas
+                en dos columnas escalonadas. */}
+            <div className="lg:col-span-8 lg:pt-14">
+              <div className="rounded-3xl border border-white/[0.08] bg-black/40 p-5 backdrop-blur-md md:p-6">
+                <SerpClimbVisual reducedMotion={!!prefersReducedMotion} />
+              </div>
+
+              <ul className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-x-6 lg:mt-10">
                 {seoTactics.map((t, i) => (
                   <motion.li
                     key={t.title}
-                    initial={{ opacity: 0, x: -12 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.08, duration: 0.5, ease: easePremium }}
-                    whileHover={
-                      prefersReducedMotion ? undefined : { x: 6, transition: { duration: 0.25 } }
-                    }
-                    className="flex cursor-default gap-4 rounded-xl border border-transparent p-3 transition-colors hover:border-white/10 hover:bg-white/[0.03]"
+                    initial={{ opacity: 0, y: 18 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-60px 0px" }}
+                    transition={{ delay: (i % 2) * 0.07, duration: 0.5, ease: easePremium }}
+                    /* El escalón de la columna derecha rompe la grilla sin
+                       tocar el orden de lectura. */
+                    className={cn(i % 2 === 1 && "sm:mt-10")}
                   >
-                    <span className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.05]">
-                      <BarChart3 className="size-4 text-[#c4b5fd]" aria-hidden />
-                    </span>
-                    <div>
-                      <h3 className="font-display text-lg text-white">{t.title}</h3>
-                      <p className="mt-1 text-sm leading-relaxed text-white/60">{t.body}</p>
+                    <div className="group h-full rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5 transition-colors duration-300 hover:border-white/[0.16] hover:bg-white/[0.045]">
+                      <div className="flex items-start gap-4">
+                        {/* Un ícono por táctica: antes las cuatro repetían el
+                            mismo gráfico de barras y no distinguían nada. */}
+                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.12] bg-black/50 transition-colors duration-300 group-hover:border-[#a78bfa]/45">
+                          <t.icon className="size-[18px] text-[#c4b5fd]" strokeWidth={1.5} aria-hidden />
+                        </span>
+                        <div className="min-w-0">
+                          <div className="flex items-baseline gap-2.5">
+                            <span className="font-mono text-[10px] text-white/30">0{i + 1}</span>
+                            <h3 className="font-display text-lg leading-tight text-white">{t.title}</h3>
+                          </div>
+                          <p className="mt-1.5 text-sm leading-relaxed text-white/55">{t.body}</p>
+                        </div>
+                      </div>
                     </div>
                   </motion.li>
                 ))}
@@ -1504,20 +570,12 @@ export function DisenoWebClient() {
         </div>
       </motion.section>
 
-      {/* E-commerce */}
-      <EcommerceSpotlightSection prefersReducedMotion={prefersReducedMotion} />
-
-      {/* Landing */}
-      <ServiceSpotlightSection variant="landing" prefersReducedMotion={prefersReducedMotion} />
-
-      {/* WordPress */}
-      <ServiceSpotlightSection variant="wordpress" prefersReducedMotion={prefersReducedMotion} />
-
-      {/* CRM */}
-      <ServiceSpotlightSection variant="crm" prefersReducedMotion={prefersReducedMotion} />
+      {/* Servicios — antes eran cuatro secciones de pantalla completa con la
+          misma estructura; ahora es una grilla de cuatro tarjetas comparables. */}
+      <DisenoWebServicios reducedMotion={!!prefersReducedMotion} />
 
       {/* Cierre */}
-      <CierreSpotlightSection prefersReducedMotion={prefersReducedMotion} />
+      <DisenoWebCierre reducedMotion={!!prefersReducedMotion} />
 
       <motion.footer {...footerEnter}>
         <FooterSection />

@@ -72,7 +72,21 @@ export function NosotrosTeamKineticSection({ members }: { members: NosotrosTeamM
   const showFloatCard = !isMobile && !reduceMotion;
 
   return (
-    <section className="relative bg-[#060607]/40 py-16 md:py-24">
+    <section className="relative overflow-hidden bg-[#0d0710]/85 py-16 md:py-24">
+      {/* Fondo rosa + líneas horizontales: cierra el recorrido volviendo al color de marca. */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_60%_at_50%_-10%,rgba(236,168,214,0.24),transparent_60%)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_55%_at_8%_100%,rgba(236,168,214,0.12),transparent_55%)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.45] [background-image:linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:100%_36px]"
+        aria-hidden
+      />
+      {/* La línea del corte la dibuja el <SectionDivider color="rose"> de arriba. */}
       <div
         ref={containerRef}
         onMouseMove={handleMouseMove}
@@ -81,12 +95,20 @@ export function NosotrosTeamKineticSection({ members }: { members: NosotrosTeamM
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_20%,rgba(236,168,214,0.06),transparent_55%)]" />
 
         <div className="relative mx-auto max-w-[1200px] px-6 lg:px-12">
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-[#eca8d6]/85">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-[#eca8d6]">
             Equipo
           </p>
-          <h2 className="mt-3 font-display text-3xl font-semibold md:text-4xl">Nosotros</h2>
-          <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-white/68">
-            Marketing digital, desarrollo, diseño, fotografía y estrategia en un mismo equipo.
+          <h2 className="mt-5 max-w-3xl font-display text-[2.6rem] font-semibold leading-[0.92] tracking-tight sm:text-6xl lg:text-[5rem]">
+            Las
+            <span className="italic text-[#eca8d6]"> personas</span>{" "}
+            <span className="block text-white/30">detrás de cada proyecto</span>
+          </h2>
+          <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-white/60 md:text-[17px]">
+            Seis perfiles complementarios: dirección y desarrollo, estrategia de marketing,
+            comunidad, fotografía y diseño.{" "}
+            <span className="text-white/40">
+              Pasá el cursor sobre cada nombre para conocerlos.
+            </span>
           </p>
 
           <div className="mt-12 flex flex-col">
@@ -119,16 +141,21 @@ export function NosotrosTeamKineticSection({ members }: { members: NosotrosTeamM
                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                 exit={{ opacity: 0, scale: 0.92, filter: "blur(8px)" }}
                 transition={{ type: "spring", stiffness: 320, damping: 28 }}
-                className="relative h-64 w-80 overflow-hidden rounded-xl border border-white/15 bg-[#0a0a0c] shadow-[0_24px_80px_-32px_rgba(236,168,214,0.35)]"
+                className="relative w-80 overflow-hidden rounded-xl border border-white/15 bg-[#0a0a0c] shadow-[0_24px_80px_-32px_rgba(236,168,214,0.35)]"
               >
-                <TeamPreviewMedia member={activeMember} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/25 to-transparent" />
-                <div className="absolute bottom-0 w-full p-4">
+                <div className="relative h-52 w-full overflow-hidden">
+                  <TeamPreviewMedia member={activeMember} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-black/20 to-transparent" />
+                </div>
+                <div className="w-full border-t border-white/10 p-4">
                   <p className="font-display text-lg font-semibold leading-tight text-white">
                     {activeMember.name}
                   </p>
                   <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#eca8d6]/95">
                     {activeMember.role}
+                  </p>
+                  <p className="mt-3 text-[12.5px] leading-relaxed text-white/60">
+                    {activeMember.bio}
                   </p>
                 </div>
               </motion.div>

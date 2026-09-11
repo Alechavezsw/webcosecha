@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { KineticHeading } from "@/components/landing/kinetic-heading";
 import { ProjectGallerySlider } from "@/components/landing/project-gallery/project-gallery-slider";
 
 export function ProjectsSection() {
@@ -44,14 +45,13 @@ export function ProjectsSection() {
               <span className="h-px w-12 bg-foreground/30" />
               Proyectos
             </span>
-            <h2
-              className={`font-display text-3xl tracking-tight transition-all duration-1000 sm:text-4xl md:text-5xl lg:text-6xl text-white ${
-                isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-              }`}
-            >
-              Trabajos reales,
-              <span className="block text-neutral-400">resultados medibles.</span>
-            </h2>
+            <KineticHeading
+              className="font-display text-3xl tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
+              lines={[
+                { text: "Trabajos reales," },
+                { text: "resultados medibles.", className: "text-neutral-400" },
+              ]}
+            />
             <p
               className={`mt-6 max-w-xl text-lg text-neutral-400 transition-all duration-1000 delay-100 ${
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"

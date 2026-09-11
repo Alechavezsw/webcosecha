@@ -17,8 +17,13 @@ const wrap = (min: number, max: number, v: number) => {
   return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min
 }
 
-const gradientText =
-  "[box-decoration-break:clone] bg-gradient-to-r from-[#67e8f9] via-[#a78bfa] to-[#eca8d6] bg-clip-text pb-[0.25em] pt-[0.2em] text-transparent"
+/**
+ * Tipografía calada: contorno ácido y relleno vacío. Es el mismo recurso
+ * gráfico del resto de /servicios/apps (único lugar donde se usa este
+ * componente); el degradado violeta/cian anterior venía de la paleta vieja.
+ */
+const outlineText =
+  "[box-decoration-break:clone] pb-[0.25em] pt-[0.2em] text-transparent [-webkit-text-stroke:1px_rgba(200,255,0,0.32)]"
 
 /** Suaviza bordes sin capas oscuras encima del texto (evita letras “cortadas” visualmente). */
 const edgeFadeMask = {
@@ -56,7 +61,7 @@ function ParallaxText({ children, baseVelocity }: ParallaxTextProps) {
     return (
       <div className="overflow-hidden px-4 py-4 sm:px-6" style={edgeFadeMask}>
         <p
-          className={`font-display text-lg font-semibold uppercase leading-[1.5] tracking-tight md:text-2xl ${gradientText}`}
+          className={`font-display text-lg font-semibold uppercase leading-[1.5] tracking-tight md:text-2xl ${outlineText}`}
         >
           {children}
         </p>
@@ -71,7 +76,7 @@ function ParallaxText({ children, baseVelocity }: ParallaxTextProps) {
     >
       <motion.div
         style={{ x }}
-        className={`flex w-max flex-nowrap whitespace-nowrap font-display text-xl font-semibold uppercase leading-[1.5] tracking-wide will-change-transform md:text-3xl lg:text-4xl ${gradientText}`}
+        className={`flex w-max flex-nowrap whitespace-nowrap font-display text-xl font-semibold uppercase leading-[1.5] tracking-wide will-change-transform md:text-3xl lg:text-4xl ${outlineText}`}
       >
         {[0, 1, 2, 3].map((i) => (
           <span key={i} className="mr-10 inline-block shrink-0 pb-1 pt-1 md:mr-14 lg:mr-16">
@@ -94,22 +99,22 @@ export function BeneficiosParallaxMarquee({ lines }: { lines: readonly string[] 
 
   return (
     <div
-      className="relative my-10 overflow-hidden rounded-2xl border border-white/[0.09] bg-black/35 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] md:my-12 md:rounded-3xl md:py-6"
+      className="relative my-10 overflow-hidden border border-[#1E1E24] bg-black py-4 md:my-12 md:py-6"
       aria-hidden
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.12]"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(103,232,249,0.22) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(167,139,250,0.14) 1px, transparent 1px)
+            linear-gradient(to right, rgba(200,255,0,0.18) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)
           `,
           backgroundSize: "26px 26px",
         }}
         aria-hidden
       />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/25 to-transparent" aria-hidden />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-violet-400/20 to-transparent" aria-hidden />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[#C8FF00]/25" aria-hidden />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-white/10" aria-hidden />
 
       <div className="relative space-y-0.5 md:space-y-1">
         {triples.map((text, i) => (
