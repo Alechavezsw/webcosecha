@@ -753,9 +753,15 @@ export default function ContactoPage() {
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1500);
             camera.position.set(0, 5, 20); 
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            // Con post-procesado el `antialias` del canvas no se aplica: la escena
+            // se dibuja en el render target del composer y el canvas sólo recibe
+            // el quad final. Pedirlo igual era pagar MSAA para nada.
+            const useComposer = window.innerWidth >= 768;
+            renderer = new THREE.WebGLRenderer({ antialias: !useComposer, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.5 : 1.75));
+            // El bloom cuesta por píxel: a 1.75x de ratio la escena se dibujaba
+            // tres veces a resolución completa y bajaba de 25 fps.
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, useComposer ? 1.25 : 1.5));
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
             renderer.toneMappingExposure = 1.15;
 
@@ -764,11 +770,13 @@ export default function ContactoPage() {
             }
 
             // Post-procesado con Bloom cinematográfico (solo desktop para cuidar GPUs móviles)
-            if (window.innerWidth >= 768) {
+            if (useComposer) {
                 composer = new EffectComposer(renderer);
                 composer.addPass(new RenderPass(scene, camera));
                 const bloomPass = new UnrealBloomPass(
-                    new THREE.Vector2(window.innerWidth, window.innerHeight),
+                    // El bloom es un desenfoque: a media resolución se ve igual y
+                    // cuesta la cuarta parte.
+                    new THREE.Vector2(window.innerWidth * 0.5, window.innerHeight * 0.5),
                     0.42,  // strength: sutil, realza luciérnagas, sol y alas emisivas
                     0.7,   // radius
                     0.78   // threshold
@@ -2503,64 +2511,62 @@ export default function ContactoPage() {
                             boxShadow: '0 32px 100px -28px rgba(0,0,0,0.75), 0 0 60px -18px rgba(255,190,120,0.25)'
                         }}
                     >
-                        <div className="relative max-h-[88vh] overflow-y-auto p-6 sm:p-7 rounded-3xl bg-[#140d20]/70 backdrop-blur-xl text-white flex flex-col items-center text-center gap-4.5 scrollbar-thin">
+                        <div className="relative max-h-[88vh] overflow-y-auto rounded-3xl bg-[#140d20]/72 backdrop-blur-xl text-white flex flex-col scrollbar-thin">
                             {/* Brillo especular que sigue al cursor */}
-                            <div ref={sheenRef} className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 z-10" />
+                            <div ref={sheenRef} className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 z-20" />
 
-                            <div className="flex flex-col items-center text-center gap-1.5 w-full">
-                                <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#ffeedd]/90">Háblanos</span>
-                                <h1 className="text-3xl font-display font-semibold tracking-tight text-white">Cosecha Creativa</h1>
+                            {/* Amanecer al tope de la tarjeta: recoge el naranja del valle y
+                                reemplaza el hueco que dejó el embed de la mariposa. */}
+                            <div className="pointer-events-none absolute inset-x-0 top-0 h-40 rounded-t-3xl bg-[radial-gradient(ellipse_70%_100%_at_50%_0%,rgba(255,170,90,0.28)_0%,rgba(255,140,120,0.12)_45%,transparent_75%)] z-0" aria-hidden />
+                            <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#ffd0a0]/70 to-transparent z-10" aria-hidden />
 
-                                {/* Sketchfab 3D Embed of the Butterfly (Cropped to hide free-tier logos/watermarks/buttons) */}
-                                <div className="sketchfab-embed-wrapper w-full h-[140px] rounded-2xl overflow-hidden border border-white/10 my-2 shadow-inner bg-[#0c0a0f]/40 relative">
-                                    <iframe
-                                        title="Mariposa"
-                                        className="absolute border-0"
-                                        style={{
-                                            top: '-54px',
-                                            left: '-4%',
-                                            width: '108%',
-                                            height: 'calc(100% + 132px)'
-                                        }}
-                                        allowFullScreen
-                                        allow="autoplay; fullscreen; xr-spatial-tracking"
-                                        src="https://sketchfab.com/models/1bdceea4939b4f3c8d4a09a8f0e8d6a6/embed?autostart=1&preload=1&ui_controls=0&ui_infos=0&ui_watermark=0&ui_animations=0"
-                                    />
-                                </div>
+                            <div className="relative z-10 flex flex-col items-center text-center px-6 pt-7 pb-6 sm:px-7 sm:pt-8">
+                                <span className="inline-flex items-center gap-2.5 text-[10px] font-mono uppercase tracking-[0.3em] text-[#ffdcb8]">
+                                    <span className="h-px w-6 bg-gradient-to-r from-transparent to-[#ffdcb8]/70" />
+                                    Háblanos
+                                    <span className="h-px w-6 bg-gradient-to-l from-transparent to-[#ffdcb8]/70" />
+                                </span>
 
-                                <p className="text-sm text-white/80 leading-relaxed font-sans font-light mt-1">
-                                    Sembrá tus ideas digitales con nosotros. Conversemos sobre cómo expandir tu presencia digital, impulsar tu marca o diseñar tus próximas aplicaciones.
+                                <h1 className="mt-3 font-display text-[2rem] font-semibold leading-[1.05] tracking-tight sm:text-[2.35rem]">
+                                    <span className="bg-gradient-to-b from-white via-[#ffeedd] to-[#ffbd9a] bg-clip-text text-transparent">
+                                        Cosecha Creativa
+                                    </span>
+                                </h1>
+
+                                <p className="mt-3.5 max-w-[34ch] text-[13.5px] font-light leading-relaxed text-white/75 sm:text-sm">
+                                    Llegaste al final del valle. Contanos qué querés construir y lo charlamos hoy mismo.
                                 </p>
+
+                                <div className="mt-6 flex w-full flex-col gap-2.5">
+                                    <a
+                                        href={getWhatsAppHref("Contacto General")}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group/wa relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-[#25D366] px-5 py-4 text-sm font-semibold text-white shadow-[0_14px_34px_-14px_rgba(37,211,102,0.8)] transition-all duration-300 hover:bg-[#22c35e] hover:shadow-[0_18px_44px_-14px_rgba(37,211,102,0.95)] active:scale-[0.98]"
+                                    >
+                                        {/* Destello que cruza el botón */}
+                                        <span className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-white/25 opacity-0 transition-[left,opacity] duration-700 ease-out group-hover/wa:left-[115%] group-hover/wa:opacity-100" aria-hidden />
+                                        <WhatsAppMark className="relative z-10 w-5 h-5 shrink-0 text-white" />
+                                        <span className="relative z-10 truncate">Escribinos por WhatsApp</span>
+                                    </a>
+
+                                    <a
+                                        href="mailto:ventas@cosechacreativa.com.ar?subject=Consulta desde la web"
+                                        className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-white/12 bg-white/[0.07] px-5 py-3.5 text-[13px] font-medium text-white/90 backdrop-blur-sm transition-all duration-300 hover:border-[#ffdcb8]/40 hover:bg-white/[0.12] hover:text-white active:scale-[0.98] sm:text-sm"
+                                    >
+                                        <Mail className="w-4 h-4 shrink-0 text-[#ffdcb8]" />
+                                        <span className="truncate">ventas@cosechacreativa.com.ar</span>
+                                    </a>
+                                </div>
                             </div>
 
-                            <div className="flex flex-col gap-4 mt-2 w-full">
-                                <a
-                                    href={getWhatsAppHref("Contacto General")}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-3 w-full py-4 px-5 rounded-2xl bg-[#25D366] text-white font-semibold text-sm hover:bg-[#20bd5a] hover:shadow-[0_12px_32px_-8px_rgba(37,211,102,0.55)] transition-all duration-300 active:scale-[0.98] overflow-hidden"
-                                >
-                                    <WhatsAppMark className="w-5 h-5 shrink-0 text-white" />
-                                    <span className="truncate">Escribinos por WhatsApp</span>
-                                </a>
-
-                                <a
-                                    href="mailto:ventas@cosechacreativa.com.ar?subject=Consulta desde la web"
-                                    className="flex items-center justify-center gap-2.5 w-full py-4 px-5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 text-white font-medium text-[13px] sm:text-sm transition-all duration-300 backdrop-blur-sm active:scale-[0.98] overflow-hidden"
-                                >
-                                    <Mail className="w-4 h-4 shrink-0 text-[#ffeedd]" />
-                                    <span className="truncate">ventas@cosechacreativa.com.ar</span>
-                                </a>
-                            </div>
-
-                            <div className="flex flex-col items-center gap-3 mt-4 pt-4 border-t border-white/10 text-xs text-white/60 w-full">
-                                <div className="flex items-center gap-1.5 justify-center">
-                                    <MapPin className="w-3.5 h-3.5 text-[#ffeedd]" />
-                                    <span>San Juan, Argentina</span>
-                                </div>
-                                <div className="text-[10px] font-mono tracking-wider opacity-75 mt-1">
-                                    Usa el Scroll / Mouse 🌸
-                                </div>
+                            {/* Pie de la tarjeta: barra propia, anclada abajo. Antes flotaba
+                                suelto y al sacar el embed quedaba trepado al bloque de arriba. */}
+                            <div className="relative z-10 mt-auto flex items-center justify-center gap-2 rounded-b-3xl border-t border-white/10 bg-black/25 px-6 py-3.5 text-[11px] text-white/60">
+                                <MapPin className="w-3.5 h-3.5 shrink-0 text-[#ffdcb8]" />
+                                <span>San Juan, Argentina</span>
+                                <span className="mx-1 h-3 w-px bg-white/15" aria-hidden />
+                                <span>Respondemos en el día</span>
                             </div>
                         </div>
                     </div>

@@ -3,7 +3,6 @@ import { Navigation } from "@/components/landing/navigation";
 import { Ambient3DBackground } from "@/components/landing/ambient-3d";
 import { HeroSection } from "@/components/landing/hero-section";
 import { FeaturesSection } from "@/components/landing/features-section";
-import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { ServicesSection } from "@/components/landing/infrastructure-section";
 import { MetricsSection } from "@/components/landing/metrics-section";
 import { IntegrationsSection } from "@/components/landing/integrations-section";
@@ -59,11 +58,9 @@ export default function Home() {
       <HeroSection />
       <FeaturesSection />
 
+      {/* Hoja clara: la única banda de papel del recorrido, justo después del
+          bloque oscuro del hero. */}
       <SectionBand surface="bone">
-        <HowItWorksSection />
-      </SectionBand>
-
-      <SectionBand surface="slab">
         <ServicesSection />
       </SectionBand>
 

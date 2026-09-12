@@ -125,6 +125,8 @@ const SKETCHFAB_API_SRC = 'https://static.sketchfab.com/api/sketchfab-viewer-1.1
 
 /** Tono de roca de la foto de fondo, en 0-1, para que el visor no corte en gris. */
 const TRUCK_BG_COLOR = [0.15, 0.132, 0.112];
+/** El mismo tono en CSS, para los overlays que van sobre el visor. */
+const TRUCK_BG_CSS = `rgb(${TRUCK_BG_COLOR.map((c) => Math.round(c * 255)).join(',')})`;
 
 /** Carga única del script del visor; las siguientes llamadas reusan la promesa. */
 let sketchfabApiPromise: Promise<void> | null = null;
@@ -324,6 +326,23 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
               // Decorativo: sin puntero, la rueda y el touch nunca quedan
               // atrapados en el visor.
               style={{ pointerEvents: 'none' }}
+            />
+          )}
+
+          {/* Franja inferior: el visor deja fijos el cartel "click & hold to
+              rotate" y su insignia de marca abajo a la izquierda, y ni la API ni
+              los flags `ui_hint` / `ui_watermark` los apagan en esta cuenta. El
+              degradé los cubre con el mismo tono del visor y, de paso, funde las
+              ruedas contra el piso en vez de cortarlas. */}
+          {modelVisible && (
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[32%]"
+              style={{
+                // Opaco hasta bien arriba del cartel (que aparece cerca del 85 %
+                // de la altura del visor) y recién ahí se funde.
+                background: `linear-gradient(to top, ${TRUCK_BG_CSS} 0%, ${TRUCK_BG_CSS} 72%, transparent 100%)`,
+              }}
+              aria-hidden
             />
           )}
         </div>

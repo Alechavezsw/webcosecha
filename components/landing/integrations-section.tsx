@@ -178,10 +178,14 @@ export function IntegrationsSection() {
   return (
     <section id="integrations" ref={sectionRef} className="relative overflow-hidden">
 
-      {/* Header — compacto */}
+      {/* Header — compacto.
+          Las tres capas (header, foto y grilla) se desplazan en el MISMO sentido
+          y con factores crecientes de arriba hacia abajo. Antes iban en sentidos
+          opuestos (-0.25 / +0.55 / -0.32) y, sumado a los márgenes negativos, se
+          pisaban entre sí casi 90 px en desktop. */}
       <div
         className="relative z-10 pt-20 lg:pt-28 text-center will-change-transform"
-        style={{ transform: `translate3d(0, ${parallaxY * -0.25}px, 0)` }}
+        style={{ transform: `translate3d(0, ${parallaxY * 0.06}px, 0)` }}
       >
         <span className={`inline-flex items-center gap-3 text-xs font-mono text-muted-foreground mb-5 transition-all duration-700 justify-center ${
           isVisible ? "opacity-100" : "opacity-0"
@@ -215,12 +219,12 @@ export function IntegrationsSection() {
       </div>
 
       {/* Full-width image with parallax */}
-      <div className={`relative left-1/2 -translate-x-1/2 w-screen -mt-10 overflow-hidden transition-all duration-1000 delay-200 ${
+      <div className={`relative left-1/2 -translate-x-1/2 w-screen mt-8 lg:mt-12 overflow-hidden transition-all duration-1000 delay-200 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}>
         <div
           className="relative will-change-transform"
-          style={{ transform: `translate3d(0, ${parallaxY * 0.55}px, 0) scale(1.08)` }}
+          style={{ transform: `translate3d(0, ${parallaxY * 0.14}px, 0) scale(1.08)` }}
         >
           <img
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/connection-KeJwWPQvn6l0a7C48tCARYtNEdC92H.png"
@@ -239,8 +243,8 @@ export function IntegrationsSection() {
 
       {/* Integration grid — compacto */}
       <div
-        className="relative z-10 mt-0 lg:-mt-16 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-10 will-change-transform"
-        style={{ transform: `translate3d(0, ${parallaxY * -0.32}px, 0)` }}
+        className="relative z-10 mt-10 lg:mt-14 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-10 will-change-transform"
+        style={{ transform: `translate3d(0, ${parallaxY * 0.2}px, 0)` }}
       >
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-10">
           {integrations.map((integration, index) => (
