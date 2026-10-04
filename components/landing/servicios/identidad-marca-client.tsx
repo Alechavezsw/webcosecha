@@ -7,6 +7,7 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js"
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js"
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion"
 import {
   ArrowLeft,
@@ -124,46 +125,6 @@ function makeGroundTexture() {
   ctx.globalAlpha = 1
   const t = new THREE.CanvasTexture(c)
   t.colorSpace = THREE.SRGBColorSpace
-  return t
-}
-
-/** Silueta de árbol para la arboleda del fondo. */
-function makeTreeTexture() {
-  const W = 96
-  const H = 128
-  const c = document.createElement("canvas")
-  c.width = W
-  c.height = H
-  const ctx = c.getContext("2d")
-  if (!ctx) return new THREE.Texture()
-  ctx.fillStyle = "#000000"
-  // Tronco con una rama: una copa redonda sobre un palo se ve a chupetín.
-  ctx.beginPath()
-  ctx.moveTo(W / 2 - 3.5, H)
-  ctx.lineTo(W / 2 - 2, H * 0.5)
-  ctx.lineTo(W / 2 + 2, H * 0.5)
-  ctx.lineTo(W / 2 + 3.5, H)
-  ctx.fill()
-  ctx.lineWidth = 2.5
-  ctx.strokeStyle = "#000000"
-  ctx.beginPath()
-  ctx.moveTo(W / 2, H * 0.62)
-  ctx.lineTo(W / 2 - 14, H * 0.44)
-  ctx.moveTo(W / 2, H * 0.58)
-  ctx.lineTo(W / 2 + 15, H * 0.42)
-  ctx.stroke()
-  // Copa irregular: muchas manchas chicas, no una sola grande.
-  for (let i = 0; i < 46; i++) {
-    const a = Math.random() * Math.PI * 2
-    const rr = Math.pow(Math.random(), 0.65) * 32
-    const x = W / 2 + Math.cos(a) * rr
-    const y = H * 0.36 + Math.sin(a) * rr * 0.66
-    ctx.beginPath()
-    ctx.arc(x, y, 4 + Math.random() * 11, 0, Math.PI * 2)
-    ctx.fill()
-  }
-  const t = new THREE.CanvasTexture(c)
-  t.minFilter = THREE.LinearFilter
   return t
 }
 
@@ -292,6 +253,9 @@ function makePetalGeometry(curl: number) {
  */
 function tintPetalGeometry(geo: THREE.BufferGeometry, base: number, mid: number, tip: number) {
   const p = geo.attributes.position as THREE.BufferAttribute
+  // Si la geometría ya trae sombreado por vértice (venas del modelo de
+  // Blender), el degradado se multiplica por encima en vez de pisarlo.
+  const shadeAttr = geo.attributes.color as THREE.BufferAttribute | undefined
   const colors = new Float32Array(p.count * 3)
   const cBase = new THREE.Color(base)
   const cMid = new THREE.Color(mid)
@@ -312,6 +276,7 @@ function tintPetalGeometry(geo: THREE.BufferGeometry, base: number, mid: number,
     // pétalo real y deja la nervadura central como la zona más clara.
     const edge = Math.abs(p.getX(i)) / maxX
     c.multiplyScalar(1 - edge * edge * 0.26)
+    if (shadeAttr) c.multiplyScalar(shadeAttr.getX(i))
     colors[i * 3] = c.r
     colors[i * 3 + 1] = c.g
     colors[i * 3 + 2] = c.b
@@ -613,34 +578,127 @@ function GrowthScene() {
     scene.add(wildflowers)
     disposables.push(wfGeo, wfMat)
 
-    // --- Arboleda lejana: da escala al valle ---
-    const treeTex = makeTreeTexture()
-    const treeMat = new THREE.MeshBasicMaterial({
-      map: treeTex,
-      transparent: true,
-      alphaTest: 0.4,
-      color: 0x141008,
+    // --- Arboleda: modelos low-poly hechos en Blender (public/models/trees.glb) ---
+    // Copa redonda, álamo, algarrobo y arbusto, con color por vértice. Con
+    // volumen real reciben la luz de contorno del sol en vez de ser recortes.
+    const treeMat = new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      roughness: 0.92,
       fog: true,
-      side: THREE.DoubleSide,
     })
-    const treeCount = isMobile ? 26 : 54
-    const treeGeo = new THREE.PlaneGeometry(1, 1.35)
-    treeGeo.translate(0, 0.675, 0)
-    const trees = new THREE.InstancedMesh(treeGeo, treeMat, treeCount)
-    trees.frustumCulled = false
-    for (let i = 0; i < treeCount; i++) {
+    treeMat.onBeforeCompile = (shader: { uniforms: Record<string, unknown>; vertexShader: string }) => {
+      shader.uniforms.uTime = windUniform
+      shader.vertexShader = shader.vertexShader
+        .replace("#include <common>", "#include <common>\nuniform float uTime;")
+        .replace(
+          "#include <begin_vertex>",
+          [
+            "#include <begin_vertex>",
+            // El tronco queda firme: sólo se mece lo que está arriba de la base.
+            "float tPhase = instanceMatrix[3][0] * 0.3 + instanceMatrix[3][2] * 0.2;",
+            "float tBend = max(transformed.y - 0.35, 0.0);",
+            "float tSway = sin(uTime * 0.9 + tPhase) * 0.035 + sin(uTime * 2.3 + tPhase * 1.7) * 0.012;",
+            "transformed.x += tSway * tBend * tBend;",
+            "transformed.z += tSway * 0.5 * tBend * tBend;",
+          ].join("\n")
+        )
+    }
+    disposables.push(treeMat)
+
+    type TreeKind = "tree_round" | "tree_poplar" | "tree_carob" | "tree_bush"
+    type TreeSpot = { x: number; z: number; s: number; tilt: number }
+    const treeSpots: Record<TreeKind, TreeSpot[]> = {
+      tree_round: [],
+      tree_poplar: [],
+      tree_carob: [],
+      tree_bush: [],
+    }
+    const k = isMobile ? 0.5 : 1
+    // Arboleda lejana: mezcla de copas redondas y algarrobos sobre el valle.
+    for (let i = 0; i < Math.round(38 * k); i++) {
       const x = (Math.random() - 0.5) * 150
       const z = -18 - Math.random() * 26
-      dummy.position.set(x, GROUND_Y + terrainH(x, z) - 0.1, z)
-      dummy.rotation.set(0, 0, 0)
-      const s = 1.6 + Math.random() * 2.8
-      dummy.scale.set(s, s, s)
-      dummy.updateMatrix()
-      trees.setMatrixAt(i, dummy.matrix)
+      const kind = Math.random() < 0.68 ? "tree_round" : "tree_carob"
+      treeSpots[kind].push({ x, z, s: 1.6 + Math.random() * 2.8, tilt: 0.05 })
     }
-    trees.instanceMatrix.needsUpdate = true
-    scene.add(trees)
-    disposables.push(treeTex, treeGeo, treeMat)
+    // Hileras de álamos: el cortaviento típico de las fincas cuyanas.
+    const rows = [
+      { x0: -62, x1: -22, z: -30 },
+      { x0: 18, x1: 70, z: -36 },
+    ]
+    rows.forEach((row) => {
+      const n = Math.round(((row.x1 - row.x0) / 2.2) * k)
+      for (let i = 0; i < n; i++) {
+        const x = row.x0 + ((row.x1 - row.x0) * i) / n + (Math.random() - 0.5) * 0.6
+        const z = row.z + (Math.random() - 0.5) * 0.8
+        treeSpots.tree_poplar.push({ x, z, s: 2.6 + Math.random() * 0.9, tilt: 0.03 })
+      }
+    })
+    // Plano medio a los costados: con el paralaje de la cámara se nota el volumen.
+    for (let i = 0; i < Math.round(10 * k); i++) {
+      const side = i % 2 ? 1 : -1
+      const x = side * (14 + Math.random() * 16)
+      const z = -11 - Math.random() * 8
+      treeSpots[Math.random() < 0.6 ? "tree_round" : "tree_carob"].push({
+        x,
+        z,
+        s: 1.1 + Math.random() * 0.7,
+        tilt: 0.06,
+      })
+    }
+    // Arbustos: lejos de la cámara y semihundidos entre el pasto; adelante
+    // y enteros se leían como almohadones.
+    for (let i = 0; i < Math.round(26 * k); i++) {
+      const ang = Math.random() * Math.PI * 2
+      const rad = 13 + Math.random() * 26
+      const x = Math.cos(ang) * rad
+      const z = -Math.abs(Math.sin(ang) * rad) - 6
+      if (Math.abs(x) < 5 && z > -12) continue // que no tape la planta
+      treeSpots.tree_bush.push({ x, z, s: 0.9 + Math.random() * 1.1, tilt: 0.1 })
+    }
+
+    let disposed = false
+    const treeMeshes: THREE.InstancedMesh[] = []
+    new GLTFLoader().load(
+      "/models/trees.glb",
+      (gltf) => {
+        if (disposed) {
+          gltf.scene.traverse((o) => (o as THREE.Mesh).geometry?.dispose())
+          return
+        }
+        ;(Object.keys(treeSpots) as TreeKind[]).forEach((kind) => {
+          const src = gltf.scene.getObjectByName(kind) as THREE.Mesh | undefined
+          const spots = treeSpots[kind]
+          if (!src || !spots.length) return
+          const mesh = new THREE.InstancedMesh(src.geometry, treeMat, spots.length)
+          mesh.frustumCulled = false
+          const sink = kind === "tree_bush" ? 0.18 : 0.08
+          spots.forEach((p, i) => {
+            dummy.position.set(p.x, GROUND_Y + terrainH(p.x, p.z) - sink * p.s, p.z)
+            dummy.rotation.set(
+              (Math.random() - 0.5) * p.tilt,
+              Math.random() * Math.PI * 2,
+              (Math.random() - 0.5) * p.tilt
+            )
+            dummy.scale.setScalar(p.s)
+            dummy.updateMatrix()
+            mesh.setMatrixAt(i, dummy.matrix)
+            // Cada ejemplar con su tono: una arboleda clonada se ve de juguete.
+            const v = (kind === "tree_bush" ? 0.55 : 0.8) + Math.random() * 0.3
+            mesh.setColorAt(i, gc.setRGB(v, v * (0.95 + Math.random() * 0.1), v * 0.9))
+          })
+          if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+          mesh.instanceMatrix.needsUpdate = true
+          scene.add(mesh)
+          treeMeshes.push(mesh)
+          disposables.push(src.geometry)
+        })
+      },
+      undefined,
+      () => {
+        // Sin modelos el valle queda abierto: mejor eso que romper la escena.
+      }
+    )
 
     // -----------------------------------------------------------------
     // SOL: nace detrás de las montañas y sube con el scroll
@@ -694,7 +752,7 @@ function GrowthScene() {
         (Math.sin(x * 0.3 + s) * 0.5 + 0.5) * 0.1
       return Math.max(0, Math.min(1, v))
     }
-    type Ridge = { mat: THREE.MeshBasicMaterial; base: THREE.Color; lift: number }
+    type Ridge = { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; base: THREE.Color; lift: number }
     const ridges: Ridge[] = []
     const makeRidge = (
       W: number,
@@ -718,12 +776,76 @@ function GrowthScene() {
       const m = new THREE.Mesh(geo, mat)
       m.position.set(0, 0, z)
       scene.add(m)
-      ridges.push({ mat, base: new THREE.Color(color), lift })
+      ridges.push({ mesh: m, mat, base: new THREE.Color(color), lift })
       disposables.push(geo, mat)
     }
     makeRidge(320, 110, -86, -1.0, 7.0, 0x5c4433, 4.1, 1.0)
     makeRidge(240, 100, -62, -1.2, 5.0, 0x35261a, 1.3, 0.55)
     makeRidge(190, 100, -42, -1.4, 3.4, 0x181008, 8.7, 0.25)
+
+    // --- Cordillera y rocas modeladas en Blender (public/models/landscape.glb) ---
+    // La capa del fondo pasa a ser una cordillera con relieve y nieve en las
+    // cumbres (con un portezuelo donde nace el sol). El color por vértice trae
+    // roca, nieve y sombreado de laderas; el tinte del amanecer sigue en `ridges`.
+    const rockMat = new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      roughness: 0.95,
+      flatShading: true,
+    })
+    disposables.push(rockMat)
+    type RockSpot = { x: number; z: number; s: number }
+    const rockSpots: RockSpot[][] = [[], [], []]
+    // Un par de piedras al pie de la planta: la apoyan en el suelo.
+    rockSpots[0].push({ x: -1.35, z: 0.55, s: 0.32 })
+    rockSpots[1].push({ x: 1.25, z: 0.35, s: 0.24 })
+    rockSpots[2].push({ x: 0.55, z: 1.25, s: 0.18 })
+    for (let i = 0; i < Math.round(30 * k); i++) {
+      const x = (Math.random() - 0.5) * 44
+      const z = 4 - Math.random() * 26
+      if (Math.hypot(x, z) < 3.2) continue
+      // Más chicas cerca de la cámara, para que no tapen el texto.
+      const s = (0.25 + Math.random() * 0.75) * (z > 0 ? 0.6 : 1)
+      rockSpots[i % 3].push({ x, z, s })
+    }
+    const rockMeshes: THREE.InstancedMesh[] = []
+    new GLTFLoader().load(
+      "/models/landscape.glb",
+      (gltf) => {
+        if (disposed) {
+          gltf.scene.traverse((o) => (o as THREE.Mesh).geometry?.dispose())
+          return
+        }
+        const range = gltf.scene.getObjectByName("range_far") as THREE.Mesh | undefined
+        const far = ridges[0]
+        if (range && far) {
+          far.mesh.geometry = range.geometry
+          far.mat.vertexColors = true
+          far.mat.needsUpdate = true
+          far.base.setHex(0xa08e86)
+          disposables.push(range.geometry)
+        }
+        rockSpots.forEach((spots, r) => {
+          const src = gltf.scene.getObjectByName(`rock_${r}`) as THREE.Mesh | undefined
+          if (!src || !spots.length) return
+          const mesh = new THREE.InstancedMesh(src.geometry, rockMat, spots.length)
+          mesh.frustumCulled = false
+          mesh.receiveShadow = true
+          spots.forEach((p, i) => {
+            dummy.position.set(p.x, GROUND_Y + terrainH(p.x, p.z) - 0.25 * p.s, p.z)
+            dummy.rotation.set(0, Math.random() * Math.PI * 2, (Math.random() - 0.5) * 0.3)
+            dummy.scale.setScalar(p.s)
+            dummy.updateMatrix()
+            mesh.setMatrixAt(i, dummy.matrix)
+          })
+          mesh.instanceMatrix.needsUpdate = true
+          scene.add(mesh)
+          rockMeshes.push(mesh)
+          disposables.push(src.geometry)
+        })
+      },
+      undefined,
+      () => {}
+    )
 
     // --- Niebla de valle en capas ---
     type Haze = { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; speed: number }
@@ -906,12 +1028,14 @@ function GrowthScene() {
     const leafGeo = makeLeafGeometry()
     type Leaf = { pivot: THREE.Group; at: number; ang: number; size: number }
     const leaves: Leaf[] = []
+    const leafMeshes: THREE.Mesh[] = []
     const leafAts = [0.16, 0.29, 0.42, 0.54, 0.66, 0.76]
     leafAts.forEach((at, i) => {
       const pivot = new THREE.Group()
       pivot.rotation.y = i * 2.399 // ángulo áureo
       const mesh = new THREE.Mesh(leafGeo, leafMat)
       mesh.castShadow = true
+      leafMeshes.push(mesh)
       pivot.add(mesh)
       pivot.scale.setScalar(0.001)
       scene.add(pivot)
@@ -1026,6 +1150,7 @@ function GrowthScene() {
     }
     type PetalData = { pivot: THREE.Group; ring: number; idx: number; openJit: number; sway: number }
     const petals: PetalData[] = []
+    const petalMeshes: THREE.Mesh[][] = [[], [], []]
     const RINGS = [
       { n: 16, geo: 0, scale: [0.82, 0.5, 1.24] as const, open: 0.42, delay: 0.0 },
       { n: 13, geo: 1, scale: [0.68, 0.46, 0.94] as const, open: 0.28, delay: 0.05 },
@@ -1047,6 +1172,7 @@ function GrowthScene() {
         )
         // Torsión sobre el eje largo: un pétalo plano se ve troquelado.
         petal.rotation.z = jA * 0.3
+        petalMeshes[ring.geo].push(petal)
         pivot.add(petal)
         flower.add(pivot)
         petals.push({ pivot, ring: r, idx: i, openJit: jC * 0.16, sway: 0.8 + hash(i + r * 17) * 0.6 })
@@ -1124,6 +1250,43 @@ function GrowthScene() {
       recepGeo,
       recepMat,
       flowerGlowMat
+    )
+
+    // Pétalos y hojas modelados en Blender (public/models/flower.glb): superficie
+    // fina con nervadura, cuenco, borde ondulado y venas en el color por vértice.
+    // Llegan después; hasta entonces (o si fallan) quedan las piezas extruidas.
+    const PETAL_TINTS = [
+      [0x7d1140, 0xdb2b78, 0xff8cbe],
+      [0x6b0b34, 0xcb1e6b, 0xfa6ea8],
+      [0x55071f, 0xa81050, 0xe74d8f],
+    ] as const
+    new GLTFLoader().load(
+      "/models/flower.glb",
+      (gltf) => {
+        const geoOf = (name: string) =>
+          (gltf.scene.getObjectByName(name) as THREE.Mesh | undefined)?.geometry
+        if (disposed) {
+          gltf.scene.traverse((o) => (o as THREE.Mesh).geometry?.dispose())
+          return
+        }
+        petalMeshes.forEach((meshes, r) => {
+          const geo = geoOf(`petal_${r}`)
+          if (!geo) return
+          const [base, mid, tip] = PETAL_TINTS[r]
+          tintPetalGeometry(geo, base, mid, tip)
+          meshes.forEach((m) => (m.geometry = geo))
+          disposables.push(geo)
+        })
+        const leafModel = geoOf("leaf")
+        if (leafModel) {
+          leafMeshes.forEach((m) => (m.geometry = leafModel))
+          leafMat.vertexColors = true
+          leafMat.needsUpdate = true
+          disposables.push(leafModel)
+        }
+      },
+      undefined,
+      () => {}
     )
 
     // --- Mariposas: llegan cuando la flor se abre ---
@@ -1341,7 +1504,12 @@ function GrowthScene() {
       soilMat.color.setRGB(0.14 + day * 0.5, 0.12 + day * 0.42, 0.09 + day * 0.28)
       grassMat.color.setRGB(0.16 + day * 0.72, 0.2 + day * 0.78, 0.1 + day * 0.38)
       wfMat.opacity = smooth(0.18, 0.62, growth) * 0.9
-      treeMat.color.setRGB(0.05 + day * 0.14, 0.04 + day * 0.13, 0.03 + day * 0.08)
+      // De noche casi silueta; con el sol aparece el verde de las copas.
+      treeMat.color.setRGB(0.22 + day * 0.85, 0.2 + day * 0.8, 0.2 + day * 0.62)
+      rockMat.color.setRGB(0.16 + day * 0.5, 0.15 + day * 0.46, 0.15 + day * 0.4)
+      // Con el sol alto el aire se limpia: así la cordillera y la flor no se
+      // pierden en la bruma justo en el cierre.
+      if (scene.fog) (scene.fog as THREE.FogExp2).density = 0.0085 - day * 0.0035
       // Grado de exposición: la noche respira más oscura que la mañana.
       renderer.toneMappingExposure = 0.88 + day * 0.26
 
@@ -1553,6 +1721,9 @@ function GrowthScene() {
       window.removeEventListener("mousemove", onMouseMove)
       window.removeEventListener("resize", onResize)
       cancelAnimationFrame(raf)
+      disposed = true
+      treeMeshes.forEach((m) => m.dispose())
+      rockMeshes.forEach((m) => m.dispose())
       if (mount && renderer.domElement.parentElement === mount) {
         mount.removeChild(renderer.domElement)
       }

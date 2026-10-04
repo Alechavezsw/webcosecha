@@ -7,6 +7,8 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -17,8 +19,8 @@ import {
   Target, 
   Sparkles, 
   TrendingUp, 
-  CheckCircle,
   Mail,
+  Phone,
   ChevronDown,
   Globe,
   Palette,
@@ -30,7 +32,10 @@ import {
   Calendar
 } from 'lucide-react';
 import { WhatsAppMark } from "@/components/icons/whatsapp-mark";
-import { getWhatsAppHref } from "@/lib/whatsapp";
+import { getWhatsAppDisplayLabel, getWhatsAppHref, getWhatsAppPhoneDigits } from "@/lib/whatsapp";
+
+/** Mail de contacto general (el mismo que usa el resto del sitio). */
+const CONTACT_EMAIL = "contacto@cosechacreativa.com.ar";
 
 // Estructura de datos de los 12 servicios (Incluyendo Compol, Nube y Eventos)
 const SERVICES_DATA = [
@@ -148,26 +153,6 @@ export function ServiciosPageClient() {
   const mountRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useRef<number>(0);
   const [activeSection, setActiveSection] = useState<number>(0);
-
-  // Form states for the Contact Card (Section 12)
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [service, setService] = useState('Estrategia 360°');
-  const [message, setMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      setName('');
-      setEmail('');
-      setMessage('');
-    }, 1500);
-  };
 
   const handleRestart = () => {
     const scrollEl = document.getElementById('bosque-scroll');
@@ -493,7 +478,10 @@ export function ServiciosPageClient() {
     scene.add(new THREE.AmbientLight('#ffb3c6', 0.02));
     
     // Luces principales del bosque
-    const dirLight1 = new THREE.DirectionalLight('#ffffff', 0.25);
+    // Luz de luna: cielo violeta tenue arriba y casi negro abajo. Sin ella el
+    // suelo y los troncos quedaban en negro absoluto entre árbol y árbol.
+    scene.add(new THREE.HemisphereLight('#6b5a9c', '#120c10', 0.55));
+    const dirLight1 = new THREE.DirectionalLight('#c9d4ff', 0.55);
     dirLight1.position.set(10, 20, 10);
     scene.add(dirLight1);
     
@@ -621,7 +609,9 @@ export function ServiciosPageClient() {
     groundGeo.computeVertexNormals();
 
     const groundMat = new THREE.MeshStandardMaterial({ 
-      color: '#030206', 
+      // Suelo de musgo oscuro: recibe la luz de los árboles cercanos (charcos de
+      // color bajo cada copa). Con #030206 quedaba negro absoluto.
+      color: '#1a1622',
       roughness: 0.95,
       metalness: 0.05
     });
@@ -1001,9 +991,12 @@ export function ServiciosPageClient() {
       { x: 0, z: -176 }      // Eventos (Rosa Fuerte)
     ];
 
+    const treeGroups: THREE.Group[] = [];
+    const fallbackTrunks: THREE.Object3D[] = [];
     treePositions.forEach((pos, idx) => {
       const service = SERVICES_DATA[idx];
       const treeGroup = new THREE.Group();
+      treeGroups.push(treeGroup);
       
       let groundY = Math.sin(pos.x * 0.1) * Math.cos(pos.z * 0.1) * 2.2;
       groundY += Math.sin(pos.x * 0.5) * Math.cos(pos.z * 0.3) * 0.5;
@@ -1012,11 +1005,7 @@ export function ServiciosPageClient() {
       forestGroup.add(treeGroup);
 
       buildBranch(treeGroup, 0.42, 0.28, 3.8, 3, service.color);
-
-      // Luz puntual en el follaje
-      const ptLight = new THREE.PointLight(service.color, 45, 12);
-      ptLight.position.set(0, 5, 0);
-      treeGroup.add(ptLight);
+      fallbackTrunks.push(treeGroup.children[treeGroup.children.length - 1]);
 
       // Nodos brillantes en el suelo
       const nodeGeo = new THREE.SphereGeometry(0.05, 6, 6);
@@ -1042,9 +1031,10 @@ export function ServiciosPageClient() {
 
     // Creamos la estructura fractal del Árbol Gigante con nivel 4, altura 15, ramas extendidas
     buildBranch(giantTreeGroup, 1.4, 0.95, 15.0, 4, "#10b981"); // Verde esmeralda mágico de base
+    const giantFallback = giantTreeGroup.children[giantTreeGroup.children.length - 1];
 
     // Añadimos luces de colores de los servicios dentro de la copa del árbol gigante
-    const colorsList = ["#ff2a6d", "#8b5cf6", "#f59e0b", "#00f3ff", "#10b981", "#fbbf24", "#ec4899"];
+    const colorsList = ["#ff2a6d", "#00f3ff", "#fbbf24"];
     colorsList.forEach((col, cIdx) => {
       const ptLight = new THREE.PointLight(col, 50, 18);
       const angle = (cIdx / colorsList.length) * Math.PI * 2;
@@ -1082,6 +1072,128 @@ export function ServiciosPageClient() {
     const giantParticles = new THREE.Points(giantParticlesGeo, giantParticlesMat);
     giantTreeGroup.add(giantParticles);
 
+    // --- 8.6. LUCES QUE ACOMPAÑAN AL VUELO ---
+    // Antes cada árbol tenía su luz (12 + 7 del gigante, todas activas): cada
+    // material iluminado las recorría todas en cada cuadro. Ahora 4 luces se
+    // reparten entre los árboles más cercanos a la cámara y toman su color.
+    // Prender/apagar luces recompila shaders; moverlas y teñirlas, no.
+    const lightPool = Array.from({ length: 4 }, () => {
+      const l = new THREE.PointLight('#ffffff', 45, 13);
+      scene.add(l);
+      return l;
+    });
+    const updateLightPool = (camZ: number) => {
+      const order = treePositions
+        .map((p, i) => ({ i, d: Math.abs(p.z - (camZ - 8)) }))
+        .sort((a, b) => a.d - b.d);
+      lightPool.forEach((l, k) => {
+        const t = order[k];
+        const g = treeGroups[t.i];
+        l.position.set(g.position.x, g.position.y + 6.5, g.position.z);
+        l.color.set(SERVICES_DATA[t.i].color);
+      });
+    };
+
+    // --- 8.65. ÁRBOLES MODELADOS EN BLENDER (public/models/bio-trees.glb) ---
+    // Troncos orgánicos con raíces y oclusión horneada, y copas de hojas reales
+    // que brillan con el color de cada servicio y se mecen con el viento. Si el
+    // modelo no carga, quedan los árboles procedurales de arriba.
+    const windUniform = { value: 0 };
+    const makeLeafTexture = () => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const ctx = c.getContext('2d');
+      if (ctx) {
+        ctx.translate(64, 64);
+        ctx.rotate(-Math.PI / 4);
+        const g = ctx.createLinearGradient(0, -58, 0, 58);
+        g.addColorStop(0, '#ffffff');
+        g.addColorStop(1, '#c8c8c8');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(0, -58);
+        ctx.bezierCurveTo(34, -30, 34, 30, 0, 58);
+        ctx.bezierCurveTo(-34, 30, -34, -30, 0, -58);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, -50);
+        ctx.lineTo(0, 54);
+        ctx.stroke();
+      }
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    };
+    const leafTex = makeLeafTexture();
+    const addWind = (mat: THREE.Material, amount: number) => {
+      mat.onBeforeCompile = (shader) => {
+        shader.uniforms.uTime = windUniform;
+        shader.vertexShader = shader.vertexShader
+          .replace('#include <common>', '#include <common>\nuniform float uTime;')
+          .replace(
+            '#include <begin_vertex>',
+            [
+              '#include <begin_vertex>',
+              'float wH = clamp(position.y / 8.0, 0.0, 1.5);',
+              'vec4 wW = modelMatrix * vec4(position, 1.0);',
+              'float wP = wW.x * 0.35 + wW.z * 0.25;',
+              'transformed.x += (sin(uTime * 1.1 + wP) * 0.6 + sin(uTime * 2.7 + wP * 2.3) * 0.25) * ' + amount.toFixed(3) + ' * wH;',
+              'transformed.z += cos(uTime * 0.9 + wP * 1.3) * 0.5 * ' + amount.toFixed(3) + ' * wH;',
+            ].join('\n')
+          );
+      };
+    };
+    const barkMat = new THREE.MeshStandardMaterial({ color: '#3a2f38', vertexColors: true, roughness: 0.92, metalness: 0.0 });
+    addWind(barkMat, 0.03);
+    const leafMats = new Map<string, THREE.MeshBasicMaterial>();
+    const leafMatFor = (hex: string) => {
+      let m = leafMats.get(hex);
+      if (!m) {
+        // Color por encima de 1: el bloom (umbral 0.72) lo hace brillar.
+        m = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(hex).multiplyScalar(1.45),
+          vertexColors: true,
+          map: leafTex,
+          alphaTest: 0.5,
+          side: THREE.DoubleSide,
+        });
+        addWind(m, 0.12);
+        leafMats.set(hex, m);
+      }
+      return m;
+    };
+    let treesDisposed = false;
+    const treeLoader = new GLTFLoader();
+    treeLoader.setMeshoptDecoder(MeshoptDecoder);
+    treeLoader.load(
+      '/models/bio-trees.glb',
+      (gltf) => {
+        if (treesDisposed) return;
+        const get = (n: string) => gltf.scene.getObjectByName(n) as THREE.Mesh | undefined;
+        const variants = ['a', 'b', 'c'];
+        const place = (group: THREE.Group, v: string, hex: string, fallback: THREE.Object3D, yaw: number) => {
+          const trunk = get(v + '_trunk');
+          const leaves = get(v + '_leaves');
+          if (!trunk || !leaves) return;
+          group.remove(fallback);
+          const t = new THREE.Mesh(trunk.geometry, barkMat);
+          const l = new THREE.Mesh(leaves.geometry, leafMatFor(hex));
+          t.castShadow = true;
+          t.receiveShadow = true;
+          t.rotation.y = l.rotation.y = yaw;
+          t.position.y = l.position.y = -0.45;
+          group.add(t, l);
+        };
+        treeGroups.forEach((g, i) => place(g, variants[i % 3], SERVICES_DATA[i].color, fallbackTrunks[i], i * 1.7));
+        place(giantTreeGroup, 'giant', '#10b981', giantFallback, 0.6);
+        allLeafSystems.length = 0; // las partículas viejas ya no están en escena
+      },
+      undefined,
+      () => {}
+    );
+
     // --- 8.7. PARALLAX DE MOUSE (la cámara acompaña sutilmente al cursor) ---
     let mouseX = 0;
     let mouseY = 0;
@@ -1102,6 +1214,8 @@ export function ServiciosPageClient() {
       const time = clock.getElapsedTime();
       const dt = Math.min(time - lastTime, 0.05);
       lastTime = time;
+      windUniform.value = time;
+      updateLightPool(camera.position.z);
 
       // Cielo, luna y estrellas fugaces acompañan a la cámara (distancia infinita aparente)
       skyMesh.position.copy(camera.position);
@@ -1364,6 +1478,10 @@ export function ServiciosPageClient() {
       if (mountRef.current && renderer.domElement) {
         mountRef.current.removeChild(renderer.domElement);
       }
+      treesDisposed = true;
+      leafTex.dispose();
+      barkMat.dispose();
+      leafMats.forEach((m) => m.dispose());
       composer?.dispose();
       renderer.dispose();
     };
@@ -1580,126 +1698,88 @@ export function ServiciosPageClient() {
                 boxShadow: activeSection === 12 ? '0 0 60px rgba(52, 211, 153, 0.08)' : undefined
               }}
             >
-              {isSubmitted ? (
-                <div className="text-center py-10 flex flex-col items-center">
-                  <div className="size-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)] animate-pulse">
-                    <CheckCircle className="size-10 text-[#34d399]" />
+              <div className="flex items-center gap-3.5 mb-5">
+                <div className="size-11 rounded-2xl flex items-center justify-center border border-[#34d399]/40 bg-[#34d399]/10">
+                  <Sparkles className="size-5.5 text-[#34d399]" />
+                </div>
+                <span className="font-mono text-xs uppercase tracking-[0.25em] font-semibold text-[#34d399]">
+                  Ecosistema Digital
+                </span>
+              </div>
+
+              <h2 className="cc-section-title mb-3 uppercase italic text-white sm:text-4xl">
+                Cosechemos Juntos
+              </h2>
+              <p className="text-white/60 text-sm sm:text-base leading-relaxed mb-7">
+                Escribinos o llamanos y empezamos a diseñar, automatizar y hacer crecer tu ecosistema digital.
+              </p>
+
+              {/* Contacto directo: celular (WhatsApp o llamada) y mail. */}
+              <div className="grid gap-3">
+                <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-5 transition-colors hover:border-[#25D366]/40">
+                  <div className="mb-4 flex items-center gap-2.5">
+                    <span className="flex size-9 items-center justify-center rounded-xl border border-[#25D366]/30 bg-[#25D366]/10">
+                      <Phone className="size-4 text-[#25D366]" />
+                    </span>
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-white/45">Celular</span>
                   </div>
-                  <h2 className="cc-section-title mb-4 uppercase italic text-white">
-                    ¡Cosecha Iniciada!
-                  </h2>
-                  <p className="text-white/70 text-base max-w-md mx-auto mb-10 leading-relaxed">
-                    Tu mensaje fue enviado con éxito. Nuestro equipo analizará tu proyecto y se pondrá en contacto en menos de 24 horas.
-                  </p>
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    <button
-                      onClick={() => setIsSubmitted(false)}
-                      className="px-6 py-3 text-sm font-semibold tracking-wide rounded-full border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300"
+                  <a
+                    href={`tel:+${getWhatsAppPhoneDigits()}`}
+                    className="block text-lg font-semibold tracking-tight text-white transition-colors hover:text-[#25D366] sm:text-xl"
+                  >
+                    {getWhatsAppDisplayLabel()}
+                  </a>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <a
+                      href={getWhatsAppHref('Vengo del Bosque Digital de servicios')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-4 py-2 text-xs font-semibold text-black transition-transform hover:scale-105"
                     >
-                      Enviar otro mensaje
-                    </button>
-                    <button
-                      onClick={handleRestart}
-                      className="px-6 py-3 text-sm font-semibold tracking-wide rounded-full bg-[#34d399] text-black hover:scale-105 transition-all duration-300"
+                      <WhatsAppMark className="size-[15px]" />
+                      WhatsApp
+                    </a>
+                    <a
+                      href={`tel:+${getWhatsAppPhoneDigits()}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-medium text-white/90 transition-colors hover:border-white/20 hover:bg-white/[0.08]"
                     >
-                      Volver a recorrer el bosque
-                    </button>
+                      <Phone className="size-3.5" />
+                      Llamar
+                    </a>
                   </div>
                 </div>
-              ) : (
-                <>
-                  <div className="flex items-center gap-3.5 mb-5">
-                    <div className="size-11 rounded-2xl flex items-center justify-center border border-[#34d399]/40 bg-[#34d399]/10">
-                      <Sparkles className="size-5.5 text-[#34d399]" />
-                    </div>
-                    <span className="font-mono text-xs uppercase tracking-[0.25em] font-semibold text-[#34d399]">
-                      Ecosistema Digital
+
+                <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-5 transition-colors hover:border-[#34d399]/40">
+                  <div className="mb-4 flex items-center gap-2.5">
+                    <span className="flex size-9 items-center justify-center rounded-xl border border-[#34d399]/30 bg-[#34d399]/10">
+                      <Mail className="size-4 text-[#34d399]" />
                     </span>
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-white/45">Email</span>
                   </div>
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="block break-words text-lg font-semibold tracking-tight text-white transition-colors hover:text-[#34d399] sm:text-xl"
+                  >
+                    {CONTACT_EMAIL}
+                  </a>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <a
+                      href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Consulta desde el Bosque Digital')}`}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#34d399] px-4 py-2 text-xs font-semibold text-black transition-transform hover:scale-105"
+                    >
+                      Escribir un mail
+                      <ArrowRight className="size-3.5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
 
-                  <h2 className="cc-section-title mb-3 uppercase italic text-white sm:text-4xl">
-                    Cosechemos Juntos
-                  </h2>
-                  <p className="text-white/60 text-sm sm:text-base leading-relaxed mb-6">
-                    Dejanos tu mensaje para empezar a diseñar, automatizar y hacer crecer tu ecosistema digital.
-                  </p>
-
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-white/40 mb-1.5">Nombre</label>
-                        <input
-                          type="text"
-                          required
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder="Tu nombre completo"
-                          className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#34d399]/40 transition-all pointer-events-auto"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-white/40 mb-1.5">Email</label>
-                        <input
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="ejemplo@correo.com"
-                          className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#34d399]/40 transition-all pointer-events-auto"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/40 mb-1.5">Servicio de Interés</label>
-                      <select
-                        value={service}
-                        onChange={(e) => setService(e.target.value)}
-                        className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34d399]/40 transition-all pointer-events-auto"
-                      >
-                        {SERVICES_DATA.map((srv) => (
-                          <option key={srv.id} value={srv.title} className="bg-[#030105] text-white">
-                            {srv.title}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/40 mb-1.5">Mensaje</label>
-                      <textarea
-                        required
-                        rows={3}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Contanos sobre tu proyecto, objetivos o ideas..."
-                        className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#34d399]/40 transition-all pointer-events-auto resize-none"
-                      />
-                    </div>
-
-                    <div className="flex flex-wrap gap-4 items-center pt-2">
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-[#34d399] px-6 py-3 text-sm font-semibold tracking-wide text-black transition-all hover:scale-105 duration-300 disabled:opacity-50 disabled:scale-100"
-                      >
-                        {isSubmitting ? "Enviando..." : "Enviar Mensaje"}
-                        <ArrowRight className="size-4" />
-                      </button>
-
-                      <a
-                        href={getWhatsAppHref(`¡Hola! Me interesa conversar sobre el servicio de ${service}`)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-medium tracking-wide text-white/90 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.08]"
-                      >
-                        <WhatsAppMark className="size-[17px] text-[#25D366]" />
-                        Escribir por WhatsApp
-                      </a>
-                    </div>
-                  </form>
-                </>
-              )}
+              <button
+                onClick={handleRestart}
+                className="mt-6 text-xs font-medium tracking-wide text-white/45 transition-colors hover:text-white"
+              >
+                ↑ Volver a recorrer el bosque
+              </button>
             </div>
           </div>
 

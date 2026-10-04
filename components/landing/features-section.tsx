@@ -62,6 +62,16 @@ export function FeaturesSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
   const parallaxY = useImmersiveParallax(sectionRef, 220);
+  // El mazo fijado reemplaza a la grilla salvo con movimiento reducido.
+  const [deck, setDeck] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setDeck(!mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -79,7 +89,7 @@ export function FeaturesSection() {
     <section
       id="about"
       ref={sectionRef}
-      className="cc-aura cc-aura-rose relative scroll-mt-6 overflow-hidden bg-black/55 pb-16 pt-20 sm:pb-20 sm:pt-24 lg:pb-24 lg:pt-28"
+      className="cc-aura cc-aura-rose relative scroll-mt-6 overflow-x-clip bg-black/55 pb-16 pt-20 sm:pb-20 sm:pt-24 lg:pb-24 lg:pt-28"
     >
       {/* Fondo: arranca justo donde el hero terminó de fundir a negro. El corte lo
           marca la hairline del hero; acá sólo entra la luz de bienvenida. */}
@@ -148,6 +158,8 @@ export function FeaturesSection() {
         </div>
 
         {/* Diferenciales */}
+        {!deck && (
+        <>
         <div className="mb-8 flex items-end justify-between gap-4 border-b border-white/10 pb-4">
           <h3
             className={`font-display text-xl text-white sm:text-2xl md:text-3xl ${
@@ -234,7 +246,208 @@ export function FeaturesSection() {
             );
           })}
         </div>
+        </>
+        )}
       </div>
+
+      {deck && <FeatureDeck />}
     </section>
+  );
+}
+
+/**
+ * Mazo de diferenciales: la sección queda fijada y cada pilar sube desde abajo
+ * y se apoya sobre el anterior, que retrocede (más chico, inclinado y en
+ * sombra). Seis fichas chicas en grilla se leían de un vistazo y se olvidaban;
+ * de a una, cada pilar tiene su momento.
+ */
+function FeatureDeck() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLElement | null)[]>([]);
+  const shadeRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const numRef = useRef<HTMLSpanElement>(null);
+  const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const n = features.length;
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    let raf = 0;
+    let running = false;
+    let shown = -1;
+    let t = 0;
+    const ease = (x: number) => 1 - Math.pow(1 - x, 3);
+    const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+
+    const target = () => {
+      const r = root.getBoundingClientRect();
+      const total = r.height - window.innerHeight;
+      const p = total > 0 ? clamp(-r.top / total) : 0;
+      // Un respiro al final: la última ficha queda quieta antes de soltar el pin.
+      return clamp(p / 0.88) * (n - 1);
+    };
+    t = target();
+
+    const frame = () => {
+      raf = running ? requestAnimationFrame(frame) : 0;
+      t += (target() - t) * 0.16;
+      for (let i = 0; i < n; i++) {
+        const el = cardRefs.current[i];
+        if (!el) continue;
+        const arrive = i === 0 ? 1 : ease(clamp(t - (i - 1)));
+        const depth = clamp(t - i, 0, n); // cuántas fichas tiene encima
+        const y = (1 - arrive) * 150 - depth * 4.2; // % del alto propio
+        const scale = 1 - Math.min(depth, 3) * 0.065;
+        const tilt = Math.min(depth, 3) * 5;
+        el.style.transform = `translate3d(0, ${y.toFixed(2)}%, 0) scale(${scale.toFixed(4)}) rotateX(${tilt.toFixed(2)}deg)`;
+        // Las que esperan no asoman: entran con fundido; las del fondo del mazo se apagan.
+        const enter = i === 0 ? 1 : clamp((t - (i - 1)) * 3);
+        const leave = depth > 3.2 ? clamp(1 - (depth - 3.2)) : 1;
+        el.style.opacity = (enter * leave).toFixed(3);
+        const shade = shadeRefs.current[i];
+        if (shade) shade.style.opacity = Math.min(0.75, depth * 0.32).toFixed(3);
+      }
+      const active = Math.min(n - 1, Math.max(0, Math.round(t)));
+      if (active !== shown) {
+        shown = active;
+        if (numRef.current) numRef.current.textContent = features[active].number;
+        dotRefs.current.forEach((d, i) => {
+          if (!d) return;
+          d.style.transform = `scaleX(${i === active ? 1 : 0.35})`;
+          d.style.opacity = i <= active ? "1" : "0.3";
+        });
+      }
+    };
+
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting && !running) {
+          running = true;
+          raf = requestAnimationFrame(frame);
+        } else if (!e.isIntersecting) {
+          running = false;
+          cancelAnimationFrame(raf);
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+    io.observe(root);
+    running = true;
+    frame();
+    running = false;
+    return () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      io.disconnect();
+    };
+  }, [n]);
+
+  return (
+    <div ref={rootRef} className="relative" style={{ height: `${n * 60 + 100}vh` }}>
+      <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
+        <div className="mx-auto grid w-full max-w-[1200px] items-center gap-8 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 lg:px-10">
+          {/* Lado del relato: qué es esto y en qué pilar vamos. */}
+          <div className="lg:col-span-5">
+            <span className="cc-eyebrow mb-4">
+              <span className="cc-eyebrow-line w-8" />6 pilares
+            </span>
+            <h3 className="font-display text-2xl leading-tight text-white sm:text-3xl lg:text-5xl">
+              El diferencial de trabajar con estrategia
+            </h3>
+            <div className="mt-6 hidden items-end gap-5 lg:mt-10 lg:flex">
+              <span
+                ref={numRef}
+                className="font-display text-[7rem] leading-[0.8] text-transparent [-webkit-text-stroke:1px_rgba(236,168,214,0.55)]"
+              >
+                01
+              </span>
+              <span className="mb-2 font-mono text-xs text-white/40">/ 0{n}</span>
+            </div>
+            <div className="mt-6 flex gap-1.5" aria-hidden>
+              {features.map((f, i) => (
+                <span
+                  key={f.number}
+                  ref={(el) => {
+                    dotRefs.current[i] = el;
+                  }}
+                  className="h-[3px] w-8 origin-left rounded-full transition-[transform,opacity] duration-500"
+                  style={{ background: `rgb(${f.accent})`, transform: "scaleX(0.35)", opacity: 0.3 }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* El mazo. */}
+          <div className="relative h-[min(58svh,440px)] [perspective:1400px] lg:col-span-7">
+            {features.map((feature, i) => {
+              const Icon = feature.icon;
+              return (
+                <article
+                  key={feature.number}
+                  ref={(el) => {
+                    cardRefs.current[i] = el;
+                  }}
+                  className="absolute inset-0 flex origin-top flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#0d0a10] p-7 shadow-[0_40px_90px_-40px_rgba(0,0,0,0.95)] will-change-transform sm:p-10"
+                  style={
+                    {
+                      "--accent-rgb": feature.accent,
+                      zIndex: i + 1,
+                      transform: i === 0 ? undefined : "translate3d(0,150%,0)",
+                      opacity: i === 0 ? 1 : 0,
+                    } as CSSProperties
+                  }
+                >
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      background:
+                        "radial-gradient(ellipse 80% 70% at 100% 0%, rgba(var(--accent-rgb),0.22) 0%, transparent 60%), linear-gradient(160deg, rgba(var(--accent-rgb),0.08) 0%, transparent 55%)",
+                    }}
+                  />
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-x-0 top-0 h-px"
+                    style={{ background: "linear-gradient(90deg, transparent, rgba(var(--accent-rgb),0.7), transparent)" }}
+                  />
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute -bottom-6 right-4 select-none font-display text-[9rem] leading-none sm:text-[12rem]"
+                    style={{ color: "rgba(var(--accent-rgb),0.1)" }}
+                  >
+                    {feature.number}
+                  </span>
+                  <span
+                    className="relative inline-flex h-14 w-14 items-center justify-center rounded-2xl border"
+                    style={{
+                      color: "rgb(var(--accent-rgb))",
+                      backgroundColor: "rgba(var(--accent-rgb),0.1)",
+                      borderColor: "rgba(var(--accent-rgb),0.28)",
+                      boxShadow: "0 0 40px -10px rgba(var(--accent-rgb),0.6)",
+                    }}
+                    aria-hidden
+                  >
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <div className="relative max-w-md">
+                    <h4 className="font-display text-3xl leading-tight text-white sm:text-4xl">{feature.title}</h4>
+                    <p className="mt-4 text-base leading-relaxed text-white/65 sm:text-lg">{feature.description}</p>
+                  </div>
+                  {/* Sombra de las fichas que quedan debajo del mazo. */}
+                  <div
+                    ref={(el) => {
+                      shadeRefs.current[i] = el;
+                    }}
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-black"
+                    style={{ opacity: 0 }}
+                  />
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

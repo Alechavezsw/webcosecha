@@ -70,9 +70,13 @@ export function NosotrosTeamKineticSection({ members }: { members: NosotrosTeamM
   const activeMember = members.find((m) => m.id === activeId);
 
   const showFloatCard = !isMobile && !reduceMotion;
+  // El escenario fijado reemplaza la lista salvo con movimiento reducido.
+  const drum = !reduceMotion;
+  const COUNT_WORDS = ["Cero", "Un", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho"];
+  const countWord = COUNT_WORDS[members.length] ?? String(members.length);
 
   return (
-    <section className="relative overflow-hidden bg-[#0d0710]/85 py-16 md:py-24">
+    <section className="relative overflow-x-clip bg-[#0d0710]/85 py-16 md:py-24">
       {/* Fondo rosa + líneas horizontales: cierra el recorrido volviendo al color de marca. */}
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_60%_at_50%_-10%,rgba(236,168,214,0.24),transparent_60%)]"
@@ -104,13 +108,14 @@ export function NosotrosTeamKineticSection({ members }: { members: NosotrosTeamM
             <span className="block text-white/30">detrás de cada proyecto</span>
           </h2>
           <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-white/60 md:text-[17px]">
-            Seis perfiles complementarios: dirección y desarrollo, estrategia de marketing,
+            {countWord} perfiles complementarios: dirección y desarrollo, estrategia de marketing,
             comunidad, fotografía y diseño.{" "}
             <span className="text-white/40">
-              Pasá el cursor sobre cada nombre para conocerlos.
+              {drum ? "Deslizá para conocerlos." : "Pasá el cursor sobre cada nombre para conocerlos."}
             </span>
           </p>
 
+          {!drum && (
           <div className="mt-12 flex flex-col">
             {members.map((member, index) => (
               <TeamRow
@@ -125,10 +130,13 @@ export function NosotrosTeamKineticSection({ members }: { members: NosotrosTeamM
               />
             ))}
           </div>
+          )}
         </div>
       </div>
 
-      {showFloatCard && (
+      {drum && <TeamDrum members={members} />}
+
+      {showFloatCard && !drum && (
         <motion.div
           style={{ x: cursorX, y: cursorY }}
           className="pointer-events-none fixed left-0 top-0 z-50 hidden md:block"
@@ -266,5 +274,181 @@ function TeamRow({
         )}
       </AnimatePresence>
     </motion.div>
+  );
+}
+
+/** Giro entre nombres consecutivos del tambor (grados). */
+const DRUM_STEP = 26;
+
+/**
+ * Escenario del equipo: la sección queda fijada y los nombres giran en un
+ * tambor 3D con el scroll. El que pasa por el frente se enciende y la ficha
+ * de la derecha cambia a esa persona. Una lista con hover no se descubre en
+ * celular y en escritorio pide adivinar que hay algo detrás del nombre.
+ */
+function TeamDrum({ members }: { members: NosotrosTeamMember[] }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const nameRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const barRef = useRef<HTMLSpanElement>(null);
+  const [active, setActive] = useState(0);
+  const n = members.length;
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    let raf = 0;
+    let running = false;
+    let shown = -1;
+    let t = 0;
+    const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+    const target = () => {
+      const r = root.getBoundingClientRect();
+      const total = r.height - window.innerHeight;
+      const p = total > 0 ? clamp(-r.top / total) : 0;
+      return { p, t: clamp((p - 0.04) / 0.86) * (n - 1) };
+    };
+    t = target().t;
+
+    const frame = () => {
+      raf = running ? requestAnimationFrame(frame) : 0;
+      const tg = target();
+      t += (tg.t - t) * 0.14;
+      const radius = window.innerWidth < 768 ? 150 : 260;
+      for (let i = 0; i < n; i++) {
+        const el = nameRefs.current[i];
+        if (!el) continue;
+        const d = i - t;
+        const ad = Math.abs(d);
+        el.style.transform = `translate3d(0, -50%, 0) rotateX(${(-d * DRUM_STEP).toFixed(2)}deg) translateZ(${radius}px)`;
+        el.style.opacity = clamp(1 - ad * 0.36).toFixed(3);
+        // El del frente en rosa pleno; el resto se apaga hacia gris.
+        const lit = clamp(1 - ad * 1.6);
+        el.style.color = `rgba(${Math.round(255 - lit * 19)}, ${Math.round(255 - lit * 87)}, ${Math.round(255 - lit * 41)}, ${(0.28 + lit * 0.72).toFixed(3)})`;
+        el.style.filter = ad > 0.6 ? `blur(${Math.min(4, (ad - 0.6) * 2.4).toFixed(2)}px)` : "";
+        el.style.pointerEvents = ad < 0.5 ? "auto" : "none";
+      }
+      if (barRef.current) barRef.current.style.transform = `scaleY(${tg.p.toFixed(4)})`;
+      const a = Math.min(n - 1, Math.max(0, Math.round(t)));
+      if (a !== shown) {
+        shown = a;
+        setActive(a);
+      }
+    };
+
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting && !running) {
+          running = true;
+          raf = requestAnimationFrame(frame);
+        } else if (!e.isIntersecting) {
+          running = false;
+          cancelAnimationFrame(raf);
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+    io.observe(root);
+    running = true;
+    frame();
+    running = false;
+    return () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      io.disconnect();
+    };
+  }, [n]);
+
+  const member = members[active];
+
+  return (
+    <div ref={rootRef} className="relative" style={{ height: `${n * 70 + 100}vh` }}>
+      <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
+        <div className="mx-auto grid w-full max-w-[1200px] items-center gap-6 px-6 md:gap-10 lg:grid-cols-12 lg:px-12">
+          {/* Tambor de nombres. */}
+          {/* Los extremos del tambor se funden con máscara: el fondo de la sección
+              es translúcido, así que un degradado de color se vería como una caja. */}
+          <div className="relative h-[34svh] [mask-image:linear-gradient(to_bottom,transparent,black_28%,black_72%,transparent)] [perspective:1100px] md:h-[60svh] lg:col-span-7">
+            {/* Franja de foco: marca la posición del frente del tambor. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-1/2 h-[4.5rem] -translate-y-1/2 border-y border-[#eca8d6]/15 bg-[linear-gradient(90deg,rgba(236,168,214,0.07),transparent_70%)] md:h-28"
+            />
+            <div
+              className="absolute inset-0 [transform-style:preserve-3d]"
+              style={{ transform: `translateZ(${-260}px)` }}
+            >
+              {members.map((m, i) => (
+                <div
+                  key={m.id}
+                  ref={(el) => {
+                    nameRefs.current[i] = el;
+                  }}
+                  className="absolute inset-x-0 top-1/2 flex items-baseline gap-4 [backface-visibility:hidden] will-change-transform md:gap-8"
+                >
+                  <span className="font-mono text-xs tabular-nums opacity-60">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-display text-[2.4rem] font-semibold leading-none tracking-tight sm:text-6xl lg:text-[5.4rem]">
+                    {m.link ? (
+                      <a href={m.link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                        {m.name}
+                      </a>
+                    ) : (
+                      m.name
+                    )}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Ficha de la persona del frente. */}
+          <div className="relative lg:col-span-5">
+            <div className="absolute -left-6 top-0 hidden h-full w-px bg-white/10 lg:block" aria-hidden>
+              <span ref={barRef} className="absolute inset-0 origin-top bg-[#eca8d6]" style={{ transform: "scaleY(0)" }} />
+            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={member.id}
+                initial={{ opacity: 0, y: 24, rotateY: -12, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, rotateY: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -18, rotateY: 10, filter: "blur(8px)" }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                style={{ transformPerspective: 900 }}
+                className="overflow-hidden rounded-2xl border border-white/12 bg-[#0a0a0c]/90 shadow-[0_30px_90px_-40px_rgba(236,168,214,0.45)]"
+              >
+                <div className="relative h-40 w-full overflow-hidden sm:h-56 md:h-64">
+                  <TeamPreviewMedia member={member} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-black/10 to-transparent" />
+                  <span className="absolute bottom-3 right-4 font-mono text-[11px] tabular-nums text-white/55">
+                    {String(active + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
+                  </span>
+                </div>
+                <div className="p-5 md:p-7">
+                  <p className="text-[10.5px] font-medium uppercase tracking-[0.22em] text-[#eca8d6]">
+                    {member.role}
+                  </p>
+                  <p className="mt-2 font-display text-2xl font-semibold leading-tight text-white md:text-3xl">
+                    {member.name}
+                  </p>
+                  <p className="mt-3 text-[14px] leading-relaxed text-white/65 md:text-[15px]">{member.bio}</p>
+                  {member.link && (
+                    <a
+                      href={member.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#eca8d6] transition-colors hover:text-white"
+                    >
+                      Conocer más
+                      <ArrowUpRight size={16} />
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

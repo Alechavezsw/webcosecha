@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Radio, Compass, Cpu } from 'lucide-react';
 import { assetOpt } from '../lib/asset';
 import SectionKicker from './SectionKicker';
+import TruckScene from './TruckScene';
 
 interface Stat {
   label: string;
@@ -119,143 +120,7 @@ function AnimatedStatValue({
   );
 }
 
-/** UID del modelo en Sketchfab (camión de acarreo minero). */
-const SKETCHFAB_UID = 'dcf8bedc3b4848bfa0ff4fcaf2c697de';
-const SKETCHFAB_API_SRC = 'https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js';
-
-/** Tono de roca de la foto de fondo, en 0-1, para que el visor no corte en gris. */
-const TRUCK_BG_COLOR = [0.15, 0.132, 0.112];
-/** El mismo tono en CSS, para los overlays que van sobre el visor. */
-const TRUCK_BG_CSS = `rgb(${TRUCK_BG_COLOR.map((c) => Math.round(c * 255)).join(',')})`;
-
-/** Carga única del script del visor; las siguientes llamadas reusan la promesa. */
-let sketchfabApiPromise: Promise<void> | null = null;
-function loadSketchfabApi(): Promise<void> {
-  if (typeof window === 'undefined') return Promise.resolve();
-  if (sketchfabApiPromise) return sketchfabApiPromise;
-  sketchfabApiPromise = new Promise<void>((resolve, reject) => {
-    if ((window as unknown as { Sketchfab?: unknown }).Sketchfab) return resolve();
-    const script = document.createElement('script');
-    script.src = SKETCHFAB_API_SRC;
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('sketchfab-api'));
-    document.head.appendChild(script);
-  });
-  return sketchfabApiPromise;
-}
-
 const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
-  const modelSlotRef = useRef<HTMLDivElement>(null);
-  const modelFrameRef = useRef<HTMLIFrameElement>(null);
-  const [modelVisible, setModelVisible] = useState(false);
-
-  useEffect(() => {
-    const slot = modelSlotRef.current;
-    if (!slot || modelVisible) return;
-    if (typeof IntersectionObserver === 'undefined') {
-      setModelVisible(true);
-      return;
-    }
-    // 400px de margen: llega montado justo antes de que el usuario lo vea.
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setModelVisible(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin: '400px 0px' },
-    );
-    io.observe(slot);
-    return () => io.disconnect();
-  }, [modelVisible]);
-
-  /**
-   * El embed por querystring ignora `transparent=1`: este modelo trae su propio
-   * fondo gris de escena y tapaba la foto minera. La API del visor sí lo puede
-   * apagar (`setBackground({ transparent: true })`), y así el camión queda
-   * sólido y recortado sobre la foto.
-   */
-  useEffect(() => {
-    if (!modelVisible) return;
-    const iframe = modelFrameRef.current;
-    if (!iframe) return;
-    let cancelled = false;
-
-    loadSketchfabApi()
-      .then(() => {
-        if (cancelled) return;
-        const Sketchfab = (window as unknown as { Sketchfab?: new (v: string, el: HTMLIFrameElement) => { init: (uid: string, opts: Record<string, unknown>) => void } }).Sketchfab;
-        if (!Sketchfab) return;
-
-        new Sketchfab('1.12.1', iframe).init(SKETCHFAB_UID, {
-          autostart: 1,
-          autospin: 0.2,
-          scrollwheel: 0,
-          preload: 0,
-          transparent: 1,
-          dnt: 1,
-          ui_animations: 0,
-          ui_infos: 0,
-          ui_stop: 0,
-          ui_inspector: 0,
-          ui_watermark_link: 0,
-          ui_watermark: 0,
-          ui_hint: 0,
-          ui_help: 0,
-          ui_settings: 0,
-          ui_vr: 0,
-          ui_fullscreen: 0,
-          ui_annotations: 0,
-          ui_controls: 0,
-          success: (api: {
-            start: () => void;
-            addEventListener: (ev: string, cb: () => void) => void;
-            setBackground: (opts: Record<string, unknown>) => void;
-          }) => {
-            api.start();
-            // El gris claro viene con la escena del modelo: `transparent=1` por
-            // querystring no lo saca. Desde la API sí se puede pisar, así que le
-            // ponemos el tono de la roca de la foto de fondo y el recuadro deja
-            // de leerse como una caja blanca.
-            const clearBg = () => {
-              try {
-                api.setBackground({ transparent: true });
-                api.setBackground({ color: TRUCK_BG_COLOR });
-              } catch {
-                /* el visor todavía no aceptó la llamada */
-              }
-            };
-            api.addEventListener('viewerready', () => {
-              clearBg();
-              [200, 800, 2000].forEach((ms) => window.setTimeout(clearBg, ms));
-            });
-          },
-          error: () => {},
-        });
-      })
-      .catch(() => {});
-
-    return () => {
-      cancelled = true;
-    };
-  }, [modelVisible]);
-
-  /**
-   * Las opciones del visor viajan por la API (ver el efecto de arriba), no por
-   * querystring. De ahí que `scrollwheel=0` (no robar la rueda del mouse),
-   * `autospin` (gira solo) y `preload=0` vivan en ese `init`.
-   */
-
-  /** Atributos que React no tipa (políticas de permisos del embed). */
-  const embedPolicyAttrs = {
-    'xr-spatial-tracking': 'true',
-    'execution-while-out-of-viewport': 'true',
-    'execution-while-not-rendered': 'true',
-    'web-share': 'true',
-  } as unknown as React.IframeHTMLAttributes<HTMLIFrameElement>;
-
   return (
     <section className="reveal-section stats-container relative flex min-h-[950px] flex-col justify-between overflow-hidden border-y border-[#ffb800]/10 bg-[#050607] py-20 md:py-28 xl:min-h-[1050px]">
       
@@ -295,57 +160,14 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
         {/* Halo ámbar detrás del camión: lo recorta del fondo y le da un piso
             de luz, en vez de dejarlo flotando en negro. */}
         <div
-          className="pointer-events-none absolute inset-0 z-[3] bg-[radial-gradient(ellipse_46%_38%_at_50%_58%,rgba(255,184,0,0.16),transparent_70%)] xl:bg-[radial-gradient(ellipse_30%_40%_at_74%_55%,rgba(255,184,0,0.2),transparent_70%)]"
+          className="pointer-events-none absolute inset-0 z-[3] bg-[radial-gradient(ellipse_46%_38%_at_50%_58%,rgba(255,184,0,0.16),transparent_70%)] xl:bg-[radial-gradient(ellipse_32%_34%_at_72%_62%,rgba(255,184,0,0.2),transparent_70%)]"
           aria-hidden
         />
 
-        {/* Camión 3D sólido y recortado sobre la foto: el fondo del visor lo
-            apaga la API en `setBackground({ transparent: true })`.
-            Ocupa un recuadro acotado, centrado abajo en mobile y corrido a la
-            derecha en desktop para dejarle aire al texto de la izquierda. */}
-        <div
-          ref={modelSlotRef}
-          className="absolute bottom-[6%] left-1/2 z-[4] h-[46%] w-[86%] -translate-x-1/2 pointer-events-none md:h-[52%] md:w-[64%] xl:bottom-[10%] xl:left-auto xl:right-[2%] xl:h-[58%] xl:w-[46%] xl:translate-x-0"
-          style={{
-            // Difumina el borde del visor para que el recuadro no se recorte
-            // contra la foto: el camión aparece dentro de la escena, no encima.
-            maskImage:
-              'radial-gradient(ellipse 78% 76% at 50% 52%, #000 58%, transparent 100%)',
-            WebkitMaskImage:
-              'radial-gradient(ellipse 78% 76% at 50% 52%, #000 58%, transparent 100%)',
-          }}
-        >
-          {modelVisible && (
-            <iframe
-              ref={modelFrameRef}
-              title="Camión minero de acarreo en 3D"
-              frameBorder="0"
-              allow="autoplay; xr-spatial-tracking"
-              {...embedPolicyAttrs}
-              className="h-full w-full"
-              // Decorativo: sin puntero, la rueda y el touch nunca quedan
-              // atrapados en el visor.
-              style={{ pointerEvents: 'none' }}
-            />
-          )}
-
-          {/* Franja inferior: el visor deja fijos el cartel "click & hold to
-              rotate" y su insignia de marca abajo a la izquierda, y ni la API ni
-              los flags `ui_hint` / `ui_watermark` los apagan en esta cuenta. El
-              degradé los cubre con el mismo tono del visor y, de paso, funde las
-              ruedas contra el piso en vez de cortarlas. */}
-          {modelVisible && (
-            <div
-              className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[32%]"
-              style={{
-                // Opaco hasta bien arriba del cartel (que aparece cerca del 85 %
-                // de la altura del visor) y recién ahí se funde.
-                background: `linear-gradient(to top, ${TRUCK_BG_CSS} 0%, ${TRUCK_BG_CSS} 72%, transparent 100%)`,
-              }}
-              aria-hidden
-            />
-          )}
-        </div>
+        {/* Camión 3D propio (Blender → three.js): entra andando con el scroll,
+            gira y prende los faros. Ocupa toda la sección para poder cruzarla;
+            en desktop termina a la derecha, dejándole aire al texto. */}
+        <TruckScene className="absolute inset-0 z-[4] pointer-events-none" />
       </div>
 
       {/* Decorative Scanlines Overlay */}
@@ -366,17 +188,16 @@ const Stats: React.FC<StatsProps> = ({ stats, onMouseEnter, onMouseLeave }) => {
           </div>
         </div>
         <div className="text-[8px] font-mono tracking-[0.5em] text-[#ffb800]/30 uppercase rotate-90 origin-center -translate-y-12">
-          MODEL // CAT.797F
+          UNIDAD // ACARREO
         </div>
       </div>
 
-      {/* Chapa del modelo. Antes decía "arrastrá para rotar", pero el visor ya
-          no recibe puntero: giraba solo y capturaba la rueda del mouse. */}
+      {/* Chapa del modelo. */}
       <div className="absolute right-10 top-24 z-20 hidden select-none items-center gap-2.5 rounded border border-[#ffb800]/15 bg-black/45 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest text-[#ffb800]/50 backdrop-blur-sm md:flex pointer-events-none">
         <Radio className="h-3.5 w-3.5 text-[#ffb800]/70" />
-        <span>Escaneo 3D · Camión de acarreo</span>
+        <span>Modelo 3D · Camión de acarreo</span>
         <span className="h-3 w-px bg-[#ffb800]/20" />
-        <span className="text-[#ffb800]/70">360°</span>
+        <span className="text-[#ffb800]/70">En ruta</span>
       </div>
 
       {/* Top Telemetry Header */}

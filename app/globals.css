@@ -1047,6 +1047,51 @@ html.lenis body {
   clip-path: polygon(0 2.6vw, 100% 0, 100% calc(100% - 2.6vw), 0 100%);
 }
 
+/* ── Entradas atadas al scroll ──────────────────────────────
+   La hoja clara sube y se expande hasta cubrir la pantalla, como una
+   tarjeta que se abre; el contenido de cada banda llega con un leve
+   ascenso. Sólo CSS (scroll-driven animations): donde no hay soporte o
+   con movimiento reducido, todo queda en su lugar sin animar.
+   Van sobre `scale` / `translate` sueltos para no pisar los `transform`
+   que ya escriben el paralaje y los componentes fijados. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cc-band-bone > .cc-band-fx {
+      animation: cc-sheet-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 90%;
+    }
+
+    .cc-band > section {
+      animation: cc-band-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+
+@keyframes cc-sheet-in {
+  from {
+    scale: 0.86 0.92;
+    translate: 0 9vh;
+  }
+  to {
+    scale: 1 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes cc-band-rise {
+  from {
+    translate: 0 7vh;
+    opacity: 0.35;
+  }
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
 /* ── WELL · pozo con luz cenital ────────────────────────────
    Paredes negras, haz de luz que cae desde el borde superior y el
    contenido flotando en el fondo del pozo. */

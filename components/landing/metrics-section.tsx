@@ -1,6 +1,7 @@
 "use client";
 
 import { DISENO_STORIES_IMAGES } from "@/lib/diseno-stories-images";
+import { StoriesTunnel } from "@/components/landing/stories-tunnel";
 import { useEffect, useState, useRef } from "react";
 import {
   Dialog,
@@ -408,6 +409,17 @@ export function MetricsSection({ variant = "ai" }: { variant?: MetricsSectionVar
   const [parallaxY, setParallaxY] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const graphRef = useRef<HTMLDivElement>(null);
+  // Con movimiento reducido el túnel fijado no tiene sentido: queda la cinta.
+  const [tunnel, setTunnel] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setTunnel(!mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  const immersive = isContent && tunnel;
 
   useEffect(() => {
     setTime(new Date());
@@ -449,50 +461,60 @@ export function MetricsSection({ variant = "ai" }: { variant?: MetricsSectionVar
     };
   }, []);
 
-  return (
-    <section ref={sectionRef} className="cc-aura cc-aura-gold relative py-32 lg:py-40 overflow-hidden">
-      <GridBackground />
-
-      <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
-        <div className="grid lg:grid-cols-12 gap-8 mb-20 lg:mb-32">
-          <div className="lg:col-span-8 lg:col-start-1">
-            <div
-              className={`mb-6 flex items-center gap-4 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:duration-300 ${
-                isVisible ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"
-              }`}
-              style={{ transitionDelay: isVisible ? "40ms" : "0ms" }}
-            >
-              <span className="flex items-center gap-2 rounded-md bg-[#eca8d6]/10 px-3 py-1 font-mono text-xs text-[#eca8d6] shadow-[0_0_24px_-8px_rgba(236,168,214,0.35)]">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-[#eca8d6]" />
-                {isContent ? "EN PRODUCCIÓN" : "LIVE"}
-              </span>
-              <span className="font-mono text-sm text-muted-foreground tabular-nums">
-                {time
-                  ? isContent
-                    ? `${time.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} ART`
-                    : `${time.toLocaleTimeString("en-GB")} UTC`
-                  : ""}
-              </span>
-            </div>
-
-            <h2 className={`max-w-3xl text-3xl font-display tracking-tight leading-[1.05] transition-[opacity,transform,filter] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:blur-none sm:text-4xl md:text-5xl lg:text-6xl ${
-              isVisible ? "translate-y-0 opacity-100 blur-0" : "translate-y-10 opacity-0 blur-[10px]"
-            }`}
-              style={{ transitionDelay: isVisible ? "120ms" : "0ms" }}
-            >
-              <span className="block w-fit cursor-default text-foreground hover:font-bold">
-                {isContent ? "Generamos contenido" : "Números en vivo"}
-              </span>
-              <span className="block w-fit cursor-default text-muted-foreground hover:font-bold hover:text-foreground">
-                {isContent
-                  ? "que tu marca publica cada día."
-                  : "de nuestros sistemas con IA corriendo."}
-              </span>
-            </h2>
-          </div>
+  const header = (
+    <div className="grid lg:grid-cols-12 gap-8">
+      <div className="lg:col-span-8 lg:col-start-1">
+        <div
+          className={`mb-6 flex items-center gap-4 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:duration-300 ${
+            isVisible ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"
+          }`}
+          style={{ transitionDelay: isVisible ? "40ms" : "0ms" }}
+        >
+          <span className="flex items-center gap-2 rounded-md bg-[#eca8d6]/10 px-3 py-1 font-mono text-xs text-[#eca8d6] shadow-[0_0_24px_-8px_rgba(236,168,214,0.35)]">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[#eca8d6]" />
+            {isContent ? "EN PRODUCCIÓN" : "LIVE"}
+          </span>
+          <span className="font-mono text-sm text-muted-foreground tabular-nums">
+            {time
+              ? isContent
+                ? `${time.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} ART`
+                : `${time.toLocaleTimeString("en-GB")} UTC`
+              : ""}
+          </span>
         </div>
 
+        <h2 className={`max-w-3xl text-3xl font-display tracking-tight leading-[1.05] transition-[opacity,transform,filter] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:blur-none sm:text-4xl md:text-5xl lg:text-6xl ${
+          isVisible ? "translate-y-0 opacity-100 blur-0" : "translate-y-10 opacity-0 blur-[10px]"
+        }`}
+          style={{ transitionDelay: isVisible ? "120ms" : "0ms" }}
+        >
+          <span className="block w-fit cursor-default text-foreground hover:font-bold">
+            {isContent ? "Generamos contenido" : "Números en vivo"}
+          </span>
+          <span className="block w-fit cursor-default text-muted-foreground hover:font-bold hover:text-foreground">
+            {isContent
+              ? "que tu marca publica cada día."
+              : "de nuestros sistemas con IA corriendo."}
+          </span>
+        </h2>
+      </div>
+    </div>
+  );
+
+  return (
+    <section
+      ref={sectionRef}
+      className={`cc-aura cc-aura-gold relative overflow-x-clip ${immersive ? "pb-32 lg:pb-40" : "overflow-hidden py-32 lg:py-40"}`}
+    >
+      <GridBackground />
+
+      {immersive && <StoriesTunnel images={DISENO_STORIES_IMAGES} header={header} />}
+
+      <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
+        {!immersive && <div className="mb-20 lg:mb-32">{header}</div>}
+
         {/* Organic graph image — parallax inmersivo */}
+        {!immersive && (
         <div
           ref={graphRef}
           className={`relative mb-0 w-full overflow-hidden rounded-2xl border border-white/[0.06] shadow-[0_32px_80px_-24px_rgba(0,0,0,0.75)] transition-[opacity,transform] duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:duration-300 ${
@@ -534,6 +556,7 @@ export function MetricsSection({ variant = "ai" }: { variant?: MetricsSectionVar
             </>
           )}
         </div>
+        )}
 
         {/* Metrics grid */}
         <div className="grid lg:grid-cols-3 gap-6">

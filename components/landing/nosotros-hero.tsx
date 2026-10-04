@@ -2,15 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Nosotros3dCover } from "./nosotros-3d-cover";
 
@@ -28,119 +23,168 @@ const HERO_CHIPS = [
 
 export function NosotrosHero({ className }: { className?: string }) {
   const reduce = useReducedMotion();
+  const trackRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
+  const veilRef = useRef<HTMLDivElement>(null);
+
+  // El relato del hero va en dos tiempos sobre la oficina fijada: primero el
+  // título grande, después el detalle y las acciones. Todo atado al scroll.
+  useEffect(() => {
+    if (reduce) return;
+    const track = trackRef.current;
+    if (!track) return;
+    const clamp = (x: number) => Math.min(1, Math.max(0, x));
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = track.getBoundingClientRect();
+      const total = r.height - window.innerHeight;
+      const p = total > 0 ? clamp(-r.top / total) : 0;
+      const title = titleRef.current;
+      if (title) {
+        const out = clamp((p - 0.3) / 0.2);
+        title.style.opacity = (1 - out).toFixed(3);
+        title.style.transform = `translate3d(0, ${(-out * 60).toFixed(1)}px, 0) scale(${(1 - out * 0.06).toFixed(4)})`;
+        title.style.filter = out > 0.01 ? `blur(${(out * 8).toFixed(1)}px)` : "";
+      }
+      const body = bodyRef.current;
+      if (body) {
+        const inn = clamp((p - 0.42) / 0.2);
+        body.style.opacity = inn.toFixed(3);
+        body.style.transform = `translate3d(0, ${((1 - inn) * 50).toFixed(1)}px, 0)`;
+        body.style.pointerEvents = inn > 0.5 ? "auto" : "none";
+      }
+      if (hintRef.current) hintRef.current.style.opacity = clamp(1 - p / 0.08).toFixed(3);
+      // Cerca del final la escena se oscurece para que el detalle se lea limpio.
+      if (veilRef.current) veilRef.current.style.opacity = (0.1 + clamp((p - 0.38) / 0.25) * 0.22).toFixed(3);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [reduce]);
 
   return (
-    <section className={cn("relative pt-24 pb-20 md:pt-32 md:pb-28", className)}>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(236,168,214,0.18),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_100%_60%,rgba(124,58,237,0.12),transparent_45%)]" />
-      <div className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:56px_56px]" />
-
-      <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12">
-        {/* Banda visual: ocupa todo el ancho del contenedor y se ve claramente */}
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 16 }}
-          animate={reduce ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, ease: easePremium }}
-          className="relative aspect-[20/12] w-full overflow-hidden rounded-2xl border border-white/15 shadow-[0_32px_100px_-48px_rgba(0,0,0,0.95)] sm:aspect-[2.2/1] md:aspect-[2.5/1] md:min-h-[260px] lg:min-h-[300px]"
-        >
-          {/* Componente 3D interactivo vinculado al scroll global */}
-          <Nosotros3dCover />
-
-          {/* Imagen de fondo / fallback elegante para SEO y cuando WebGL está cargando/no disponible */}
+    <section
+      ref={trackRef}
+      className={cn("relative", reduce ? "min-h-[100svh]" : "h-[260vh]", className)}
+    >
+      <div className="sticky top-0 h-[100svh] overflow-hidden">
+        {/* La oficina ocupa toda la pantalla: la cámara la recorre mientras se scrollea. */}
+        <div className="absolute inset-0">
+          <Nosotros3dCover trackRef={trackRef} />
           <Image
             src={HERO_IMAGE_SRC}
             alt="Equipo y trabajo creativo en Cosecha Creativa, San Juan"
             fill
             priority
-            sizes="(max-width: 1200px) 100vw, 1200px"
-            className="object-cover object-[center_28%] pointer-events-none -z-10"
+            sizes="100vw"
+            className="pointer-events-none -z-10 object-cover object-[center_28%]"
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/35 to-transparent md:from-[#050506]/90 md:via-black/25 z-10" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent z-10" />
-          <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10 z-10" />
-        </motion.div>
+        </div>
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_70%_at_50%_-10%,rgba(236,168,214,0.16),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-[#050506] via-[#050506]/60 to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-[60%] bg-gradient-to-r from-black/55 to-transparent" />
+        <div ref={veilRef} className="pointer-events-none absolute inset-0 bg-[#050506]" style={{ opacity: 0.15 }} />
 
-        {/* Tarjeta superpuesta (vidrio) */}
-        <Card
-          className={cn(
-            "relative z-20 -mt-10 gap-0 overflow-hidden border border-white/15 bg-[#070709]/90 py-0 text-white shadow-[0_28px_80px_-40px_rgba(0,0,0,0.85)] backdrop-blur-xl sm:-mt-14 md:-mt-20 md:mx-auto md:max-w-[920px]",
-          )}
+        {/* Tiempo 1: el título sobre la sala. */}
+        <div
+          ref={titleRef}
+          className="absolute inset-x-0 bottom-[14svh] z-10 will-change-transform"
         >
-          <CardHeader className="space-y-4 px-6 pb-2 pt-8 md:px-10 md:pt-10 lg:px-12">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.35em] text-[#eca8d6]/90">
-                Nosotros
-              </p>
-              <span className="h-px w-8 bg-[#eca8d6]/35" aria-hidden />
-              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-white/35">
-                San Juan, Argentina
-              </p>
-            </div>
-            <h1 className="font-display text-3xl font-semibold leading-[1.08] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[3.25rem]">
-              Innovación y tecnología para tu negocio
-            </h1>
-            <p className="max-w-xl pt-1 text-sm text-white/55 md:text-[15px]">
-              Agencia de marketing digital, desarrollo e IA aplicada.
-            </p>
-          </CardHeader>
-
-          <CardContent className="space-y-6 px-6 pb-2 pt-1 md:px-10 lg:px-12">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12">
             <motion.div
-              initial={reduce ? false : { opacity: 0, y: 12 }}
+              initial={reduce ? false : { opacity: 0, y: 24 }}
               animate={reduce ? undefined : { opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.08, ease: easePremium }}
-              className="max-w-2xl text-lg leading-relaxed text-white/75 md:text-xl"
+              transition={{ duration: 0.9, ease: easePremium }}
             >
-              <p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.35em] text-[#eca8d6]/90">
+                  Nosotros
+                </p>
+                <span className="h-px w-8 bg-[#eca8d6]/35" aria-hidden />
+                <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-white/45">
+                  San Juan, Argentina · desde 2003
+                </p>
+              </div>
+              <h1 className="mt-5 max-w-4xl font-display text-[2.7rem] font-semibold leading-[0.95] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-[5.6rem]">
+                Innovación y tecnología
+                <span className="block italic text-[#eca8d6]">para tu negocio</span>
+              </h1>
+              <p className="mt-5 max-w-xl text-sm text-white/60 md:text-base">
+                Agencia de marketing digital, desarrollo e IA aplicada.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Tiempo 2: quiénes somos y qué hacer ahora. */}
+        <div
+          ref={bodyRef}
+          className="absolute inset-0 z-10 flex items-center will-change-transform"
+          style={reduce ? undefined : { opacity: 0, pointerEvents: "none" }}
+        >
+          <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-12">
+            <div className="max-w-2xl">
+              <p className="font-display text-2xl leading-snug text-white/90 sm:text-3xl md:text-[2.4rem] md:leading-[1.15]">
                 Empezamos a hacer sitios web en 2003, mucho antes de que en San Juan se hablara de
-                marketing digital. Hoy somos un equipo de seis que diseña, desarrolla, comunica y
-                automatiza — todo en la misma casa, y todo medido.
+                marketing digital.
               </p>
-            </motion.div>
-
-            <motion.ul
-              initial={reduce ? false : { opacity: 0, y: 10 }}
-              animate={reduce ? undefined : { opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.14, ease: easePremium }}
-              className="flex flex-wrap gap-2"
-            >
-              {HERO_CHIPS.map((chip) => (
-                <li
-                  key={chip}
-                  className="rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.18em] text-white/50"
+              <p className="mt-5 text-lg leading-relaxed text-white/65 md:text-xl">
+                Hoy somos un equipo de seis que diseña, desarrolla, comunica y automatiza — todo en
+                la misma casa, y todo medido.
+              </p>
+              <ul className="mt-7 flex flex-wrap gap-2">
+                {HERO_CHIPS.map((chip) => (
+                  <li
+                    key={chip}
+                    className="rounded-full border border-white/15 bg-black/30 px-3.5 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.18em] text-white/60 backdrop-blur-sm"
+                  >
+                    {chip}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-9 flex flex-wrap gap-4">
+                <Button
+                  asChild
+                  className="h-auto min-h-11 rounded-full border-0 bg-[#eca8d6] px-7 py-3.5 text-base font-semibold text-gray-900 shadow-[0_20px_60px_-28px_rgba(236,168,214,0.55)] hover:bg-[#f0bcdf]"
                 >
-                  {chip}
-                </li>
-              ))}
-            </motion.ul>
-          </CardContent>
+                  <Link href="/#contacto">
+                    Hablar con el equipo
+                    <ArrowUpRight className="h-5 w-5" aria-hidden />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-auto min-h-11 rounded-full border-white/15 bg-white/5 px-7 py-3.5 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/10"
+                >
+                  <Link href="/servicios">Ver servicios</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <CardFooter className="flex flex-wrap gap-4 border-t border-white/10 bg-black/20 px-6 py-8 md:px-10 lg:px-12">
-            <motion.div
-              initial={reduce ? false : { opacity: 0 }}
-              animate={reduce ? undefined : { opacity: 1 }}
-              transition={{ duration: 0.55, delay: 0.12 }}
-              className="flex flex-wrap gap-4"
-            >
-              <Button
-                asChild
-                className="h-auto min-h-11 rounded-full border-0 bg-[#eca8d6] px-7 py-3.5 text-base font-semibold text-gray-900 shadow-[0_20px_60px_-28px_rgba(236,168,214,0.55)] hover:bg-[#f0bcdf]"
-              >
-                <Link href="/#contacto">
-                  Hablar con el equipo
-                  <ArrowUpRight className="h-5 w-5" aria-hidden />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="h-auto min-h-11 rounded-full border-white/15 bg-white/5 px-7 py-3.5 text-base font-semibold text-white hover:bg-white/10"
-              >
-                <Link href="/servicios">Ver servicios</Link>
-              </Button>
-            </motion.div>
-          </CardFooter>
-        </Card>
+        {/* Invitación a scrollear: se apaga apenas empieza el recorrido. */}
+        {!reduce && (
+          <div
+            ref={hintRef}
+            className="pointer-events-none absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-white/45"
+          >
+            Recorré la casa
+            <span className="h-8 w-px animate-pulse bg-gradient-to-b from-[#eca8d6] to-transparent" />
+          </div>
+        )}
       </div>
     </section>
   );

@@ -239,7 +239,7 @@ export function NosotrosPageClient() {
   const reduce = useReducedMotion();
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-[#050506] text-white antialiased">
+    <main className="relative min-h-screen overflow-x-clip bg-[#050506] text-white antialiased">
       <Navigation />
 
       {/* Campo bioluminiscente 3D (esporas + monarcas) detrás de TODA la página,

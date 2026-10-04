@@ -91,8 +91,10 @@ export function NosotrosSectionShell({
 }) {
   const v = VARIANTS[variant];
 
+  // overflow: clip recorta igual que hidden pero no crea contenedor de scroll:
+  // así las secciones pueden fijar contenido con position: sticky.
   return (
-    <section className={cn("relative overflow-hidden py-16 md:py-24", sectionClassName)}>
+    <section className={cn("relative [overflow:clip] py-16 md:py-24", sectionClassName)}>
       <div className={cn("pointer-events-none absolute inset-0", v.base)} aria-hidden />
       {v.glows.map((g, i) => (
         <div key={i} className={cn("pointer-events-none absolute inset-0", g)} aria-hidden />

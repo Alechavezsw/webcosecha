@@ -12,14 +12,23 @@ import { getWhatsAppHref } from "@/lib/whatsapp";
 
 // === FUNCIONES MATEMÁTICAS Y CONSTANTES GLOBALES ===
 const colors = {
-    sky: 0xffb7b2,         
-    ambient: 0xffe4e1,     
-    sun: 0xffaa00,         
-    ground: 0x8DA354,      
+    sky: 0xffb7b2,
+    ambient: 0xffe4e1,
+    sun: 0xffaa00,
+    ground: 0x6a9a4c, // verde pradera (0x8DA354 se veía mostaza de noche)
     mountain: 0x5c7247,    // Mossy, earthy green-brown rock
-    pollen: 0xffeedd,      
+    pollen: 0xffeedd,
     rays: 0xfff0dd         // Warm golden sunset rays
 };
+
+// Colores de la transición noche → día: se interpolan cada cuadro, así que
+// van creados una sola vez (antes eran seis Color nuevos por frame).
+const TWILIGHT_FOG = new THREE.Color(0x32254f);
+const DAY_FOG = new THREE.Color(0xaeddfa);
+const TWILIGHT_SUN = new THREE.Color(colors.sun);
+const DAY_SUN = new THREE.Color(0xfff7e6);
+const TWILIGHT_RAY = new THREE.Color(0xffebd2);
+const DAY_RAY = new THREE.Color(0xffffff);
 
 function getPathX(z: number) {
     return Math.sin(z * 0.04) * 12 + Math.cos(z * 0.015) * 15;
@@ -27,13 +36,13 @@ function getPathX(z: number) {
 
 function getTerrainHeight(worldX: number, worldZ: number) {
     const localX = worldX;
-    const localZ = worldZ + 300; 
+    const localZ = worldZ + 300;
     const pathX = getPathX(worldZ);
 
-    let y = Math.sin(localX * 0.1) * 2 + 
+    let y = Math.sin(localX * 0.1) * 2 +
             Math.cos(localZ * 0.08) * 3 +
             Math.sin(localX * 0.05 + localZ * 0.05) * 4;
-    
+
     const distanceToPath = Math.abs(worldX - pathX);
     if (distanceToPath < 16) {
         y = y * (distanceToPath / 16);
@@ -415,20 +424,20 @@ function generateRealisticPeak(base: number, height: number, mountainMat: THREE.
     // Mayor resolución geométrica (24x24) para contornos redondeados y suaves, evitando aspecto de papel picado
     const mainGeom = new THREE.ConeGeometry(base, height, 24, 24);
     mainGeom.translate(0, height / 2, 0);
-    
+
     const posAttr = mainGeom.attributes.position;
     const tempV = new THREE.Vector3();
     for (let j = 0; j < posAttr.count; j++) {
         tempV.fromBufferAttribute(posAttr, j);
         const yRatio = tempV.y / height; // 0 a 1
-        
+
         if (yRatio > 0 && yRatio < 1) {
             const angle = Math.atan2(tempV.z, tempV.x);
             // Ruido fractal para dar relieve rocoso irregular
             const ridgeNoise = Math.sin(angle * 5) * (base * 0.12) * (1 - yRatio) +
                                Math.cos(angle * 11) * (base * 0.04) * (1 - yRatio) +
                                Math.sin(tempV.y * 0.2) * (base * 0.06) * (1 - yRatio);
-                               
+
             const currentRadius = Math.sqrt(tempV.x * tempV.x + tempV.z * tempV.z);
             if (currentRadius > 0) {
                 const newRadius = currentRadius + ridgeNoise;
@@ -441,12 +450,12 @@ function generateRealisticPeak(base: number, height: number, mountainMat: THREE.
         posAttr.setXYZ(j, tempV.x, tempV.y, tempV.z);
     }
     mainGeom.computeVertexNormals();
-    
+
     // Variación aleatoria de tonalidad musgosa/rocosa para mayor realismo natural
     const variationColor = new THREE.Color(colors.mountain);
     variationColor.offsetHSL(
-        (Math.random() - 0.5) * 0.05, 
-        (Math.random() - 0.5) * 0.08, 
+        (Math.random() - 0.5) * 0.05,
+        (Math.random() - 0.5) * 0.08,
         (Math.random() - 0.5) * 0.06
     );
     const customMat = new THREE.MeshStandardMaterial({
@@ -465,9 +474,9 @@ function generateRealisticPeak(base: number, height: number, mountainMat: THREE.
     const snowNormAttr = snowGeom.attributes.normal;
     const snowV = new THREE.Vector3();
     const snowN = new THREE.Vector3();
-    
+
     const colorsArray = new Float32Array(snowPosAttr.count * 3);
-    
+
     for (let j = 0; j < snowPosAttr.count; j++) {
         snowV.fromBufferAttribute(snowPosAttr, j);
         if (snowNormAttr) {
@@ -475,13 +484,13 @@ function generateRealisticPeak(base: number, height: number, mountainMat: THREE.
         } else {
             snowN.set(0, 1, 0);
         }
-        
+
         const yRatio = snowV.y / height;
         const angle = Math.atan2(snowV.z, snowV.x);
-        
+
         // Línea de nieve ondulada natural (elevada al 80% del pico para hacer la nieve mucho más pequeña y discreta)
         const wavySnowline = 0.80 + Math.sin(angle * 5) * 0.03 + Math.cos(angle * 11) * 0.015;
-        
+
         if (yRatio < wavySnowline) {
             // Vértice por debajo de la línea de nieve: lo colapsamos en la punta superior (peak)
             // para evitar que se estiren caras hacia el centro y queden expuestas fuera de la roca.
@@ -489,7 +498,7 @@ function generateRealisticPeak(base: number, height: number, mountainMat: THREE.
             snowV.z = 0;
             snowV.y = height;
             snowPosAttr.setXYZ(j, snowV.x, snowV.y, snowV.z);
-            
+
             colorsArray[j * 3] = variationColor.r;
             colorsArray[j * 3 + 1] = variationColor.g;
             colorsArray[j * 3 + 2] = variationColor.b;
@@ -498,42 +507,42 @@ function generateRealisticPeak(base: number, height: number, mountainMat: THREE.
             // de alta fidelidad, eliminando la forma puntiaguda del cono.
             const rAtSnowline = base * (1.0 - wavySnowline);
             const yStart = wavySnowline * height;
-            
+
             // Altura de abombamiento superior para redondear el pico
             const domeBulge = base * 0.08 + 0.3;
             const yEnd = height + domeBulge;
-            
+
             // Mapeamos el ratio vertical dentro del copón de nieve (0 a 1)
             const s = (snowV.y - yStart) / (height - yStart);
             const t = Math.min(1.0, Math.max(0.0, s));
-            
+
             // Espesor de nieve física (más grueso en el centro del domo para darle aspecto regordete y tridimensional)
-            const maxThickness = base * 0.02 + 0.12; 
+            const maxThickness = base * 0.02 + 0.12;
             const thickness = 0.08 + Math.sin(t * Math.PI) * maxThickness;
-            
+
             // Ecuación de elipsoide/cúpula redondeada para eliminar el vértice puntiagudo del cono
             const rNew = rAtSnowline * Math.sqrt(1.0 - t * t) + thickness;
             const yNew = yStart + t * (yEnd - yStart);
-            
+
             snowV.x = Math.cos(angle) * rNew;
             snowV.z = Math.sin(angle) * rNew;
             snowV.y = yNew;
-            
+
             snowPosAttr.setXYZ(j, snowV.x, snowV.y, snowV.z);
-            
+
             // Paleta cromática premium con degradados atardecer y sombras:
             const snowTopColor = new THREE.Color(0xfffaf4);    // Blanco cálido sol poniente
             const snowShadowColor = new THREE.Color(0xdbe6f5); // Sombra azul celeste muy suave de ventisquero
-            
+
             const snowColor = new THREE.Color().lerpColors(snowShadowColor, snowTopColor, t);
             const finalColor = new THREE.Color().lerpColors(variationColor, snowColor, Math.max(0.2, t));
-            
+
             colorsArray[j * 3] = finalColor.r;
             colorsArray[j * 3 + 1] = finalColor.g;
             colorsArray[j * 3 + 2] = finalColor.b;
         }
     }
-    
+
     snowGeom.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
     snowGeom.computeVertexNormals();
 
@@ -545,7 +554,7 @@ function generateRealisticPeak(base: number, height: number, mountainMat: THREE.
 
 function createBeautifulMountain(base: number, height: number, mountainMat: THREE.Material, snowMat: THREE.Material) {
     const group = new THREE.Group();
-    
+
     // Pico principal realista con nieve física difuminada
     const mainPeak = generateRealisticPeak(base, height, mountainMat, snowMat);
     group.add(mainPeak);
@@ -556,7 +565,7 @@ function createBeautifulMountain(base: number, height: number, mountainMat: THRE
         const sBase = base * (0.4 + Math.random() * 0.3);
         const sHeight = height * (0.4 + Math.random() * 0.4);
         const sPeak = generateRealisticPeak(sBase, sHeight, mountainMat, snowMat);
-        
+
         const angle = Math.random() * Math.PI * 2;
         const dist = base * 0.5;
         sPeak.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
@@ -568,7 +577,7 @@ function createBeautifulMountain(base: number, height: number, mountainMat: THRE
 // Crea árboles realistas estilizados (tipo coníferas / pinos y árboles frondosos de copa redonda) con nieve
 function createRealisticTree(height: number, trunkMat: THREE.Material, foliageMat: THREE.Material, snowMat: THREE.Material) {
     const treeGroup = new THREE.Group();
-    
+
     // Tronco
     const trunkHeight = height * 0.35;
     const trunkRadius = height * 0.06;
@@ -576,20 +585,20 @@ function createRealisticTree(height: number, trunkMat: THREE.Material, foliageMa
     trunkGeom.translate(0, trunkHeight / 2, 0);
     const trunk = new THREE.Mesh(trunkGeom, trunkMat);
     treeGroup.add(trunk);
-    
+
     // Copa (pino o frondoso aleatoriamente)
     const treeType = Math.random() > 0.45 ? "pino" : "frondoso";
-    
+
     if (treeType === "pino") {
         const numLayers = 3;
         const baseFoliageRadius = height * 0.28;
         const layerHeight = height * 0.32;
-        
+
         for (let i = 0; i < numLayers; i++) {
             const layerRadius = baseFoliageRadius * (1 - i * 0.25);
             const layerGeom = new THREE.ConeGeometry(layerRadius, layerHeight, 5);
             layerGeom.translate(0, layerHeight / 2, 0);
-            
+
             // Perturbación orgánica de las hojas
             const posAttr = layerGeom.attributes.position;
             for (let j = 0; j < posAttr.count; j++) {
@@ -599,7 +608,7 @@ function createRealisticTree(height: number, trunkMat: THREE.Material, foliageMa
                 }
             }
             layerGeom.computeVertexNormals();
-            
+
             const layerMesh = new THREE.Mesh(layerGeom, foliageMat);
             layerMesh.position.y = trunkHeight + (i * layerHeight * 0.55);
             treeGroup.add(layerMesh);
@@ -618,11 +627,11 @@ function createRealisticTree(height: number, trunkMat: THREE.Material, foliageMa
         const numSpheres = 4 + Math.floor(Math.random() * 3);
         const foliageRadius = height * 0.22;
         const foliageCenterY = trunkHeight + foliageRadius;
-        
+
         for (let i = 0; i < numSpheres; i++) {
             const sphereGeom = new THREE.IcosahedronGeometry(foliageRadius * (0.75 + Math.random() * 0.35), 1);
             const sphere = new THREE.Mesh(sphereGeom, foliageMat);
-            
+
             const angle = Math.random() * Math.PI * 2;
             const dist = foliageRadius * 0.35 * Math.random();
             sphere.position.set(
@@ -641,7 +650,7 @@ function createRealisticTree(height: number, trunkMat: THREE.Material, foliageMa
             }
         }
     }
-    
+
     return treeGroup;
 }
 
@@ -681,6 +690,23 @@ export default function ContactoPage() {
         viewModeRef.current = mode;
         setViewMode(mode);
     };
+
+    // La página no scrollea: la rueda y el táctil manejan el vuelo. Sin esto,
+    // el documento (y Lenis) también se desplazaban hacia abajo.
+    useEffect(() => {
+        const html = document.documentElement;
+        const body = document.body;
+        const prev = [html.style.overflow, body.style.overflow, html.style.overscrollBehavior];
+        html.style.overflow = "hidden";
+        body.style.overflow = "hidden";
+        html.style.overscrollBehavior = "none";
+        window.scrollTo(0, 0);
+        return () => {
+            html.style.overflow = prev[0];
+            body.style.overflow = prev[1];
+            html.style.overscrollBehavior = prev[2];
+        };
+    }, []);
 
     useEffect(() => {
         if (!mountRef.current) return;
@@ -724,6 +750,7 @@ export default function ContactoPage() {
         // Mirada suavizada de cámara (permite paneos cinematográficos al cambiar de vista)
         const lookTarget = new THREE.Vector3(0, 3, 10);
         const lookDesired = new THREE.Vector3();
+        const endVista = new THREE.Vector3();
 
         // Variables de interacción
         let mouseX = 0, mouseY = 0;
@@ -738,7 +765,7 @@ export default function ContactoPage() {
         let guideEnergy = 1;
         let guideGliding = false;
         let guideModeUntil = 0;
-        
+
         let windowHalfX = window.innerWidth / 2;
         let windowHalfY = window.innerHeight / 2;
         const clock = new THREE.Clock();
@@ -748,10 +775,10 @@ export default function ContactoPage() {
             scene = new THREE.Scene();
             // Dejar el fondo transparente para traslucir el degradado épico de atardecer CSS
             scene.background = null;
-            scene.fog = new THREE.FogExp2(0x32254f, 0.009); // Neblina de atardecer índigo-violácea muy suave 
+            scene.fog = new THREE.FogExp2(0x32254f, 0.009); // Neblina de atardecer índigo-violácea muy suave
 
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1500);
-            camera.position.set(0, 5, 20); 
+            camera.position.set(0, 5, 20);
 
             // Con post-procesado el `antialias` del canvas no se aplica: la escena
             // se dibuja en el render target del composer y el canvas sólo recibe
@@ -787,9 +814,10 @@ export default function ContactoPage() {
 
             // Listeners
             window.addEventListener('mousemove', onDocumentMouseMove);
-            window.addEventListener('wheel', onDocumentWheel, { passive: true });
+            window.addEventListener('wheel', onDocumentWheel, { passive: false });
             window.addEventListener('touchstart', onDocumentTouchStart, { passive: true });
-            window.addEventListener('touchmove', onDocumentTouchMove, { passive: true });
+            window.addEventListener('touchmove', onDocumentTouchMove, { passive: false });
+            window.addEventListener('touchend', onDocumentTouchEnd, { passive: true });
             window.addEventListener('pointerdown', onPointerDown);
             window.addEventListener('keydown', onKeyDown);
             window.addEventListener('resize', onWindowResize);
@@ -811,8 +839,8 @@ export default function ContactoPage() {
             scene.add(dirLight);
 
             // Terreno
-            const terrainGeometry = new THREE.PlaneGeometry(400, 800, 80, 160);
-            terrainGeometry.rotateX(-Math.PI / 2); 
+            const terrainGeometry = new THREE.PlaneGeometry(400, 800, 160, 200);
+            terrainGeometry.rotateX(-Math.PI / 2);
 
             const positionAttribute = terrainGeometry.attributes.position;
             const terrainColors = new Float32Array(positionAttribute.count * 3);
@@ -820,17 +848,18 @@ export default function ContactoPage() {
             const deepValleyColor = new THREE.Color(0x3e4d26); // Verde oscuro boscoso húmedo
             const terrainSnowColor = new THREE.Color(0xfffaf0);  // Nieve atardecer cálida
             const vertex = new THREE.Vector3();
+            const trailColor = new THREE.Color(0x8a6a48);
             for (let i = 0; i < positionAttribute.count; i++) {
                 vertex.fromBufferAttribute(positionAttribute, i);
                 const worldX = vertex.x;
-                const worldZ = vertex.z - 300; 
-                
+                const worldZ = vertex.z - 300;
+
                 const y = getTerrainHeight(worldX, worldZ);
                 positionAttribute.setY(i, y);
 
                 // Gradiente topográfico realista multietapa
                 let finalColor = new THREE.Color(colors.ground);
-                
+
                 if (y < 0.0) {
                     // Valle profundo (vaguadas y lechos del río): musgoso y umbrío
                     const t = Math.min(1.0, Math.abs(y) / 8.0);
@@ -842,6 +871,14 @@ export default function ContactoPage() {
                     finalColor.lerpColors(groundColor, terrainSnowColor, smoothT * 0.72);
                 }
 
+                // Manchones de pradera: el verde parejo se leía como una lona.
+                const patch = Math.sin(worldX * 0.13 + worldZ * 0.07) * Math.cos(worldZ * 0.11 - worldX * 0.05);
+                finalColor.multiplyScalar(0.82 + patch * 0.14 + Math.random() * 0.06);
+                // El sendero que sigue la mariposa: tierra cálida con bordes suaves.
+                const trailD = Math.abs(worldX - getPathX(worldZ));
+                const trail = 1 - THREE.MathUtils.smoothstep(trailD, 1.2, 3.4);
+                if (trail > 0) finalColor.lerp(trailColor, trail * 0.85);
+
                 terrainColors[i * 3] = finalColor.r;
                 terrainColors[i * 3 + 1] = finalColor.g;
                 terrainColors[i * 3 + 2] = finalColor.b;
@@ -850,35 +887,35 @@ export default function ContactoPage() {
             terrainGeometry.computeVertexNormals();
 
             const terrainMaterial = new THREE.MeshStandardMaterial({
-                vertexColors: true, roughness: 0.9, flatShading: true 
+                vertexColors: true, roughness: 0.9, flatShading: true
             });
 
             terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
-            terrain.position.z = -300; 
+            terrain.position.z = -300;
             scene.add(terrain);
 
             // Montañas (Con nieve física difuminada y base enterrada para que no floten!)
             mountainGroup = new THREE.Group();
             scene.add(mountainGroup);
-            
+
             const mountainMat = new THREE.MeshStandardMaterial({ color: colors.mountain, flatShading: true, roughness: 0.95 });
             snowMat = new THREE.MeshStandardMaterial({
                 vertexColors: true, // Habilitar soporte de colores degradados por vértice
                 flatShading: false,
-                roughness: 0.9, 
+                roughness: 0.9,
                 metalness: 0.0,
                 emissive: new THREE.Color(0x2d1815), // Emisión cálida de atardecer
                 emissiveIntensity: 0.35
             });
-            
+
             for (let i = 0; i < 100; i++) {
                 const z = (Math.random() - 0.5) * 800 - 300;
                 const pathX = getPathX(z);
                 const side = Math.random() > 0.5 ? 1 : -1;
-                const offset = 45 + Math.random() * 80; 
+                const base = 20 + Math.random() * 30;
+                const offset = base * 1.3 + 24 + Math.random() * 70;
                 const x = pathX + (side * offset);
 
-                const base = 20 + Math.random() * 30;
                 const height = 40 + Math.random() * 80;
                 const y = getTerrainHeight(x, z);
 
@@ -887,7 +924,7 @@ export default function ContactoPage() {
                 mountain.position.set(x, y - 6.0, z);
                 mountain.rotation.y = Math.random() * Math.PI;
 
-                mountain.scale.set(1, 1, 1); 
+                mountain.scale.set(1, 1, 1);
                 mountain.userData = { targetScale: 1, currentScale: 1, active: true, speed: 0.03 };
                 mountainGroup.add(mountain);
             }
@@ -897,32 +934,32 @@ export default function ContactoPage() {
             const endZ = -600;
             const endX = getPathX(endZ);
             const endY = getTerrainHeight(endX, endZ);
-            
+
             const giantMtnMat = new THREE.MeshStandardMaterial({ color: 0x48583b, roughness: 0.95, flatShading: true });
-            giantSnowMat = new THREE.MeshStandardMaterial({ 
-                vertexColors: true, 
-                flatShading: false, 
-                roughness: 0.9, 
+            giantSnowMat = new THREE.MeshStandardMaterial({
+                vertexColors: true,
+                flatShading: false,
+                roughness: 0.9,
                 metalness: 0.0,
                 emissive: new THREE.Color(0x221110), // Emisión atardecer gigante
                 emissiveIntensity: 0.35
             });
             const giantMtn = generateRealisticPeak(150, 280, giantMtnMat, giantSnowMat);
             cloudyMountainGroup.add(giantMtn);
-            
+
             // Enterrar montaña final
             cloudyMountainGroup.position.set(endX, endY - 22.0, endZ);
 
             cloudsGroup = new THREE.Group();
             const cloudGeom = new THREE.IcosahedronGeometry(25, 1);
             const cloudMat = new THREE.MeshStandardMaterial({ color: 0xfff5ea, roughness: 1, transparent: true, opacity: 0.9, flatShading: true });
-            
+
             for (let i = 0; i < 60; i++) {
                 const cloud = new THREE.Mesh(cloudGeom, cloudMat);
                 const angle = Math.random() * Math.PI * 2;
                 const radius = 60 + Math.random() * 80;
-                const h = 80 + Math.random() * 120; 
-                
+                const h = 80 + Math.random() * 120;
+
                 cloud.position.set(Math.cos(angle) * radius, h, Math.sin(angle) * radius);
                 cloud.scale.set(1 + Math.random()*1.5, 0.5 + Math.random()*0.5, 1 + Math.random()*1.5);
                 cloud.rotation.y = Math.random() * Math.PI;
@@ -934,20 +971,20 @@ export default function ContactoPage() {
             // Bosque de Árboles (Pinos y Árboles Frondosos enterrados 1.2 unidades)
             treesGroup = new THREE.Group();
             scene.add(treesGroup);
-            
+
             const treeTrunkMat = new THREE.MeshStandardMaterial({ color: 0x5a3e2e, roughness: 0.95, flatShading: true });
             const treeFoliageMats = [
-                new THREE.MeshStandardMaterial({ color: 0x2d521d, roughness: 0.9, flatShading: true }), 
-                new THREE.MeshStandardMaterial({ color: 0x3d6e2a, roughness: 0.9, flatShading: true }), 
-                new THREE.MeshStandardMaterial({ color: 0x1f3c12, roughness: 0.95, flatShading: true }), 
-                new THREE.MeshStandardMaterial({ color: 0x477832, roughness: 0.9, flatShading: true })  
+                new THREE.MeshStandardMaterial({ color: 0x2d521d, roughness: 0.9, flatShading: true }),
+                new THREE.MeshStandardMaterial({ color: 0x3d6e2a, roughness: 0.9, flatShading: true }),
+                new THREE.MeshStandardMaterial({ color: 0x1f3c12, roughness: 0.95, flatShading: true }),
+                new THREE.MeshStandardMaterial({ color: 0x477832, roughness: 0.9, flatShading: true })
             ];
 
             for (let i = 0; i < 200; i++) {
                 const z = (Math.random() - 0.5) * 800 - 300;
                 const pathX = getPathX(z);
                 const side = Math.random() > 0.5 ? 1 : -1;
-                const offset = 18 + Math.random() * 60; 
+                const offset = 18 + Math.random() * 60;
                 const x = pathX + (side * offset);
                 const y = getTerrainHeight(x, z);
 
@@ -957,7 +994,7 @@ export default function ContactoPage() {
                 // Enterrar 1.2 unidades para enraizar perfectamente
                 const tScale = Math.random() * 0.4 + 0.8;
                 tree.position.set(x, y - 1.2, z);
-                tree.scale.set(tScale, tScale, tScale); 
+                tree.scale.set(tScale, tScale, tScale);
                 tree.userData = {
                     targetScale: tScale,
                     currentScale: tScale,
@@ -976,39 +1013,39 @@ export default function ContactoPage() {
 
             const stemMat = new THREE.MeshStandardMaterial({ color: 0x6a8a3e, flatShading: true, roughness: 0.8 });
             const leafMat = new THREE.MeshStandardMaterial({ color: 0x5a7a2e, flatShading: true, roughness: 0.8 });
-            const redMat = new THREE.MeshStandardMaterial({ color: 0xF44336, flatShading: true }); 
-            const blueMat = new THREE.MeshStandardMaterial({ color: 0xB3E5FC, flatShading: true }); 
-            const yellowMat = new THREE.MeshStandardMaterial({ color: 0xFFC107, flatShading: true }); 
-            const darkGreenMat = new THREE.MeshStandardMaterial({ color: 0x2E4D30, flatShading: true }); 
-            
+            const redMat = new THREE.MeshStandardMaterial({ color: 0xF44336, flatShading: true });
+            const blueMat = new THREE.MeshStandardMaterial({ color: 0xB3E5FC, flatShading: true });
+            const yellowMat = new THREE.MeshStandardMaterial({ color: 0xFFC107, flatShading: true });
+            const darkGreenMat = new THREE.MeshStandardMaterial({ color: 0x2E4D30, flatShading: true });
+
             const tallStemGeom = new THREE.CylinderGeometry(0.12, 0.18, 1, 6);
-            tallStemGeom.translate(0, 0.5, 0); 
-            
+            tallStemGeom.translate(0, 0.5, 0);
+
             const bigLeafGeom = new THREE.SphereGeometry(0.6, 8, 8);
             bigLeafGeom.scale(1, 0.1, 2);
 
-            for (let i = 0; i < 500; i++) { 
-                const z = (Math.random() - 0.5) * 800 - 300; 
+            for (let i = 0; i < 500; i++) {
+                const z = (Math.random() - 0.5) * 800 - 300;
                 const pathX = getPathX(z);
                 const side = Math.random() > 0.5 ? 1 : -1;
-                const offset = 8 + Math.random() * 45; 
+                const offset = 11 + Math.random() * 42; // lejos del sendero: no tapan la cámara
                 const x = pathX + (side * offset);
                 const y = getTerrainHeight(x, z);
-                
-                const flowerType = Math.floor(Math.random() * 4); 
+
+                const flowerType = Math.floor(Math.random() * 4);
                 const flower = new THREE.Group();
                 // Enterrar 0.4 unidades
-                flower.position.set(x, y - 0.4, z); 
+                flower.position.set(x, y - 0.4, z);
                 const fScale = Math.random() * 0.6 + 0.8;
                 flower.scale.set(fScale, fScale, fScale);
                 flower.userData = { targetScale: fScale, currentScale: fScale, active: true, speed: Math.random() * 0.03 + 0.01 };
-                
+
                 const height = Math.random() * 2 + 3;
                 const stem = new THREE.Mesh(tallStemGeom, stemMat);
                 stem.scale.set(1, height, 1);
-                flower.add(stem); 
+                flower.add(stem);
 
-                if (flowerType === 0) { 
+                if (flowerType === 0) {
                     const headGroup = new THREE.Group();
                     headGroup.position.set(0, height, 0);
                     const core = new THREE.Mesh(new THREE.SphereGeometry(0.8, 12, 12), redMat);
@@ -1036,7 +1073,7 @@ export default function ContactoPage() {
                         flower.add(leaf);
                     }
 
-                } else if (flowerType === 1) { 
+                } else if (flowerType === 1) {
                     const createStripedBud = () => {
                         const bud = new THREE.Group();
                         const budBase = new THREE.Mesh(new THREE.SphereGeometry(0.6, 12, 12), yellowMat);
@@ -1056,7 +1093,7 @@ export default function ContactoPage() {
                     flower.add(mainBud);
 
                     for(let l=0; l<3; l++) {
-                        const leaf = new THREE.Mesh(bigLeafGeom, redMat); 
+                        const leaf = new THREE.Mesh(bigLeafGeom, redMat);
                         leaf.scale.set(0.5, 0.1, 0.8);
                         leaf.position.set(0, height * 0.8, 0);
                         leaf.rotation.x = Math.PI / 3;
@@ -1064,10 +1101,10 @@ export default function ContactoPage() {
                         flower.add(leaf);
                     }
 
-                } else if (flowerType === 2) { 
+                } else if (flowerType === 2) {
                     const headGroup = new THREE.Group();
                     headGroup.position.set(0, height, 0);
-                    headGroup.rotation.x = Math.PI / 6 + Math.random()*0.2; 
+                    headGroup.rotation.x = Math.PI / 6 + Math.random()*0.2;
                     headGroup.rotation.y = Math.random() * Math.PI * 2;
 
                     const center = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.2, 12), darkGreenMat);
@@ -1082,12 +1119,12 @@ export default function ContactoPage() {
                         const angle = (p / numPetals) * Math.PI * 2;
                         petal.position.set(Math.cos(angle)*0.7, Math.sin(angle)*0.7, 0);
                         petal.rotation.z = angle + Math.PI/2;
-                        petal.scale.set(1, 1, 0.3); 
+                        petal.scale.set(1, 1, 0.3);
                         headGroup.add(petal);
                     }
                     flower.add(headGroup);
 
-                } else { 
+                } else {
                     for(let l=0; l<4; l++) {
                         const leaf = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.1, 6), leafMat);
                         leaf.position.set(0, height * (0.2 + l*0.22), 0);
@@ -1107,10 +1144,10 @@ export default function ContactoPage() {
                         const bar = new THREE.Mesh(barGeom, darkGreenMat);
                         bar.position.set(Math.cos(angle)*0.6, 0.8, Math.sin(angle)*0.6);
                         bar.rotation.y = -angle;
-                        bar.rotation.x = Math.PI / 8; 
+                        bar.rotation.x = Math.PI / 8;
                         topGroup.add(bar);
                     }
-                    
+
                     const pollenGeom = new THREE.SphereGeometry(0.12, 4, 4);
                     for(let p=0; p<18; p++) {
                         const pollen = new THREE.Mesh(pollenGeom, yellowMat);
@@ -1119,11 +1156,11 @@ export default function ContactoPage() {
                     }
                     flower.add(topGroup);
                 }
-                
+
                 flower.rotation.y = Math.random() * Math.PI * 2;
                 flower.rotation.x = (Math.random() - 0.5) * 0.15;
                 flower.rotation.z = (Math.random() - 0.5) * 0.15;
-                
+
                 flower.userData.baseRotX = flower.rotation.x;
                 flower.userData.baseRotZ = flower.rotation.z;
                 floraGroup.add(flower);
@@ -1131,14 +1168,14 @@ export default function ContactoPage() {
 
             // Pradera Tupida (1800 parches de Pasto enterrados 0.2 unidades)
             const grassGeom = new THREE.ConeGeometry(0.15, 1.2, 3);
-            grassGeom.translate(0, 0.6, 0); 
-            const grassMat = new THREE.MeshStandardMaterial({ color: 0x7c9642, flatShading: true, roughness: 0.9 });
-            
+            grassGeom.translate(0, 0.6, 0);
+            const grassMat = new THREE.MeshStandardMaterial({ color: 0x5f8c3e, flatShading: true, roughness: 0.9 });
+
             for (let i = 0; i < 1800; i++) {
-                const z = (Math.random() - 0.5) * 800 - 300; 
+                const z = (Math.random() - 0.5) * 800 - 300;
                 const pathX = getPathX(z);
                 const side = Math.random() > 0.5 ? 1 : -1;
-                const offset = 3 + Math.random() * 45; 
+                const offset = 3 + Math.random() * 45;
                 const x = pathX + (side * offset);
                 const y = getTerrainHeight(x, z);
 
@@ -1150,9 +1187,9 @@ export default function ContactoPage() {
                 grass.rotation.z = (Math.random() - 0.5) * 0.4;
                 const gScale = Math.random() * 1 + 0.5;
                 grass.scale.set(gScale, gScale, gScale);
-                
-                grass.userData = { 
-                    targetScale: gScale, 
+
+                grass.userData = {
+                    targetScale: gScale,
                     currentScale: gScale, active: true, speed: Math.random() * 0.05 + 0.02,
                     baseRotX: grass.rotation.x, baseRotZ: grass.rotation.z
                 };
@@ -1296,13 +1333,13 @@ export default function ContactoPage() {
                     void main() {
                         // Atenuación suave hacia la base (vUv.y es 0 abajo, 1 arriba)
                         float verticalFade = pow(vUv.y, 2.0);
-                        
+
                         // Centello crepuscular sutil
                         float shimmer = 0.65 + 0.35 * sin(uTime * 1.6 * uSpeed + uOffset + vUv.x * 6.28);
-                        
+
                         // Suavizado en bordes radiales locales
                         float sideFade = sin(vUv.x * 3.14159);
-                        
+
                         float alpha = 0.012 * verticalFade * shimmer * sideFade;
                         gl_FragColor = vec4(uColor, alpha);
                     }
@@ -1317,12 +1354,12 @@ export default function ContactoPage() {
                 const mat = rayShaderMat.clone();
                 mat.uniforms.uSpeed.value = 0.4 + Math.random() * 0.8;
                 mat.uniforms.uOffset.value = Math.random() * 10;
-                
+
                 const ray = new THREE.Mesh(rayGeom, mat);
                 const z = (Math.random() - 0.5) * 800 - 300;
                 const x = getPathX(z) + (Math.random() - 0.5) * 35;
-                
-                ray.position.set(x, 70, z); 
+
+                ray.position.set(x, 70, z);
                 ray.rotation.z = Math.PI / 9 + (Math.random() - 0.5) * 0.05;
                 ray.rotation.x = Math.PI / 11 + (Math.random() - 0.5) * 0.05;
                 raysGroup.add(ray);
@@ -1331,7 +1368,7 @@ export default function ContactoPage() {
             // Halo Solar Atmosférico Ultra Realista (Filtro Solar Suave y Esponjoso)
             sunGlowGroup = new THREE.Group();
             scene.add(sunGlowGroup);
-            
+
             const sunTex = createSunGlowTexture();
             const sunGlowGeom = new THREE.PlaneGeometry(160, 160);
             const sunGlowMat = new THREE.MeshBasicMaterial({
@@ -1352,19 +1389,19 @@ export default function ContactoPage() {
             const particlesGeometry = new THREE.BufferGeometry();
             const particlesPositions = new Float32Array(particleCount * 3);
             for (let i = 0; i < particleCount * 3; i+=3) {
-                particlesPositions[i] = (Math.random() - 0.5) * 150;     
-                particlesPositions[i+1] = Math.random() * 30;            
-                particlesPositions[i+2] = (Math.random() - 0.5) * 200 - 40; 
+                particlesPositions[i] = (Math.random() - 0.5) * 150;
+                particlesPositions[i+1] = Math.random() * 30;
+                particlesPositions[i+2] = (Math.random() - 0.5) * 200 - 40;
             }
             particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlesPositions, 3));
-            
+
             const fireflyTex = createFireflyTexture();
-            const particlesMaterial = new THREE.PointsMaterial({ 
+            const particlesMaterial = new THREE.PointsMaterial({
                 color: 0xd4ff55, // Hermosa tonalidad verde-amarilla luciérnaga clásica
                 size: 0.65,      // Tamaño más discreto y sutil
                 map: fireflyTex || undefined,
-                transparent: true, 
-                opacity: 0.95, 
+                transparent: true,
+                opacity: 0.95,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false
             });
@@ -1372,7 +1409,7 @@ export default function ContactoPage() {
             scene.add(particles);
 
             // Sistema de Nieve Cayendo Ultra Inmersivo (Partículas de Nieve Tridimensionales)
-            const snowCount = 2000;
+            const snowCount = window.innerWidth < 768 ? 800 : 1400;
             const snowGeometry = new THREE.BufferGeometry();
             const snowPositions = new Float32Array(snowCount * 3);
             const snowSpeeds = new Float32Array(snowCount);
@@ -1384,21 +1421,21 @@ export default function ContactoPage() {
                 snowPositions[i*3] = (Math.random() - 0.5) * 120;   // X
                 snowPositions[i*3+1] = Math.random() * 40;         // Y
                 snowPositions[i*3+2] = (Math.random() - 0.5) * 160; // Z
-                
+
                 snowSpeeds[i] = 0.05 + Math.random() * 0.08;      // Velocidad de caída
                 snowWiggleSpeeds[i] = 0.8 + Math.random() * 1.5;   // Velocidad de oscilación
                 snowOffsets[i] = Math.random() * Math.PI * 2;     // Desplazamiento inicial de fase
             }
 
             snowGeometry.setAttribute('position', new THREE.BufferAttribute(snowPositions, 3));
-            
+
             const snowTex = createSnowflakeTexture();
             const snowMaterial = new THREE.PointsMaterial({
                 color: 0xffffff,
-                size: 0.55,
+                size: 0.3,
                 map: snowTex || undefined,
                 transparent: true,
-                opacity: 0.9,
+                opacity: 0.75,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false
             });
@@ -1411,10 +1448,10 @@ export default function ContactoPage() {
             scene.add(trailGroup);
 
             // Sistema de Nieve Cercana (Lente / Bokeh Foregrounds)
-            const lensSnowCount = 120;
+            const lensSnowCount = 40;
             const lensSnowGeometry = new THREE.BufferGeometry();
             const lensSnowPositions = new Float32Array(lensSnowCount * 3);
-            
+
             for (let i = 0; i < lensSnowCount; i++) {
                 // Distribuidos muy cerca de la línea de vuelo del espectador
                 lensSnowPositions[i*3] = (Math.random() - 0.5) * 25; // X
@@ -1422,17 +1459,18 @@ export default function ContactoPage() {
                 lensSnowPositions[i*3+2] = (Math.random() - 0.5) * 50; // Z
             }
             lensSnowGeometry.setAttribute('position', new THREE.BufferAttribute(lensSnowPositions, 3));
-            
+
             const lensSnowMat = new THREE.PointsMaterial({
                 color: 0xffffff,
-                size: 2.2, // Grandes, simulando desenfoque Bokeh en primer plano
+                // Bokeh de primer plano: discreto. A 2.2 / 0.38 tapaba media pantalla.
+                size: 0.9,
                 map: snowTex || undefined,
                 transparent: true,
-                opacity: 0.38,
+                opacity: 0.16,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false
             });
-            
+
             lensSnowPoints = new THREE.Points(lensSnowGeometry, lensSnowMat);
             scene.add(lensSnowPoints);
 
@@ -1713,10 +1751,18 @@ export default function ContactoPage() {
             mouseX = (event.clientX - windowHalfX) / windowHalfX;
             mouseY = (event.clientY - windowHalfY) / windowHalfY;
         }
+        // Avance del vuelo: todas las entradas pasan por acá y quedan acotadas.
+        function advance(delta: number) {
+            targetScrollDepth = THREE.MathUtils.clamp(targetScrollDepth + delta, -20, 500);
+        }
         function onDocumentWheel(event: WheelEvent) {
-            targetScrollDepth += event.deltaY * 0.06;
-            if (targetScrollDepth < -20) targetScrollDepth = -20;
-            if (targetScrollDepth > 500) targetScrollDepth = 500; 
+            if (event.cancelable && !event.ctrlKey) event.preventDefault(); // ctrl+rueda = zoom del navegador
+            // deltaMode 1 = líneas (Firefox con rueda): se pasa a píxeles.
+            const px = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
+            // Una vuelta de rueda (~100 px) avanza ~16 unidades: el valle se
+            // recorre en unas 30 vueltas y no en 80. El tope evita saltos con
+            // ruedas de alta resolución o "flicks" de trackpad.
+            advance(THREE.MathUtils.clamp(px, -400, 400) * 0.16);
         }
         function onWindowResize() {
             windowHalfX = window.innerWidth / 2;
@@ -1726,20 +1772,27 @@ export default function ContactoPage() {
             renderer.setSize(window.innerWidth, window.innerHeight);
             composer?.setSize(window.innerWidth, window.innerHeight);
         }
+        // Antes el avance salía de la posición del dedo respecto del centro: con
+        // el dedo quieto en la mitad inferior la cámara retrocedía sola.
+        let lastTouchY: number | null = null;
         function onDocumentTouchStart(event: TouchEvent) {
             if (event.touches.length > 0) {
-                mouseX = (event.touches[0].pageX - windowHalfX) / windowHalfX;
-                mouseY = (event.touches[0].pageY - windowHalfY) / windowHalfY;
+                lastTouchY = event.touches[0].clientY;
+                mouseX = (event.touches[0].clientX - windowHalfX) / windowHalfX * 0.5;
             }
         }
         function onDocumentTouchMove(event: TouchEvent) {
-            if (event.touches.length > 0) {
-                mouseX = (event.touches[0].pageX - windowHalfX) / windowHalfX;
-                mouseY = (event.touches[0].pageY - windowHalfY) / windowHalfY;
-                targetScrollDepth -= (event.touches[0].pageY - windowHalfY) * 0.05;
-                if (targetScrollDepth < -20) targetScrollDepth = -20;
-                if (targetScrollDepth > 500) targetScrollDepth = 500;
+            const onUi = (event.target as HTMLElement | null)?.closest('[data-ui]');
+            if (event.cancelable && !onUi) event.preventDefault();
+            if (event.touches.length > 0 && lastTouchY !== null) {
+                const y = event.touches[0].clientY;
+                advance((lastTouchY - y) * 0.35); // deslizar hacia arriba = avanzar
+                lastTouchY = y;
+                mouseX = (event.touches[0].clientX - windowHalfX) / windowHalfX * 0.5;
             }
+        }
+        function onDocumentTouchEnd() {
+            lastTouchY = null;
         }
 
         // Explosión de chispas doradas con velocidad y gravedad propias
@@ -1775,6 +1828,19 @@ export default function ContactoPage() {
         }
 
         function onKeyDown(event: KeyboardEvent) {
+            const tag = (event.target as HTMLElement | null)?.tagName;
+            if (tag !== "INPUT" && tag !== "TEXTAREA") {
+                const step: Record<string, number> = {
+                    ArrowDown: 18, ArrowUp: -18, PageDown: 60, PageUp: -60, " ": 40,
+                };
+                if (event.key in step) {
+                    event.preventDefault();
+                    advance(event.shiftKey && event.key === " " ? -40 : step[event.key]);
+                    return;
+                }
+                if (event.key === "End") { advance(600); return; }
+                if (event.key === "Home") { advance(-600); return; }
+            }
             // Teclas 1 / 2 / 3 cambian la vista de cámara
             if (event.key === '1' || event.key === '2' || event.key === '3') {
                 const mode = Number(event.key) - 1;
@@ -1806,7 +1872,10 @@ export default function ContactoPage() {
             const dt = Math.min(clock.getDelta(), 0.05);
             const time = clock.elapsedTime;
 
-            scrollDepth += (targetScrollDepth - scrollDepth) * 0.05;
+            // Velocidad de vuelo con tope: un salto grande (Fin, rueda rápida) ya no
+            // atraviesa colinas porque la cámara alcanza a seguir las curvas.
+            const maxStep = 140 * dt; // unidades por segundo, igual a 30 o 144 fps
+            scrollDepth += THREE.MathUtils.clamp((targetScrollDepth - scrollDepth) * 0.05, -maxStep, maxStep);
             const currentZ = 30 - scrollDepth;
             const currentPathX = getPathX(currentZ);
 
@@ -1851,14 +1920,31 @@ export default function ContactoPage() {
                 bankAmt = pathBank * 0.5 + mouseX * 0.04;
             } else {
                 // Vista de vuelo clásica (chase), con banking en las curvas del sendero
-                targetX = currentPathX + mouseX * 8;
-                targetY = mouseY * 4 + 8 + bob;
+                // Con mouseX * 8 la cámara se salía del sendero y se metía en las laderas.
+                targetX = getPathX(camera.position.z) + mouseX * 4.5;
+                targetY = mouseY * 2.5 + 8 + bob;
                 const aheadZ = currentZ - 20;
                 lookDesired.set(getPathX(aheadZ) + (targetX - currentPathX) * 0.3, 3, aheadZ);
+                // Llegada: la cámara sube y levanta la vista hacia el fondo del valle
+                // (montaña final y sol de la mañana). Antes miraba al pasto a 20 m y
+                // la tarjeta de contacto quedaba sobre un primer plano de suelo.
+                if (turnFactor > 0.001) {
+                    const vistaZ = currentZ - 90;
+                    endVista.set(getPathX(vistaZ), targetY + 6, vistaZ);
+                    lookDesired.lerp(endVista, turnFactor);
+                    targetY += turnFactor * 7;
+                }
             }
 
-            camera.position.x += (targetX - camera.position.x) * 0.025;
-            camera.position.y += (targetY - camera.position.y) * 0.025;
+            // La cámara nunca entra en las colinas: piso = terreno + margen, medido
+            // donde va a estar y donde está (cubre las laderas a los costados).
+            const groundAhead = getTerrainHeight(targetX, targetZ);
+            const groundHere = getTerrainHeight(camera.position.x, camera.position.z);
+            targetY = Math.max(targetY, Math.max(groundAhead, groundHere) + 3.2);
+
+            const followXY = effectiveView === 0 ? 0.09 : 0.03;
+            camera.position.x += (targetX - camera.position.x) * followXY;
+            camera.position.y += (targetY - camera.position.y) * Math.max(0.04, followXY * 0.7);
             camera.position.z += (targetZ - camera.position.z) * 0.08;
 
             // Roll de banking + paneo suavizado de la mirada (las transiciones de vista quedan cinematográficas)
@@ -1974,9 +2060,7 @@ export default function ContactoPage() {
 
                 // 2. Color de la Neblina (Fog)
                 if (scene && scene.fog) {
-                    const twilightFogColor = new THREE.Color(0x32254f);
-                    const dayFogColor = new THREE.Color(0xaeddfa); // Suave azul cielo diurno brillante
-                    scene.fog.color.lerpColors(twilightFogColor, dayFogColor, turnFactor);
+                    scene.fog.color.lerpColors(TWILIGHT_FOG, DAY_FOG, turnFactor);
                 }
 
                 // 3. Intensidad y Color de las Luces
@@ -1984,9 +2068,7 @@ export default function ContactoPage() {
                     hemiLight.intensity = THREE.MathUtils.lerp(0.6, 1.2, turnFactor);
                 }
                 if (dirLight) {
-                    const twilightSunColor = new THREE.Color(colors.sun);
-                    const daySunColor = new THREE.Color(0xfff7e6); // Sol diurno cálido y brillante
-                    dirLight.color.lerpColors(twilightSunColor, daySunColor, turnFactor);
+                    dirLight.color.lerpColors(TWILIGHT_SUN, DAY_SUN, turnFactor);
                     dirLight.intensity = THREE.MathUtils.lerp(1.5, 2.5, turnFactor);
                 }
 
@@ -2006,9 +2088,7 @@ export default function ContactoPage() {
                     raysGroup.children.forEach((ray: THREE.Object3D) => {
                         const mat = (ray as THREE.Mesh).material as THREE.ShaderMaterial;
                         if (mat && mat.uniforms && mat.uniforms.uColor) {
-                            const twilightRayColor = new THREE.Color(0xffebd2);
-                            const dayRayColor = new THREE.Color(0xffffff);
-                            mat.uniforms.uColor.value.lerpColors(twilightRayColor, dayRayColor, turnFactor);
+                            mat.uniforms.uColor.value.lerpColors(TWILIGHT_RAY, DAY_RAY, turnFactor);
                         }
                     });
                 }
@@ -2026,7 +2106,7 @@ export default function ContactoPage() {
                     const endHoverX = camera.position.x - 3.8 + Math.sin(time * 1.5) * 0.5;
                     const endHoverY = camera.position.y - 1.2 + Math.cos(time * 1.0) * 0.4;
                     const endHoverZ = camera.position.z - 9.0 + Math.sin(time * 0.8) * 0.6;
-                    
+
                     guideTargetX = THREE.MathUtils.lerp(guideTargetX, endHoverX, turnFactor);
                     guideTargetY = THREE.MathUtils.lerp(guideTargetY, endHoverY, turnFactor);
                     guideTargetZ = THREE.MathUtils.lerp(guideTargetZ, endHoverZ, turnFactor);
@@ -2037,10 +2117,10 @@ export default function ContactoPage() {
                 butterflyGroup.position.z += (guideTargetZ - butterflyGroup.position.z) * 0.05;
 
                 const futureTime = time + 0.5;
-                const futureZ = butterflyGroup.position.z - 8; 
+                const futureZ = butterflyGroup.position.z - 8;
                 const futurePathX = getPathX(futureZ);
-                const futureX = futurePathX + Math.sin(futureTime * 1.2) * 3; 
-                const futureY = getTerrainHeight(futureX, futureZ) + 4.0 + Math.sin(futureTime * 2.0) * 1.0; 
+                const futureX = futurePathX + Math.sin(futureTime * 1.2) * 3;
+                const futureY = getTerrainHeight(futureX, futureZ) + 4.0 + Math.sin(futureTime * 2.0) * 1.0;
 
                 let targetLookX = futureX;
                 let targetLookY = futureY;
@@ -2051,18 +2131,18 @@ export default function ContactoPage() {
                     const camLookX = camera.position.x;
                     const camLookY = camera.position.y - 0.5;
                     const camLookZ = camera.position.z;
-                    
+
                     targetLookX = THREE.MathUtils.lerp(futureX, camLookX, turnFactor);
                     targetLookY = THREE.MathUtils.lerp(futureY, camLookY, turnFactor);
                     targetLookZ = THREE.MathUtils.lerp(futureZ, camLookZ, turnFactor);
                 }
 
                 butterflyGroup.lookAt(targetLookX, targetLookY, targetLookZ);
-                
+
                 // Rotaciones de inclinación (pitch y roll) suaves
                 const movementX = (guideTargetX - butterflyGroup.position.x);
                 const movementY = (guideTargetY - butterflyGroup.position.y);
-                
+
                 // Al girar hacia la cámara reducimos la inclinación para posar erguida
                 const rollScale = 0.15 * (1.0 - turnFactor * 0.6);
                 const pitchScale = 0.15 * (1.0 - turnFactor * 0.6);
@@ -2223,21 +2303,39 @@ export default function ContactoPage() {
                 });
             }
 
-            // Oscilación diferenciada (Flores, Montañas y Árboles)
-            const elements = [...floraGroup.children, ...mountainGroup.children, ...treesGroup.children];
-            elements.forEach((obj) => {
-                if (obj.userData.baseRotX !== undefined) {
+            // Recorte por distancia: el valle tiene ~2.500 objetos (cada flor y
+            // cada brizna de pasto es un mesh propio) repartidos en 800 m. Dibujar
+            // y mecer todos en cada cuadro dejaba la escena en un puñado de fps en
+            // GPUs integradas y el vuelo se trababa al scrollear. Sólo cuenta lo
+            // que está adelante de la cámara y antes de que la niebla lo borre.
+            const camZ = camera.position.z;
+            const camXc = camera.position.x;
+            const cull = (group: THREE.Group, ahead: number, behind: number, side: number) => {
+                const kids = group.children;
+                for (let k = 0; k < kids.length; k++) {
+                    const o = kids[k];
+                    const dz = o.position.z - camZ;
+                    o.visible = dz < behind && dz > -ahead && Math.abs(o.position.x - camXc) < side;
+                }
+            };
+            cull(floraGroup, 150, 14, 95);
+            cull(treesGroup, 190, 20, 130);
+            cull(mountainGroup, 520, 80, 400);
+
+            // Oscilación diferenciada (Flores, Montañas y Árboles), sólo de lo visible
+            for (const group of [floraGroup, mountainGroup, treesGroup]) group.children.forEach((obj) => {
+                if (obj.visible && obj.userData.baseRotX !== undefined) {
                     const isTree = obj.userData.isTree === true;
-                    
+
                     // Ráfaga interactiva: la mariposa dobla el pasto y flores al volar cerca
                     let guideBendingX = 0;
                     let guideBendingZ = 0;
-                    
+
                     if (!isTree && butterflyGroup) {
                         const distToGuideX = obj.position.x - butterflyGroup.position.x;
                         const distToGuideZ = obj.position.z - butterflyGroup.position.z;
                         const distToGuideSq = distToGuideX * distToGuideX + distToGuideZ * distToGuideZ;
-                        
+
                         if (distToGuideSq < 36.0) { // Dentro de 6 unidades
                             const distToGuide = Math.sqrt(distToGuideSq);
                             const force = (1.0 - distToGuide / 6.0) * 0.28;
@@ -2246,7 +2344,7 @@ export default function ContactoPage() {
                             guideBendingZ = (distToGuideZ / distToGuide) * force;
                         }
                     }
-                    
+
                     if (isTree) {
                         // Los árboles oscilan de forma muy lenta y sutil simulando inercia pesada del viento
                         obj.rotation.x = obj.userData.baseRotX + Math.sin(time * 0.35 + obj.position.x * 0.04) * 0.015;
@@ -2282,12 +2380,12 @@ export default function ContactoPage() {
             for (let i = 0; i < positions.length; i += 3) {
                 const fIdx = i / 3;
                 const floatSpeed = 0.35 + (fIdx % 5) * 0.12;
-                
+
                 // Movimiento inmersivo e irregular de enjambre (luciérnagas)
-                positions[i] += Math.sin(time * floatSpeed + positions[i+1]*0.08) * 0.035 + Math.sin(time * 0.08 + fIdx) * 0.006; 
+                positions[i] += Math.sin(time * floatSpeed + positions[i+1]*0.08) * 0.035 + Math.sin(time * 0.08 + fIdx) * 0.006;
                 positions[i+1] += Math.cos(time * floatSpeed * 0.75 + positions[i]*0.08) * 0.022 + 0.009; // deriva lenta ascendente
-                positions[i+2] += Math.cos(time * floatSpeed * 1.15 + positions[i]*0.08) * 0.035;     
-                
+                positions[i+2] += Math.cos(time * floatSpeed * 1.15 + positions[i]*0.08) * 0.035;
+
                 // Retorno cíclico suave al llegar al techo de altura
                 if (positions[i+1] > 32.0) {
                     positions[i+1] = 0.5;
@@ -2305,27 +2403,27 @@ export default function ContactoPage() {
             // Animar la nieve cayendo inmersiva
             if (snowPoints) {
                 const snowPos = snowPoints.geometry.attributes.position.array as Float32Array;
-                for (let i = 0; i < 2000; i++) {
+                for (let i = 0; i < snowPos.length / 3; i++) {
                     const idx = i * 3;
-                    
+
                     // Caída vertical con variaciones basadas en el índice
                     const speed = 0.05 + ((i % 10) / 10) * 0.08;
                     const wiggleSpeed = 0.8 + ((i % 7) / 7) * 1.5;
                     const offset = (i % 5) * (Math.PI / 2.5);
-                    
+
                     snowPos[idx + 1] -= speed;
-                    
+
                     // Oscilación lateral (viento suave en 3D)
                     snowPos[idx] += Math.sin(time * wiggleSpeed + offset) * 0.018;
                     snowPos[idx + 2] += Math.cos(time * 0.5 * wiggleSpeed + offset) * 0.012;
-                    
-                    // Si cae por debajo del nivel del terreno o se queda detrás de la cámara, 
+
+                    // Si cae por debajo del nivel del terreno o se queda detrás de la cámara,
                     // la reubicamos adelante en el túnel de vuelo para mantener densidad constante.
                     const px = snowPos[idx];
                     const py = snowPos[idx + 1];
                     const pz = snowPos[idx + 2];
                     const terrainH = getTerrainHeight(px, pz);
-                    
+
                     if (py < terrainH - 1.0 || pz > camera.position.z + 15.0) {
                         snowPos[idx] = camera.position.x + ((Math.random() - 0.5) * 110);
                         snowPos[idx + 1] = camera.position.y + 12.0 + (Math.random() * 22.0);
@@ -2338,19 +2436,19 @@ export default function ContactoPage() {
             // Animar nieve bokeh en el lente (primer plano cinematográfico)
             if (lensSnowPoints) {
                 const lensPos = lensSnowPoints.geometry.attributes.position.array as Float32Array;
-                for (let i = 0; i < 120; i++) {
+                for (let i = 0; i < lensPos.length / 3; i++) {
                     const idx = i * 3;
-                    
-                    const speed = 0.08 + ((i % 8) / 8) * 0.12; 
+
+                    const speed = 0.08 + ((i % 8) / 8) * 0.12;
                     const wiggleSpeed = 1.2 + ((i % 5) / 5) * 1.5;
                     const offset = (i % 4) * (Math.PI / 2.0);
-                    
+
                     lensPos[idx + 1] -= speed;
                     lensPos[idx] += Math.sin(time * wiggleSpeed + offset) * 0.03;
-                    
+
                     const py = lensPos[idx + 1];
                     const pz = lensPos[idx + 2];
-                    
+
                     if (py < camera.position.y - 10.0 || pz > camera.position.z + 5.0) {
                         lensPos[idx] = camera.position.x + ((Math.random() - 0.5) * 25.0);
                         lensPos[idx + 1] = camera.position.y + 10.0 + (Math.random() * 10.0);
@@ -2374,6 +2472,7 @@ export default function ContactoPage() {
         return () => {
             window.removeEventListener('mousemove', onDocumentMouseMove);
             window.removeEventListener('wheel', onDocumentWheel);
+            window.removeEventListener('touchend', onDocumentTouchEnd);
             window.removeEventListener('touchstart', onDocumentTouchStart);
             window.removeEventListener('touchmove', onDocumentTouchMove);
             window.removeEventListener('pointerdown', onPointerDown);
@@ -2393,24 +2492,24 @@ export default function ContactoPage() {
     }, []);
 
     return (
-        <div className="relative w-screen h-screen overflow-hidden select-none">
+        <div data-lenis-prevent className="fixed inset-0 overflow-hidden overscroll-none select-none">
             {/* Fondo Atardecer Espacial/Twilight */}
-            <div 
+            <div
                 ref={twilightBgRef}
                 className="absolute inset-0 transition-opacity duration-500 ease-out pointer-events-none z-0"
-                style={{ 
+                style={{
                     background: 'linear-gradient(to bottom, #090312 0%, #15092a 30%, #251249 55%, #32254f 75%, #563352 90%, #7c4c42 100%)',
                     opacity: 1
-                }} 
+                }}
             />
             {/* Fondo Día Brillante/Daytime */}
-            <div 
+            <div
                 ref={dayBgRef}
                 className="absolute inset-0 transition-opacity duration-500 ease-out pointer-events-none z-0"
-                style={{ 
+                style={{
                     background: 'linear-gradient(to bottom, #1a73e8 0%, #4ea2ff 35%, #8fd1ff 65%, #ccebff 85%, #f0f9ff 100%)',
                     opacity: 0
-                }} 
+                }}
             />
             {/* Contenedor del Canvas de Three.js */}
             <div ref={mountRef} className="absolute inset-0 z-10" />
@@ -2465,7 +2564,9 @@ export default function ContactoPage() {
             <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 px-6 py-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white text-xs font-mono uppercase tracking-[0.15em] flex items-center gap-2 pointer-events-none transition-all duration-500 ${
                 showCard ? "opacity-0 translate-y-4" : "opacity-100 animate-bounce"
             }`}>
-                <span>Scroll para volar 🦋 · Click para magia ✨</span>
+                {/* En pantallas táctiles no hay rueda ni click: el cartel lo dice como se hace ahí. */}
+                <span className="hidden whitespace-nowrap md:inline">Scroll para volar 🦋 · Click para magia ✨</span>
+                <span className="whitespace-nowrap md:hidden">Deslizá para volar 🦋</span>
             </div>
 
             {/* Selector de vistas de cámara */}

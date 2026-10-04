@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 
-export function Nosotros3dCover() {
+/**
+ * Oficina 3D del hero de Nosotros. Si recibe `trackRef`, la cámara recorre la
+ * oficina según el avance del scroll sobre ese elemento (el hero fijado); si
+ * no, según el scroll de toda la página.
+ */
+export function Nosotros3dCover({ trackRef }: { trackRef?: RefObject<HTMLElement | null> } = {}) {
   const mountRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useRef(0);
   const [webGLSupported, setWebGLSupported] = useState(false);
@@ -36,7 +41,7 @@ export function Nosotros3dCover() {
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("#101018");
-    scene.fog = new THREE.FogExp2("#101018", 0.025);
+    scene.fog = new THREE.FogExp2("#120e1a", 0.022);
 
     const camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 150);
 
@@ -45,6 +50,8 @@ export function Nosotros3dCover() {
     const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.25;
     renderer.shadowMap.enabled = !isMobile;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -108,8 +115,9 @@ export function Nosotros3dCover() {
     const woodMaterial = new THREE.MeshStandardMaterial({ color: "#8b5a2b", roughness: 0.8 });
     const darkMetalMaterial = new THREE.MeshStandardMaterial({ color: "#1a1a1a", roughness: 0.4, metalness: 0.9 });
     const silverMetalMaterial = new THREE.MeshStandardMaterial({ color: "#e0e0e0", roughness: 0.3, metalness: 0.8 });
-    const wallMaterial = new THREE.MeshStandardMaterial({ color: "#1a1a24", roughness: 0.95 });
-    const floorMaterial = new THREE.MeshStandardMaterial({ color: "#0a0a10", roughness: 0.8 });
+    const wallMaterial = new THREE.MeshStandardMaterial({ color: "#2a2433", roughness: 0.9 });
+    // Piso semibrillante: refleja los neones y le da profundidad a la sala.
+    const floorMaterial = new THREE.MeshStandardMaterial({ color: "#16121e", roughness: 0.32, metalness: 0.35 });
 
     const sofaColor = new THREE.MeshStandardMaterial({ color: "#7b2fd6", roughness: 0.3 });
     const sofaCushion = new THREE.MeshStandardMaterial({ color: "#eca8d6", roughness: 0.5 });
@@ -122,9 +130,11 @@ export function Nosotros3dCover() {
     const posterMaterial = new THREE.MeshBasicMaterial({ map: createPosterTexture("COSECHA CREATIVA", "#ffd27a") });
 
     // --- 4. ILUMINACIÓN MULTICOLOR ---
-    scene.add(new THREE.AmbientLight("#ffffff", 0.2));
+    scene.add(new THREE.AmbientLight("#ffffff", 0.35));
+    // Luz de cielo cálida arriba / rebote violeta abajo: la sala deja de ser un pozo negro.
+    scene.add(new THREE.HemisphereLight("#ffe2c4", "#2b1a3a", 0.9));
 
-    const dirLight = new THREE.DirectionalLight("#ffffff", 0.5);
+    const dirLight = new THREE.DirectionalLight("#fff1dd", 1.1);
     dirLight.position.set(10, 20, 10);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 2048;
@@ -381,14 +391,53 @@ export function Nosotros3dCover() {
     signGroup.position.set(0, 5.4, -9.9);
     officeGroup.add(signGroup);
 
+    // Tiras LED de marca al pie de las paredes: dibujan el contorno de la sala.
+    const ledColors = ["#eca8d6", "#67e8f9", "#a78bfa"];
+    const ledMats = ledColors.map((c) => new THREE.MeshBasicMaterial({ color: c }));
+    const ledBack = new THREE.Mesh(new THREE.BoxGeometry(30, 0.06, 0.06), ledMats[0]);
+    ledBack.position.set(0, 0.05, -9.7);
+    officeGroup.add(ledBack);
+    const ledTop = new THREE.Mesh(new THREE.BoxGeometry(30, 0.05, 0.05), ledMats[2]);
+    ledTop.position.set(0, 9.5, -9.7);
+    officeGroup.add(ledTop);
+    const ledSide = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 30), ledMats[1]);
+    ledSide.position.set(-14.7, 0.05, 0);
+    officeGroup.add(ledSide);
+    const ledGlow = new THREE.PointLight("#eca8d6", 18, 14);
+    ledGlow.position.set(0, 0.6, -8.8);
+    scene.add(ledGlow);
+
+    // Polvo en suspensión: con la luz de los neones da volumen al aire.
+    const dustCount = isMobile ? 160 : 420;
+    const dustPos = new Float32Array(dustCount * 3);
+    for (let i = 0; i < dustCount; i++) {
+      dustPos[i * 3] = (Math.random() - 0.5) * 28;
+      dustPos[i * 3 + 1] = Math.random() * 9;
+      dustPos[i * 3 + 2] = (Math.random() - 0.5) * 26;
+    }
+    const dustGeo = new THREE.BufferGeometry();
+    dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
+    const dustMat = new THREE.PointsMaterial({
+      color: "#ffd9ef",
+      size: 0.05,
+      transparent: true,
+      opacity: 0.55,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    const dust = new THREE.Points(dustGeo, dustMat);
+    scene.add(dust);
+
     // --- 6. TRAYECTORIAS DE CÁMARA VINCULADAS AL SCROLL ---
     const cameraPath = new THREE.CatmullRomCurve3([
       new THREE.Vector3(0, 6, 12),
       new THREE.Vector3(-3, 3.5, 6),
       new THREE.Vector3(2, 3, 2),
       new THREE.Vector3(-4, 2.5, -1),
-      new THREE.Vector3(0, 3.5, -4),
-      new THREE.Vector3(6, 5, 8),
+      // Cierre: toma amplia con la oficina corrida a la derecha, para que el
+      // texto del hero se lea a la izquierda.
+      new THREE.Vector3(3, 4.5, 7),
+      new THREE.Vector3(3, 6.5, 15),
     ]);
 
     const targetPath = new THREE.CatmullRomCurve3([
@@ -396,8 +445,8 @@ export function Nosotros3dCover() {
       new THREE.Vector3(0, 2, -4),
       new THREE.Vector3(2, 1.8, 0),
       new THREE.Vector3(-6, 2, -2),
-      new THREE.Vector3(0, 5.4, -10),
-      new THREE.Vector3(-3, 3, -3),
+      new THREE.Vector3(-4, 2.5, -4),
+      new THREE.Vector3(-8.5, 2.2, -2),
     ]);
 
     // --- 7. BUCLE DE ANIMACIÓN ---
@@ -411,6 +460,8 @@ export function Nosotros3dCover() {
       animationFrameId = requestAnimationFrame(animate);
       const time = clock.getElapsedTime();
 
+      dust.rotation.y = time * 0.01;
+      dust.position.y = Math.sin(time * 0.3) * 0.15;
       if (ringLightEmissive) {
         ringLightEmissive.emissiveIntensity = 2 + Math.sin(time * 5) * 0.5 + Math.random() * 0.2;
       }
@@ -425,8 +476,8 @@ export function Nosotros3dCover() {
       vectorDestino.y += Math.cos(time * 0.4) * 0.08;
 
       // Interpolación
-      camera.position.lerp(vectorDestino, 0.035);
-      currentLookAt.lerp(lookAtDestino, 0.045);
+      camera.position.lerp(vectorDestino, 0.06);
+      currentLookAt.lerp(lookAtDestino, 0.07);
       camera.lookAt(currentLookAt);
 
       renderer.render(scene, camera);
@@ -436,10 +487,18 @@ export function Nosotros3dCover() {
 
     // VINCULAR AL SCROLL DE LA PÁGINA GLOBAL
     const handleScroll = () => {
+      const track = trackRef?.current;
+      if (track) {
+        const r = track.getBoundingClientRect();
+        const total = r.height - window.innerHeight;
+        scrollProgress.current = total > 0 ? Math.max(0, Math.min(1, -r.top / total)) : 0;
+        return;
+      }
       const scrollY = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       scrollProgress.current = docHeight > 0 ? scrollY / docHeight : 0;
     };
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     // AJUSTAR REDIMENSIONADO DE FORMA SEGURA DENTRO DE LA TARJETA
@@ -457,12 +516,15 @@ export function Nosotros3dCover() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationFrameId);
+      dustGeo.dispose();
+      dustMat.dispose();
+      ledMats.forEach((m) => m.dispose());
       if (container && renderer.domElement) {
         container.removeChild(renderer.domElement);
       }
       renderer.dispose();
     };
-  }, []);
+  }, [trackRef]);
 
   return (
     <div
